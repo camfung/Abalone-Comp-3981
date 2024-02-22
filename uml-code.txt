@@ -1,0 +1,24 @@
+classDiagram
+    class Input {
+        + start(): void
+        + stop(): void
+        + pause(): void
+        + reset(): void
+        + undo(): void
+        + move(): void
+    }
+
+    class Output {
+        - game_score: int
+        + display_game_score(): void
+        + display_time_taken(): void
+        + display_next_move(): void
+        + display_board(): void
+    }
+
+    class Configuration {
+        + initialize_board_layout(): void
+        + select_player_color(): void
+        + set_move_limit(): void
+        + set_time_limit(): void
+    }
