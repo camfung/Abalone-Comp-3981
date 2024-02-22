@@ -3,4 +3,4 @@
 Cameron Fung 
 Elsa Ho
 Callum Goss
-Joseph Dreidger
+Joseph Driedger
