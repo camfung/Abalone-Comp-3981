@@ -1,96 +1,111 @@
 classDiagram
     %%% Gameplay Module
-    class Space {
-        - name: String
-        - value: Value
-        - neighbor_spaces: Space[]
+    namespace Gameplay {
+        class Space {
+            - name: String
+            - value: Value
+            - neighbor_spaces: Space[]
 
-        + get_name(): String
-        + get_value(): int
-        + get_neighbor_spaces(): Space[]
-    }
+            + get_name(): String
+            + get_value(): int
+            + get_neighbor_spaces(): Space[]
+        }
 
-    class Value {
-        <<enumeration>>
-        WHITE
-        EMPTY
-        BLACK
-    }
+        class Value {
+            <<enumeration>>
+            WHITE
+            EMPTY
+            BLACK
+        }
 
-    class Game {
-        - state_space: Action[]
-        - 
-        + get_state_space(): Action[]
-        + calc_white_move(): Action
-        + calc_black_move(): Action
-        - terminal_test(action: Action): bool
-        - max_value(action: Action, a: int, b: int): int
-        - min_value(action: Action, a: int, b: int): int
-    }
+        class Game {
+            - state_space: Action[]
+            - 
+            + get_state_space(): Action[]
+            + calc_white_move(): Action
+            + calc_black_move(): Action
+            - terminal_test(action: Action): bool
+            - max_value(action: Action, a: int, b: int): int
+            - min_value(action: Action, a: int, b: int): int
+        }
 
-    class Action {
-        + is_valid(): bool
-    }
+        class Action {
+            + is_valid(): bool
+        }
 
-    class Formation {
-        <<enumeration>>
-        DEFAULT
-        BELGIAN_DAISY
-        GERMAN_DAISY
-    }
+        class Formation {
+            <<enumeration>>
+            DEFAULT
+            BELGIAN_DAISY
+            GERMAN_DAISY
+        }
 
-    class RecordHistory {
-        - game_counter: int
-        - records: Record[]
-        + get_game_id(): int
-        + get_records(): Record[]
-        + get_record(index: int): Record
-    }
+        class RecordHistory {
+            - game_counter: int
+            - records: Record[]
+            + get_game_id(): int
+            + get_records(): Record[]
+            + get_record(index: int): Record
+        }
 
-    class Record {
-        - index: int
-        - game_id: int
-        - move: String
-        + __init__(): Record
-        + get_index(): int
-        + get_game_id: int
-        + get_move(): String
+        class Record {
+            - index: int
+            - game_id: int
+            - move: String
+            + __init__(): Record
+            + get_index(): int
+            + get_game_id: int
+            + get_move(): String
+        }
+
+
     }
 
     %%% Input Module
-    class Input {
-        + start(): void
-        + stop(): void
-        + pause(): void
-        + reset(): void
-        + undo(): void
-        + move(): void
+    namespace Input {
+        class ButtonManager {
+            + start(): void
+            + stop(): void
+            + pause(): void
+            + reset(): void
+            + undo(): void
+            + move(): void
+        }
     }
+    
 
     %%% Output Module
-    class Output {
-        - game_score: int
-        + display_game_score(): void
-        + display_time_taken(): void
-        + display_next_move(): void
-        + display_board(): void
-    }
+    namespace Output {
+        class OutputClass {
+            - game_score: int
+            + display_game_score(): void
+            + display_time_taken(): void
+            + display_next_move(): void
+            + display_board(): void
+        }
 
-    class GUI {
-        + display_game_score(): void
-        + display_time_taken(): void
-        + display_next_move(): void
-        + display_board(): void
+        class GUI {
+            + display_game_score(): void
+            + display_time_taken(): void
+            + display_next_move(): void
+            + display_board(): void
+        }
     }
+    
 
     %%% Configuration Module
-    class Configuration {
-        + initialize_board_layout(): void
-        + select_player_color(): void
-        + set_move_limit(): void
-        + set_time_limit(): void
+    namespace Configuration {
+        class ConfigurationClass {
+            + initialize_board_layout(): void
+            + select_player_color(): void
+            + set_move_limit(): void
+            + set_time_limit(): void
+        }
+
+        
     }
+    
 
     %%% Dependencies
     Space --> Value
-    Input --> Computer
+    InputClass --> Game
