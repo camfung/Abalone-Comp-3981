@@ -29,6 +29,12 @@ jobs:
         uses: actions/setup-node@v3
         with: 
               node-version: '14'
+
+
+      - name: Install Mermaid CLI
+        run: npm install -g @mermaid-js/mermaid-cli
+
+          
       - name: Generate Diagram
         run: mmdc -i uml-code.txt -0 diagram.png -t dark -b black
 
