@@ -24,18 +24,6 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
-      - name: test
-        run: echo "${{ secrets.TEST }}"
-             echo "${{ secrets.GH_PAT}}"
-             echo "hello eolrd"
-        
-      - name: Configure Git
-        run: |
-          git config user.name "camfung"
-          git config user.email "cameronfuung@gmail.com"
-          git remote set-url origin https://camfung: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@github.com/camfung/Abalone-Comp-3981.git
-
       - name: Set up Node
         uses: actions/setup-node@v3
         with: 
@@ -48,14 +36,13 @@ jobs:
       - name: Generate Diagram
         run: mmdc -i uml-code.txt -o diagram.png -t dark -b black
 
-      - name: Configure Git
+      - name: Commit files
         run: |
-          git config user.name "camfung"
-          git config user.email "cameronfuung@gmail.com"
-          git remote set-url origin https://camfung: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@github.com/camfung/Abalone-Comp-3981.git
-
-      - name: Commit and Push Diagram
-        run: |
-          git add diagram.png
-          git commit -m "Update diagram" || echo "No changes to commit"
-          git push
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -a -m "Add changes"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
