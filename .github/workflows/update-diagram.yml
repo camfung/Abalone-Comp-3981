@@ -41,11 +41,14 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: echo Hello, world!
+      - name: Configure Git
+        run: |
+          git config user.name "camfung"
+          git config user.email "cameronfuung@gmail.com"
+          git remote set-url origin https://camfung:${{ secrets.GH_PAT }}@github.com/Abalone-Comp-3981.git
 
       - name: Commit and Push Diagram
         run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
           git add diagram.png
           git commit -m "Update diagram" || echo "No changes to commit"
           git push
