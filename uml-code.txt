@@ -108,4 +108,4 @@ classDiagram
 
     %%% Dependencies
     Space --> Value
-    InputClass --> Game
+    InputClass --> Game 
