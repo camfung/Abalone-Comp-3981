@@ -25,6 +25,16 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
+      - name: test
+        run: echo ${{ secrets.TEST }} 
+             echo ${{ secrets.GH_PAT}}
+        
+      - name: Configure Git
+        run: |
+          git config user.name "camfung"
+          git config user.email "cameronfuung@gmail.com"
+          git remote set-url origin https://camfung:${{ secrets.GH_PAT }}@github.com/camfung/Abalone-Comp-3981.git
+
       - name: Set up Node
         uses: actions/setup-node@v3
         with: 
@@ -34,13 +44,9 @@ jobs:
       - name: Install Mermaid CLI
         run: npm install -g @mermaid-js/mermaid-cli
 
-          
       - name: Generate Diagram
         run: mmdc -i uml-code.txt -o diagram.png -t dark -b black
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
       - name: Configure Git
         run: |
           git config user.name "camfung"
