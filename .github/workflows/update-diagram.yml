@@ -26,8 +26,9 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: test
-        run: echo ${{ secrets.TEST }} 
-             echo ${{ secrets.GH_PAT}}
+        run: echo "${{ secrets.TEST }}"
+             echo "${{ secrets.GH_PAT}}"
+             echo "hello eolrd"
         
       - name: Configure Git
         run: |
