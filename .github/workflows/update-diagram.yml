@@ -45,7 +45,7 @@ jobs:
         run: |
           git config user.name "camfung"
           git config user.email "cameronfuung@gmail.com"
-          git remote set-url origin https://camfung:${{ secrets.GH_PAT }}@github.com/Abalone-Comp-3981.git
+          git remote set-url origin https://camfung:${{ secrets.GH_PAT }}@github.com/camfung/Abalone-Comp-3981.git
 
       - name: Commit and Push Diagram
         run: |
