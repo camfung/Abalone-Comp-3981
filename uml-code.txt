@@ -55,6 +55,9 @@ namespace GameLogic {
         + join_room(roomId, player) : bool
         +leave_room(observer : Observer) : void
         +notify() : void:
+    class Game {
+        - gameState : GameState
+        - recordHistory : RecordHistory
         - StartingFormatoin : Formation
         +makeMove(player: Player, move: Move) : void
         +getGameState() : GameState
