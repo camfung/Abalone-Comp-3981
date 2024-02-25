@@ -34,7 +34,7 @@ jobs:
         run: npm install -g @mermaid-js/mermaid-cli
 
       - name: Generate Diagram
-        run: mmdc -i uml-code.txt -o diagram.png -b black -w 3000 -H 3000
+        run: mmdc -i uml-code.txt -o diagram.png -w 3000 -H 3000
 
       - name: Commit files
         run: |
