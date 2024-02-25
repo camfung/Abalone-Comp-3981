@@ -66,6 +66,7 @@ namespace GameLogic {
     }
 
     class GameManger {
+        <<Singleton>>
         - players : List[Observer]
         - roomId
         + join_game(roomId, player) : bool
