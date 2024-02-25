@@ -54,7 +54,9 @@ namespace GameLogic {
         - players : List[Observer]
         + join_room(roomId, player) : bool
         +leave_room(observer : Observer) : void
-        +notify() : void:
+        +notify() : void
+    }
+
     class Game {
         - gameState : GameState
         - recordHistory : RecordHistory
@@ -64,7 +66,6 @@ namespace GameLogic {
     }
 
     class GameManger {
-        <<Singleton>>
         - players : List[Observer]
         - roomId
         + join_game(roomId, player) : bool
