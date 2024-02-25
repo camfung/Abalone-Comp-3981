@@ -6,7 +6,7 @@ namespace Players {
         <<abstract>>
         - game_state
         +update() : void
-        +makeMove(gameManager : GameManager, player: Player, move: Move) : void
+        +make_move(gameManager : GameManager, player: Player, move: Move) : void
         +undo_last_move(gameManager : GameManager, player : Player, move : Move) : void
     }
 
@@ -25,7 +25,7 @@ namespace driver {
     class App {
         <<Singleton>>
        - game : GameManager 
-       - gui : gui
+       - gui : Gui
     }
     class Gui {
         <<Singleton>>
@@ -65,8 +65,8 @@ namespace GameLogic {
         - gameState : GameState
         - recordHistory : RecordHistory
         - StartingFormation : Formation
-        +makeMove(player: Player, move: Move) : void
-        +getGameState() : GameState
+        +make_move(player: Player, move: Move) : void
+        + get_game_state() : GameState
         + start_game() : void
         + stop_game() : void
         + pause_game() : void
@@ -76,11 +76,11 @@ namespace GameLogic {
     class GameManger {
         <<Singleton>>
         - players : List[Observer]
-        - roomId
+        - room_id
         + join_game(roomId, player) : bool
         + leave_game(observer : Observer) : void
         + notify() : void
-        + makeMove(player: Player, move: Move)
+        + make_move(player: Player, move: Move)
     }
 
     class GameState {
