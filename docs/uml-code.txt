@@ -1,16 +1,13 @@
 classDiagram
 direction RL
-
-namespace players {
+namespace Players {
 
     class Player {
         <<abstract>>
         - game_state
-		- numBalls : int
-		- color : Marble
-        + update() : void
-        + make_move(gameManager : GameManager, player: Player, move: Move) : void
-        + undo_last_move(gameManager : GameManager, player : Player, move : Move) : void
+        +update() : void
+        +make_move(gameManager : GameManager, player: Player, move: Move) : void
+        +undo_last_move(gameManager : GameManager, player : Player, move : Move) : void
     }
 
     class HumanPlayer {
@@ -19,36 +16,19 @@ namespace players {
 
     class AbaloneAgent {
         - generate_move()
-		+ calc_move() : Action
-		+ max_move(): Utility
-		+ min_move(): Utility
     }
 } 
-
-Player --> Move : Makes
-HumanPlayer --|> Player
-AbaloneAgent --|> Player
-
+    Player --> Move : Makes
+    HumanPlayer --|> Player
+    AbaloneAgent --|> Player
 namespace driver {
     class App {
         <<Singleton>>
        - game : GameManager 
        - gui : Gui
-       + run() 
     }
-
-}
-
-App *-- Gui : has a
-App --|> Observer : is a
-
-namespace Ui {
-        class Gui {
+    class Gui {
         <<Singleton>>
-        - main_menu
-        - settings_menu
-        - configuration_menu
-        
         + update_screen(game_state: GameState)
         + display_score(record: Record)
         + display_moves(record: Record)
@@ -56,7 +36,8 @@ namespace Ui {
 
     }
 }
-
+App *-- Gui : has a
+App --|> Observer : is a
 namespace API {
         class Move{
         <<abstract>>
@@ -81,7 +62,6 @@ namespace GameLogic {
     }
 
     class Game {
-        - game_id
         - gameState : GameState
         - recordHistory : RecordHistory
         - StartingFormation : Formation
@@ -91,6 +71,8 @@ namespace GameLogic {
         + stop_game() : void
         + pause_game() : void
         + reset_game() : void
+		+ get_valid_moves(player: Player) : GameState
+		- get_valid_move(init_pos: Tuple): Tuple(Move)
     }
 
     class GameManger {
@@ -101,6 +83,7 @@ namespace GameLogic {
         + leave_game(observer : Observer) : void
         + notify() : void
         + make_move(player: Player, move: Move)
+		+ get_valid_moves(player: Player) : GameState
     }
 
     class GameState {
@@ -110,34 +93,7 @@ namespace GameLogic {
         + calc_black_move(): Move
         + make_move(player, move)
     }
-    class GameConfiguration {
-        + initialize_board_layout(): void
-        + select_player_color(): void
-        + set_move_limit(): void
-        + set_time_limit(): void
-    }
-
-
-}
-
-App *-- GameManger : has a
-App *-- Player : has 2
-Game *-- Formation : has a
-Game *-- RecordHistory : has a
-Game *-- GameState : has a
-Game --> Move : uses
-Game o-- GameConfiguration : has a 
-GameManger --|> Observable : is a
-Observable o-- Observer : has many
-Observable *-- Game : has a
-Observer --> Observable : observes
-Observer <|-- Player : implements
-RecordHistory *-- Record : has many
-Record o-- Move : has a 
-
-namespace Records {
     class RecordHistory {
-        - game_id
         - game_counter: int
         - records: Record[]
         + get_game_id(): int
@@ -154,20 +110,39 @@ namespace Records {
         + get_game_id: int
         + get_move(): String
     }
-}
-
-namespace Enums {
+	
+    class GameConfiguration {
+        + initialize_board_layout(): void
+        + select_player_color(): void
+        + set_move_limit(): void
+        + set_time_limit(): void
+    }
+	
     class Formation {
         <<enumeration>>
         DEFAULT
         BELGIAN_DAISY
         GERMAN_DAISY
     }
-
-    class Marble {
-        <<enumeration>>
-        WHITE
-        BLACK
-        NONE
-    }
+	
+	class Move {
+		<<enumeration>>
+		SINGLE
+		INLINE
+		SIDESTEP
+	}
 }
+App *-- GameManger : has a
+App *-- Player : has 2
+Game *-- Formation : has a
+Game *-- RecordHistory : has a
+Game *-- GameState : has a
+Game --> Move : uses
+Game o-- GameConfiguration : has a 
+GameManger --|> Observable : is a
+Observable o-- Observer : has many
+Observable *-- Game : has a
+Observer --> Observable : observes
+Observer <|-- Player : implements
+RecordHistory *-- Record : has many
+Record o-- Move : has a 
