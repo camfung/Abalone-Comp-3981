@@ -1,3 +1,4 @@
+```mermaid
 classDiagram
 direction RL
 namespace Players {
@@ -70,7 +71,6 @@ namespace GameLogic {
     }
 
     class Game {
-        - game_id
         - gameState : GameState
         - recordHistory : RecordHistory
         - StartingFormation : Formation
@@ -124,7 +124,6 @@ RecordHistory *-- Record : has many
 Record o-- Move : has a 
 namespace Records {
     class RecordHistory {
-        - game_id
         - game_counter: int
         - records: Record[]
         + get_game_id(): int
@@ -158,3 +157,4 @@ namespace Enums {
         NONE
     }
 }
+```
