@@ -1,0 +1,42 @@
+Game Board Representation
+- An 11 by 11 2D array. Null represents spaces outside the board
+- Nulls are included in the array to account for the 0 index
+[
+	[null, null, null, null, null, null, null, null, null, null, null],
+	[null, A1, A2, A3, A4, A5, null, null, null, null, null],
+	[null, B1, B2, B3, B4, B5, B6, null, null, null, null],
+	[null, C1, C2, C3, C4, C5, C6, C7, null, null, null],
+	[null, D1, D2, D3, D4, D5, D6, D7, D8, null, null],
+	[null, E1, E2, E3, E4, E5, E6, E7, E8, E9, null],
+	[null, null, F2, F3, F4, F5, F6, F7, F8, F9, null],
+	[null, null, null, G3, G4, G5, G6, G7, G8, G9, null],
+	[null, null, null, null, H4, H5, H6, H7, H8, H9, null],
+	[null, null, null, null, null, I5, I6, I7, I8, I9, null],
+	[null, null, null, null, null, null, null, null, null, null, null]
+]
+
+
+Move Notation
+[(FirstBall_I, LastBall_I), (FirstBall_F, LastBall_F), MoveType]
+
+State Representation
+- An 11 by 11 array where spaces are either 0, 1, -1, or null
+- 0 represents a space occupied by a black marble
+- 1 represents a space occupied by a white marble
+- -1 represents an empty space
+- null represents a space that is outside the board
+
+-TODO: Include an example state representation
+
+Initial State
+-TODO: Include arrays to represent the 3 initial states
+
+Actions
+-TODO: Add example actions based upon the move notation
+
+Transition Model
+-TODO: Insert a table with current state, action taken, and the resulting state. Include examples for all 3 move types.
+
+Goal Test
+When a player only has 8 balls left in the game.
+(Player.numBalls == 8)
