@@ -5,12 +5,18 @@ namespace players {
 
     class Player {
         <<abstract>>
-        - game_state
+        - time_limit : time
+        - move_limit : int
+        - current_move : int
 		- numBalls : int
 		- color : Marble
         + update() : void
+        + get_game_state(gameManager: GameManager)
         + make_move(gameManager : GameManager, player: Player, move: Move) : void
         + undo_last_move(gameManager : GameManager, player : Player, move : Move) : void
+        + select_player_color(): void
+        + set_move_limit(): void
+        + set_time_limit(): void
     }
 
     class HumanPlayer {
@@ -25,25 +31,37 @@ namespace players {
     }
 } 
 
-Player --> Move : Makes
-HumanPlayer --|> Player
-AbaloneAgent --|> Player
-
 namespace driver {
     class App {
         <<Singleton>>
        - game : GameManager 
-       - gui : Gui
+       - gui : PygameUI
        + run() 
     }
 
 }
 
-App *-- Gui : has a
-App --|> Observer : is a
+namespace API {
+        class Move{
+        - move_state
+        - player
+    }
+class Observer {
+        <<interface>>
+        +update() : void
+    }
+
+}
 
 namespace Ui {
-        class Gui {
+    class UI {
+        <<abstract>> 
+        - elements : Drawable
+        + display_board(gameManager: GameManager)
+        + get_player
+        + update()
+    }
+        class PygameUI {
         <<Singleton>>
         - main_menu
         - settings_menu
@@ -55,19 +73,17 @@ namespace Ui {
         + display_time_per_move(record : Record)
 
     }
-}
-
-namespace API {
-        class Move{
-        <<abstract>>
-        - move_state
-        - player
-    }
-class Observer {
-        <<interface>>
-        +update() : void
+    class Drawable {
+        <<interface>> 
+        + draw()
     }
 
+    class HUD {
+
+    }
+    class Board {
+
+    }
 }
 
 namespace GameLogic {
@@ -84,23 +100,21 @@ namespace GameLogic {
         - game_id
         - gameState : GameState
         - recordHistory : RecordHistory
-        - StartingFormation : Formation
         + make_move(player: Player, move: Move) : void
         + get_game_state() : GameState
-        + start_game() : void
-        + stop_game() : void
-        + pause_game() : void
-        + reset_game() : void
     }
 
-    class GameManger {
+    class GameManager {
         <<Singleton>>
         - players : List[Observer]
-        - room_id
         + join_game(roomId, player) : bool
         + leave_game(observer : Observer) : void
         + notify() : void
         + make_move(player: Player, move: Move)
+        + start_game() : void
+        + stop_game() : void
+        + pause_game() : void
+        + reset_game() : void
     }
 
     class GameState {
@@ -112,28 +126,12 @@ namespace GameLogic {
     }
     class GameConfiguration {
         + initialize_board_layout(): void
-        + select_player_color(): void
-        + set_move_limit(): void
-        + set_time_limit(): void
+        - create_game_state() : GameState
+        - StartingFormation : Formation
     }
 
 
 }
-
-App *-- GameManger : has a
-App *-- Player : has 2
-Game *-- Formation : has a
-Game *-- RecordHistory : has a
-Game *-- GameState : has a
-Game --> Move : uses
-Game o-- GameConfiguration : has a 
-GameManger --|> Observable : is a
-Observable o-- Observer : has many
-Observable *-- Game : has a
-Observer --> Observable : observes
-Observer <|-- Player : implements
-RecordHistory *-- Record : has many
-Record o-- Move : has a 
 
 namespace Records {
     class RecordHistory {
@@ -171,3 +169,30 @@ namespace Enums {
         NONE
     }
 }
+AbaloneAgent --|> Player
+App *-- GameManager : has a
+App *-- Player : has 2
+App *-- UI : has a
+App --|> Observer : is a
+Drawable <|-- HUD
+Drawable <|-- Board
+Game *-- Formation : has a
+Game *-- GameState : has a
+Game *-- RecordHistory : has a
+Game --> Move : uses
+Game o-- GameConfiguration : has a
+GameManager --|> Observable : is a
+GameManager *-- Player : has a
+HumanPlayer --|> Player
+Move --|> Record : has a
+Observable *-- Game : has a
+Observable o-- Observer : has many
+Observer --> Observable : observes
+Observer <|-- Player : implements
+Player ..> GameManager : uses
+Player --> Move : Makes
+PygameUI --|> UI
+RecordHistory *-- Record : has many
+UI *-- Drawable
+UI --|> Observer : is a
+UI ..> GameManager : uses
