@@ -20,3 +20,12 @@ class Marble(Enum):
     BLACK = 1
     NONE = 0
 
+
+class Direction(Enum):
+    """
+    Direction Enumeration for Move Directions
+    """
+    UP = auto()
+    DOWN = auto()
+    LEFT = auto()
+    RIGHT = auto()

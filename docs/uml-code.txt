@@ -42,20 +42,23 @@ namespace Driver {
 }
 
 namespace API {
-        class Move{
-        - move_state
-        - player
-    }
-class Observer {
-        <<interface>>
-        +update() : void
+    class Move {
+        - pos_i :  (first_ball_i : tuple(int, int), last_ball_i: tuple(int, int))
+        - pos_f : (first_ball_f: tuple(int, int), last_ball_f: tuple(int, int))
+        - direction : Direction(Enum)
+        - player : Marble
+        + __str__() : String
     }
 
+    class Observer {
+        <<interface>>
+        + update() : void
+    }
 }
 
 namespace Ui {
     class UI {
-        <<abstract>> 
+        <<abstract>>
         - elements : Drawable
         + display_board(gameManager: GameManager)
         + get_player
@@ -66,7 +69,7 @@ namespace Ui {
         - main_menu
         - settings_menu
         - configuration_menu
-        
+
         + update_screen(game_state: GameState)
         + display_score(record: Record)
         + display_moves(record: Record)
@@ -74,7 +77,7 @@ namespace Ui {
 
     }
     class Drawable {
-        <<interface>> 
+        <<interface>>
         + draw()
     }
 
@@ -91,24 +94,30 @@ namespace GameLogic {
         <<abstract>>
         - game_state : Game
         - players : List[Observer]
-        + join_room(roomId, player) : bool
+        + join_room(player) : bool
         + leave_room(observer : Observer) : void
         + notify() : void
     }
 
     class Game {
-        - game_id
+        + id_counter : int$
+        - game_id : int
         - current_game_state : GameState
+        - previous_game_state : GameState
         - record_history : RecordHistory
         + initialize_board_layout(formation: Formation) : GameState$
         + set_move(player: Player, move: Move) : void
         + get_current_game_state() : GameState
+        + get_previous_game_state() : GameState
     }
 
     class GameManager {
         <<Singleton>>
+        - instance : GameManager$
         - players : List[Observer]
-        + join_game(roomId, player) : bool
+        + get_instance(): GameManager$
+        + __init__() : GameManager
+        + join_game(room_id, player) : bool
         + leave_game(observer : Observer) : void
         + notify() : void
         + make_move(player: Player, move: Move)
@@ -116,10 +125,11 @@ namespace GameLogic {
         + stop_game() : void
         + pause_game() : void
         + reset_game() : void
+        + undo_last_move() : void
     }
 
     class GameState {
-        - board : int[][]
+        - board : list(list[int])
         + get_state_space(): Move[]
         + calc_white_move(): Move
         + calc_black_move(): Move
@@ -162,6 +172,14 @@ namespace Enums {
         BLACK
         NONE
     }
+
+    class Direction {
+        <<enumeration>>
+        UP
+        DOWN
+        LEFT
+        RIGHT
+    }
 }
 
 AbaloneAgent --|> Player
@@ -175,7 +193,6 @@ Game *-- Formation : has a
 Game *-- GameState : has a
 Game *-- RecordHistory : has a
 Game --> Move : uses
-Game o-- GameConfiguration : has a
 GameManager --|> Observable : is a
 GameManager *-- Player : has a
 HumanPlayer --|> Player
