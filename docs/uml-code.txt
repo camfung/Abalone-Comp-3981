@@ -1,7 +1,7 @@
 classDiagram
 direction RL
 
-namespace players {
+namespace Players {
 
     class Player {
         <<abstract>>
@@ -31,7 +31,7 @@ namespace players {
     }
 } 
 
-namespace driver {
+namespace Driver {
     class App {
         <<Singleton>>
        - game : GameManager 
@@ -118,25 +118,18 @@ namespace GameLogic {
     }
 
     class GameState {
-        - board : list[list[int]]
+        - board : int[][]
         + get_state_space(): Move[]
         + calc_white_move(): Move
         + calc_black_move(): Move
         + make_move(player, move)
     }
-    class GameConfiguration {
-        + initialize_board_layout(): void
-        - create_game_state() : GameState
-        - StartingFormation : Formation
-    }
-
-
 }
 
 namespace Records {
     class RecordHistory {
+        <<static>> - game_counter: int
         - game_id
-        - game_counter: int
         - records: Record[]
         + get_game_id(): int
         + get_records(): Record[]
@@ -169,6 +162,7 @@ namespace Enums {
         NONE
     }
 }
+
 AbaloneAgent --|> Player
 App *-- GameManager : has a
 App *-- Player : has 2
