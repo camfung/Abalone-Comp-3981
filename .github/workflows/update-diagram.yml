@@ -35,7 +35,7 @@ jobs:
         run: npm install -g @mermaid-js/mermaid-cli
 
       - name: Generate Diagram
-        run: mmdc -i docs/uml-code.txt -o diagram.png -w 3000 -H 3000
+        run: mmdc -i docs/uml-code.txt -o docs/diagram.png -w 3000 -H 3000
 
       - name: Check for changes
         id: git-check
