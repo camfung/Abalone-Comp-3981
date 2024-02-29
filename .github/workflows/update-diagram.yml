@@ -24,6 +24,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
+      
       - name: Set up Node
         uses: actions/setup-node@v3
         with: 
@@ -34,16 +35,22 @@ jobs:
         run: npm install -g @mermaid-js/mermaid-cli
 
       - name: Generate Diagram
-        run: mmdc -i uml-code.txt -o diagram.png -w 3000 -H 3000
+        run: mmdc -i docs/uml-code.txt -o diagram.png -w 3000 -H 3000
 
-      - name: Commit files
+      - name: Check for changes
+        id: git-check
         run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add . 
-          git commit -a -m "Add changes"
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+          git add .
+          if git diff --staged --quiet; then
+              echo "No changes to commit."
+              echo "::set-output name=changes::false"
+          else
+              echo "Changes detected."
+              echo "::set-output name=changes::true"
+          fi
+      
+      - name: Commit and Push changes
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git commit -m "Updated diagram"
+          git push
