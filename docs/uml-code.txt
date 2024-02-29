@@ -92,16 +92,17 @@ namespace GameLogic {
         - game_state : Game
         - players : List[Observer]
         + join_room(roomId, player) : bool
-        +leave_room(observer : Observer) : void
-        +notify() : void
+        + leave_room(observer : Observer) : void
+        + notify() : void
     }
 
     class Game {
         - game_id
-        - gameState : GameState
-        - recordHistory : RecordHistory
-        + make_move(player: Player, move: Move) : void
-        + get_game_state() : GameState
+        - current_game_state : GameState
+        - record_history : RecordHistory
+        + initialize_board_layout(formation: Formation) : GameState$
+        + set_move(player: Player, move: Move) : void
+        + get_current_game_state() : GameState
     }
 
     class GameManager {
@@ -128,7 +129,7 @@ namespace GameLogic {
 
 namespace Records {
     class RecordHistory {
-        <<static>> - game_counter: int
+        - game_counter: int$
         - game_id
         - records: Record[]
         + get_game_id(): int
