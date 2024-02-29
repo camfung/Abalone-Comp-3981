@@ -5,4 +5,4 @@
 - Callum Goss
 - Joseph Driedger
   
-![Screenshot](diagram.png)
+![Screenshot](docs/diagram.png)
