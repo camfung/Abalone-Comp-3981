@@ -49,6 +49,9 @@ class Player(ABC):
     def update(self) -> None:
         pass
 
+    # I'm not sure if this is necessary.
+    # wouldnt all the interaction with the game state be in the make move function.
+    # if so then the child classes can get the state from the gamemanager since it will be in the scope of the function
     @abstractmethod
     def get_game_state(self, gameManager: GameManager) -> None:
         return gameManager.get_game_state()
