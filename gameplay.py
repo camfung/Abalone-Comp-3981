@@ -2,60 +2,6 @@
 from enums import *
 from records import RecordHistory
 import csv
-import abc
-import copy
-
-
-class Observable(abc.ABC):
-    @abc.abstractmethod
-    def join_room(self, player):
-        pass
-
-    @abc.abstractmethod
-    def leave_room(self, player):
-        pass
-
-    @abc.abstractmethod
-    def notify(self):
-        pass
-
-
-class GameManager(Observable):
-    __instance = None
-
-    @staticmethod
-    def get_instance():
-        if GameManager.__instance is None:
-            GameManager.__instance = GameManager()
-        return GameManager.__instance
-
-    def __init__(self):
-        if GameManager.__instance is not None:
-            raise Exception("Only one instance of GameManager can be created")
-
-        self._players = []
-        GameManager.__instance = self
-
-    def join_room(self, player):
-        self._players.append(player)
-
-    def leave_room(self, player):
-        self._players.remove(player)
-
-    def notify(self):
-        pass
-
-    def start_game(self):
-        pass
-
-    def stop_game(self):
-        pass
-
-    def pause_game(self):
-        pass
-
-    def undo_last_move(self):
-        pass
 
 
 class Game:
@@ -65,7 +11,6 @@ class Game:
         Game.id_counter += 1
         self._game_id = Game.id_counter
         self._current_game_state = Game.initialize_board_layout(formation)
-        self._previous_game_state = copy.deepcopy(self._current_game_state)
         self._record_history = RecordHistory(self._game_id)
 
     @staticmethod
@@ -109,8 +54,13 @@ class Game:
     def get_current_game_state(self):
         return self._current_game_state
 
-    def set_move(self, player, move):
-        pass
+    def set_move(self, player=None, move=None):
+        if player is None and move is None:
+            self._current_game_state = self._current_game_state.get_previous_game_state()
+            self._record_history.remove_last_record()
+
+    def get_record_history(self):
+        return self._record_history
 
 
 class GameState:
@@ -118,13 +68,40 @@ class GameState:
         self._board = board
         self._prev_game_state = prev_game_state
 
+    def get_board(self):
+        return self._board
+
+    def get_previous_game_state(self):
+        return self._prev_game_state
+
     def get_state_space(self):
         pass
 
-    def calc_white_move(self):
+    def calc_move(self, marble):
         pass
 
-    def calc_black_move(self):
+    def set_board(self, marble, move):
         pass
 
 
+class Move:
+    def __init__(self, first_ball_i, last_ball_i, first_ball_f, last_ball_f, direction, player):
+        self._pos_i = (first_ball_i, last_ball_i)
+        self._pos_f = (first_ball_f, last_ball_f)
+        self._direction = direction
+        self._player = player
+
+    def get_pos_i(self):
+        return self._pos_i
+
+    def get_pos_f(self):
+        return self._pos_f
+
+    def get_direction(self):
+        return self._direction
+
+    def get_player(self):
+        return self._player
+
+    def __str__(self):
+        return f"{self._pos_i} -> {self._pos_f}"

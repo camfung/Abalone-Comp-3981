@@ -92,7 +92,7 @@ namespace Ui {
 namespace GameLogic {
     class Observable {
         <<abstract>>
-        - game_state : Game
+        - game : Game
         - players : List[Observer]
         + join_room(player) : bool
         + leave_room(observer : Observer) : void
@@ -103,18 +103,18 @@ namespace GameLogic {
         + id_counter : int$
         - game_id : int
         - current_game_state : GameState
-        - previous_game_state : GameState
         - record_history : RecordHistory
         + initialize_board_layout(formation: Formation) : GameState$
         + set_move(player: Player, move: Move) : void
         + get_current_game_state() : GameState
-        + get_previous_game_state() : GameState
+        + get_record_history(): RecordHistory
     }
 
     class GameManager {
         <<Singleton>>
         - instance : GameManager$
-        - players : List[Observer]
+        - observers : List<Observer>
+        - game: Game
         + get_instance(): GameManager$
         + __init__() : GameManager
         + join_game(room_id, player) : bool
@@ -129,11 +129,14 @@ namespace GameLogic {
     }
 
     class GameState {
-        - board : list(list[int])
+        - board : Marble[][]
+        - prev_game_state : GameState
+        + get_board(): Marble[][]
         + get_state_space(): Move[]
-        + calc_white_move(): Move
-        + calc_black_move(): Move
-        + make_move(player, move)
+        + get_previous_game_state(): GameState
+        + calc_move(marble: Marble): Move
+        + check_move(move: Move): bool
+        + set_board(marble, move)
     }
 }
 
@@ -145,6 +148,8 @@ namespace Records {
         + get_game_id(): int
         + get_records(): Record[]
         + get_record(index: int): Record
+        + add_record(move: Move): void
+        + remove_last_record(): void
     }
 
     class Record {
