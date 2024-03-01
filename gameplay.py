@@ -142,7 +142,7 @@ class GameState:
                                 moves.append(move)
 
                     # Select Groupings X Direction - DownRight
-                    for group_size in range(0, 3):
+                    for group_size in range(1, 3):
                         first_ball_i = (row_index, space_index)
                         last_ball_i = (row_index + group_size, space_index)
 
@@ -160,7 +160,7 @@ class GameState:
                                 moves.append(move)
 
                     # Select Groupings X Direction - DownLeft
-                    for group_size in range(0, 3):
+                    for group_size in range(1, 3):
                         first_ball_i = (row_index, space_index)
                         last_ball_i = (row_index + group_size,
                                        space_index - group_size)
