@@ -113,6 +113,7 @@ class GameState:
 
     def __generate_possible_moves(self):
         moves = []
+        row_col_modifiers = [(0, 1), (1, 0), (1, -1)]
 
         for row_index, row in enumerate(self._board):
             if row_index == 0 or row_index == len(self._board) - 1:
@@ -123,60 +124,24 @@ class GameState:
                     continue
 
                 if space is self._current_move_color:
-                    # Select Groupings - Right
-                    for group_size in range(0, 3):
-                        first_ball_i = (row_index, space_index)
-                        last_ball_i = (row_index, space_index + group_size)
+                    for mod_row, mod_col in row_col_modifiers:
+                        start_range = 0 if mod_row == 0 else 1
+                        for group_size in range(start_range, 3):
+                            first_ball_i = (row_index, space_index)
+                            last_ball_i = (row_index + group_size * mod_row, space_index + group_size * mod_col)
 
-                        if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
-                            break
+                            if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
+                                break
 
-                        if self.__check_inbounds(first_ball_i, last_ball_i, row):
-                            continue
+                            if self.__check_inbounds(first_ball_i, last_ball_i, row):
+                                continue
 
-                        for direction in Direction:
-                            move = self.__calc_move(first_ball_i=first_ball_i,
-                                                    last_ball_i=last_ball_i,
-                                                    direction=direction)
-                            if move is not None:
-                                moves.append(move)
-
-                    # Select Groupings X Direction - DownRight
-                    for group_size in range(1, 3):
-                        first_ball_i = (row_index, space_index)
-                        last_ball_i = (row_index + group_size, space_index)
-
-                        if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
-                            break
-
-                        if self.__check_inbounds(first_ball_i, last_ball_i, row):
-                            continue
-
-                        for direction in Direction:
-                            move = self.__calc_move(first_ball_i=first_ball_i,
-                                                    last_ball_i=last_ball_i,
-                                                    direction=direction)
-                            if move is not None:
-                                moves.append(move)
-
-                    # Select Groupings X Direction - DownLeft
-                    for group_size in range(1, 3):
-                        first_ball_i = (row_index, space_index)
-                        last_ball_i = (row_index + group_size,
-                                       space_index - group_size)
-
-                        if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
-                            break
-
-                        if self.__check_inbounds(first_ball_i, last_ball_i, row):
-                            continue
-
-                        for direction in Direction:
-                            move = self.__calc_move(first_ball_i=first_ball_i,
-                                                    last_ball_i=last_ball_i,
-                                                    direction=direction)
-                            if move is not None:
-                                moves.append(move)
+                            for direction in Direction:
+                                move = self.__calc_move(first_ball_i=first_ball_i,
+                                                        last_ball_i=last_ball_i,
+                                                        direction=direction)
+                                if move is not None:
+                                    moves.append(move)
 
         return moves
 
