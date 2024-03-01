@@ -36,13 +36,13 @@ class Game:
         for row in csv_reader:
             formatted_row = []
             for item in row:
-                if item == "None":
+                if item in "None":
                     formatted_row.append(None)
-                elif item == "Marble.White":
+                elif item in "WHITE":
                     formatted_row.append(Marble.WHITE)
-                elif item == "Marble.Black":
+                elif item in "BLACK":
                     formatted_row.append(Marble.BLACK)
-                elif item == "Marble.None":
+                elif item in "EMPTY":
                     formatted_row.append(Marble.NONE)
                 else:
                     raise InvalidMarbleValue(f"{item} is not a valid marble value.")
