@@ -25,7 +25,9 @@ class Direction(Enum):
     """
     Direction Enumeration for Move Directions
     """
-    UP = auto()
-    DOWN = auto()
-    LEFT = auto()
+    UP_LEFT = auto()
+    UP_RIGHT = auto()
     RIGHT = auto()
+    DOWN_RIGHT = auto()
+    DOWN_LEFT = auto()
+    LEFT = auto()

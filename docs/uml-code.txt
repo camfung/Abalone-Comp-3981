@@ -41,21 +41,6 @@ namespace Driver {
 
 }
 
-namespace API {
-    class Move {
-        - pos_i :  (first_ball_i : tuple(int, int), last_ball_i: tuple(int, int))
-        - pos_f : (first_ball_f: tuple(int, int), last_ball_f: tuple(int, int))
-        - direction : Direction(Enum)
-        - player : Marble
-        + __str__() : String
-    }
-
-    class Observer {
-        <<interface>>
-        + update() : void
-    }
-}
-
 namespace Ui {
     class UI {
         <<abstract>>
@@ -90,7 +75,12 @@ namespace Ui {
     }
 }
 
-namespace GameLogic {
+namespace Communication {
+    class Observer {
+        <<interface>>
+        + update() : void
+    }
+
     class Observable {
         <<abstract>>
         - game : Game
@@ -98,17 +88,6 @@ namespace GameLogic {
         + join_room(player) : bool
         + leave_room(observer : Observer) : void
         + notify() : void
-    }
-
-    class Game {
-        + id_counter : int$
-        - game_id : int
-        - current_game_state : GameState
-        - record_history : RecordHistory
-        + initialize_board_layout(formation: Formation) : GameState$
-        + set_move(player: Player, move: Move) : void
-        + get_current_game_state() : GameState
-        + get_record_history(): RecordHistory
     }
 
     class GameManager {
@@ -128,16 +107,44 @@ namespace GameLogic {
         + reset_game() : void
         + undo_last_move() : void
     }
+}
+
+namespace Gameplay {
+    class Game {
+        + id_counter : int$
+        - game_id : int
+        - current_game_state : GameState
+        - record_history : RecordHistory
+        + initialize_board_layout(formation: Formation) : GameState$
+        + set_move(player: Player, move: Move) : void
+        + get_current_game_state() : GameState
+        + get_record_history(): RecordHistory
+    }
 
     class GameState {
         - board : Marble[][]
         - prev_game_state : GameState
         + get_board(): Marble[][]
-        + get_state_space(): Move[]
         + get_previous_game_state(): GameState
-        + calc_move(marble: Marble): Move
-        - check_move(move: Move): bool
+        + get_state_space(marble: Marble): Move[]
+        + generate_new_board_state(move: Move): Marble[][]
+        - calc_move(marble: Marble, kwargs: Dict<args>): Move
+        - check_move(move: Move): bool$
         + set_board(marble, move)
+    }
+
+    class Move {
+        - pos_i :  (first_ball_i : tuple(int, int), last_ball_i: tuple(int, int))
+        - pos_f : (first_ball_f: tuple(int, int), last_ball_f: tuple(int, int))
+        - direction : Direction
+        - marble : Marble
+        + __init__(first_ball_i : tuple(int, int), last_ball_i : tuple(int, int), direction: Direction, marble: Marble) : Move
+        - calc_pos_f(first_ball_i : tuple(int, int), last_ball_i : tuple(int, int), direction: Direction) : tuple(int, int)$
+        + get_pos_i(): tuple(tuple(int, int), tuple(int, int))
+        + get_pos_f(): tuple(tuple(int, int), tuple(int, int))
+        + get_direction(): Direction
+        + get_marble(): Marble
+        + __str__() : String
     }
 }
 
@@ -190,10 +197,12 @@ namespace Enums {
 
     class Direction {
         <<enumeration>>
-        UP
-        DOWN
-        LEFT
+        UP_LEFT
+        UP_RIGHT
         RIGHT
+        DOWN_RIGHT
+        DOWN_LEFT
+        LEFT
     }
 }
 

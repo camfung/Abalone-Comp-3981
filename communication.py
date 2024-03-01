@@ -1,6 +1,7 @@
 
 import abc
 from gameplay import *
+from exceptions import DuplicateSingletons
 
 
 class Observer(abc.ABC):
@@ -38,7 +39,7 @@ class GameManager(Observable):
 
     def __init__(self):
         if GameManager.__instance is not None:
-            raise Exception("Only one instance of GameManager can be created")
+            raise DuplicateSingletons("Only one instance of GameManager can be created")
 
         self._observers = []
         self._game = None

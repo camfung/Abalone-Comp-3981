@@ -1,6 +1,8 @@
 
+import copy
 from enums import *
 from records import RecordHistory
+from exceptions import InvalidMarbleValue, InvalidDirection
 import csv
 
 
@@ -43,7 +45,7 @@ class Game:
                 elif item == "Marble.None":
                     formatted_row.append(Marble.NONE)
                 else:
-                    raise Exception("Invalid Value")
+                    raise InvalidMarbleValue(f"{item} is not a valid marble value.")
             starting_board.append(formatted_row)
 
         file.close()
@@ -58,6 +60,11 @@ class Game:
         if player is None and move is None:
             self._current_game_state = self._current_game_state.get_previous_game_state()
             self._record_history.remove_last_record()
+            return
+
+        new_board_state = self._current_game_state.generate_new_board_state(move)
+        new_game_state = GameState(new_board_state, copy.deepcopy(self._current_game_state))
+        self._current_game_state = new_game_state
 
     def get_record_history(self):
         return self._record_history
@@ -77,25 +84,88 @@ class GameState:
     def get_previous_game_state(self):
         return self._prev_game_state
 
-    def get_state_space(self):
-        pass
+    def get_state_space(self, marble):
+        moves = []
+        for row in self._board:
+            for space in row:
+                if space is marble:
+                    for direction in Direction:
+                        # Select Groupings X Direction
+                        for x in range(0, 4):
+                            first_ball_i = (self._board(row), row.index(space))
+                            last_ball_i = (self._board(row) + x, row.index(space))
+                            move = self.__calc_move(marble,
+                                                    first_ball_i=first_ball_i,
+                                                    last_ball_i=last_ball_i,
+                                                    direction=direction,
+                                                    marble=marble)
+                            if move is not None:
+                                moves.append(move)
+        return moves
 
-    def calc_move(self, marble):
-        pass
+    def generate_new_board_state(self, move):
+        # Copy the Existing Board Value into the output variable
+        new_board = copy.deepcopy(self._board)
 
-    def __check_move(self, move):
+        # Move the First and Last Balls
+        first_ball_i_x = move.get_pos_i()[0][0]
+        first_ball_i_y = move.get_pos_i()[0][1]
+        last_ball_i_x = move.get_pos_i()[1][0]
+        last_ball_i_y = move.get_pos_i()[1][1]
+        new_board[first_ball_i_x][first_ball_i_y] = Marble.NONE
+        new_board[last_ball_i_x][last_ball_i_y] = Marble.NONE
+
+        first_ball_f_x = move.get_pos_f()[0][0]
+        first_ball_f_y = move.get_pos_f()[0][1]
+        last_ball_f_x = move.get_pos_f()[1][0]
+        last_ball_f_y = move.get_pos_f()[1][1]
+        new_board[first_ball_f_x][first_ball_f_y] = move.get_marble()
+        new_board[last_ball_f_x][last_ball_f_y] = move.get_marble()
+
+        # Move any remaining Balls
+        if move.get_pos_i()[0][1] - move.get_pos_i()[0][0] > 1:
+            pass
+
+        return new_board
+
+    def __calc_move(self, marble, **kwargs):
+        move = Move(marble, **kwargs)
+        if self.__check_move(move):
+            return move
+        return None
+
+    @staticmethod
+    def __check_move(move):
         return True
-
-    def set_board(self, marble, move):
-        pass
 
 
 class Move:
-    def __init__(self, first_ball_i, last_ball_i, first_ball_f, last_ball_f, direction, player):
-        self._pos_i = (first_ball_i, last_ball_i)
-        self._pos_f = (first_ball_f, last_ball_f)
+    def __init__(self, first_ball_i, last_ball_i, direction, marble):
         self._direction = direction
-        self._player = player
+        self._marble = marble
+        self._pos_i = (first_ball_i, last_ball_i)
+        self._pos_f = Move.__calc_pos_f(direction, first_ball_i, last_ball_i)
+
+    @staticmethod
+    def __calc_pos_f(first_ball_i, last_ball_i, direction):
+        position = None
+
+        if direction == Direction.UP_LEFT:
+            position = ((first_ball_i[0] - 1, first_ball_i[1]), (last_ball_i[0] - 1, last_ball_i[1]))
+        elif direction == Direction.UP_RIGHT:
+            position = ((first_ball_i[0] - 1, first_ball_i[1] + 1), (last_ball_i[0] - 1, last_ball_i[1] + 1))
+        elif direction == Direction.RIGHT:
+            position = ((first_ball_i[0], first_ball_i[1] + 1), (last_ball_i[0], last_ball_i[1] + 1))
+        elif direction == Direction.DOWN_RIGHT:
+            position = ((first_ball_i[0] + 1, first_ball_i[1]), (last_ball_i[0] + 1, last_ball_i[1]))
+        elif direction == Direction.DOWN_LEFT:
+            position = ((first_ball_i[0] + 1, first_ball_i[1] - 1), (last_ball_i[0] + 1, last_ball_i[1] - 1))
+        elif direction == Direction.LEFT:
+            position = ((first_ball_i[0], first_ball_i[1] - 1), (last_ball_i[0], last_ball_i[1] - 1))
+        else:
+            raise InvalidDirection("Invalid direction passed to Move")
+
+        return position
 
     def get_pos_i(self):
         return self._pos_i
@@ -106,8 +176,8 @@ class Move:
     def get_direction(self):
         return self._direction
 
-    def get_player(self):
-        return self._player
+    def get_marble(self):
+        return self._marble
 
     def __str__(self):
         return f"{self._pos_i} -> {self._pos_f}"
