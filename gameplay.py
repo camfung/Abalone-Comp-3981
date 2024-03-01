@@ -123,8 +123,24 @@ class GameState:
         new_board[last_ball_f_x][last_ball_f_y] = move.get_marble()
 
         # Move any remaining Balls
-        if move.get_pos_i()[0][1] - move.get_pos_i()[0][0] > 1:
-            pass
+        remain_ball_i_x = first_ball_i_x
+        remain_ball_i_y = first_ball_i_y
+        if first_ball_i_x - last_ball_i_x > 1:
+            remain_ball_i_x = (first_ball_i_x + last_ball_i_x) / 2
+
+        if first_ball_i_y - last_ball_i_y > 1:
+            remain_ball_i_y = (first_ball_i_y + last_ball_i_y) / 2
+
+        remain_ball_f_x = first_ball_i_x
+        remain_ball_f_y = first_ball_i_y
+        if first_ball_f_x - last_ball_i_x > 1:
+            remain_ball_f_x = (first_ball_i_x + last_ball_i_x) / 2
+
+        if first_ball_i_y - last_ball_i_y > 1:
+            remain_ball_f_y = (first_ball_i_y + last_ball_i_y) / 2
+
+        new_board[remain_ball_i_x][remain_ball_i_y] = Marble.NONE
+        new_board[remain_ball_f_x][remain_ball_f_y] = move.get_marble()
 
         return new_board
 
