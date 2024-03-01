@@ -17,7 +17,8 @@ class Game:
 
     @staticmethod
     def initialize_board_layout(formation):
-        starting_board = [[None, None, None, None, None, None, None, None, None, None, None]]
+        starting_board = [[None, None, None, None,
+                           None, None, None, None, None, None, None]]
         file = None
         csv_reader = None
 
@@ -45,12 +46,14 @@ class Game:
                 elif item in "EMPTY":
                     formatted_row.append(Marble.NONE)
                 else:
-                    raise InvalidMarbleValue(f"{item} is not a valid marble value.")
+                    raise InvalidMarbleValue(
+                        f"{item} is not a valid marble value.")
             starting_board.append(formatted_row)
 
         file.close()
 
-        starting_board.append([None, None, None, None, None, None, None, None, None, None, None])
+        starting_board.append(
+            [None, None, None, None, None, None, None, None, None, None, None])
         return GameState(starting_board)
 
     def get_current_game_state(self):
@@ -70,7 +73,8 @@ class Game:
         else:
             raise InvalidMarbleValue("No Marble Value provided in Set Move.")
 
-        new_board_state = self._current_game_state.generate_new_board_state(move)
+        new_board_state = self._current_game_state.generate_new_board_state(
+            move)
         new_game_state = GameState(new_board_state,
                                    next_marble,
                                    copy.deepcopy(self._current_game_state))
@@ -82,6 +86,10 @@ class Game:
 
     def export_record_history(self):
         self._record_history.export_records()
+
+    def __str__(self):
+        game_state_str = str(self._current_game_state)
+        return f"Game ID: {self._game_id}\n{game_state_str}"
 
 
 class GameState:
@@ -154,7 +162,8 @@ class GameState:
                     # Select Groupings X Direction - DownLeft
                     for group_size in range(0, 3):
                         first_ball_i = (row_index, space_index)
-                        last_ball_i = (row_index + group_size, space_index - group_size)
+                        last_ball_i = (row_index + group_size,
+                                       space_index - group_size)
 
                         if self._board[last_ball_i[0]][last_ball_i[1]] is not self._marble:
                             break
@@ -240,6 +249,30 @@ class GameState:
 
         return True
 
+    def __str__(self):
+        # Hard-coded leading spaces for each row to match the desired output
+        leading_spaces = ["", "         ", "        ", "       ", "     ",
+                          "   ", "    ", "     ", "       ", "        ", "         """]
+        board_str = ""
+
+        for i, row in enumerate(self._board):
+            row_str = leading_spaces[i]
+
+            for space in row:
+                if space is None or space == "None":
+                    continue
+                elif space == Marble.WHITE:
+                    row_str += "W  "
+                elif space == Marble.BLACK:
+                    row_str += "B  "
+                elif space == Marble.NONE:
+                    row_str += "-  "
+
+            board_str += row_str.rstrip() + "\n"
+
+        current_turn = "Black" if self._marble == Marble.BLACK else "White"
+        return f"Current Turn: {current_turn}\nBoard:\n{board_str}"
+
 
 class Move:
     def __init__(self, first_ball_i, last_ball_i, direction, marble):
@@ -253,17 +286,23 @@ class Move:
         position = None
 
         if direction == Direction.UP_LEFT:
-            position = ((first_ball_i[0] - 1, first_ball_i[1]), (last_ball_i[0] - 1, last_ball_i[1]))
+            position = ((first_ball_i[0] - 1, first_ball_i[1]),
+                        (last_ball_i[0] - 1, last_ball_i[1]))
         elif direction == Direction.UP_RIGHT:
-            position = ((first_ball_i[0] - 1, first_ball_i[1] + 1), (last_ball_i[0] - 1, last_ball_i[1] + 1))
+            position = ((first_ball_i[0] - 1, first_ball_i[1] + 1),
+                        (last_ball_i[0] - 1, last_ball_i[1] + 1))
         elif direction == Direction.RIGHT:
-            position = ((first_ball_i[0], first_ball_i[1] + 1), (last_ball_i[0], last_ball_i[1] + 1))
+            position = ((first_ball_i[0], first_ball_i[1] + 1),
+                        (last_ball_i[0], last_ball_i[1] + 1))
         elif direction == Direction.DOWN_RIGHT:
-            position = ((first_ball_i[0] + 1, first_ball_i[1]), (last_ball_i[0] + 1, last_ball_i[1]))
+            position = ((first_ball_i[0] + 1, first_ball_i[1]),
+                        (last_ball_i[0] + 1, last_ball_i[1]))
         elif direction == Direction.DOWN_LEFT:
-            position = ((first_ball_i[0] + 1, first_ball_i[1] - 1), (last_ball_i[0] + 1, last_ball_i[1] - 1))
+            position = ((first_ball_i[0] + 1, first_ball_i[1] - 1),
+                        (last_ball_i[0] + 1, last_ball_i[1] - 1))
         elif direction == Direction.LEFT:
-            position = ((first_ball_i[0], first_ball_i[1] - 1), (last_ball_i[0], last_ball_i[1] - 1))
+            position = ((first_ball_i[0], first_ball_i[1] - 1),
+                        (last_ball_i[0], last_ball_i[1] - 1))
         else:
             raise InvalidDirection("Invalid direction passed to Move")
 
