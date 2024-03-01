@@ -65,7 +65,7 @@ class Game:
             self._record_history.remove_last_record()
             return
 
-        next_marble = self._current_game_state.get_marble()
+        next_marble = self._current_game_state.get_current_move_color()
         if next_marble is Marble.BLACK:
             next_marble = Marble.WHITE
         elif next_marble is Marble.WHITE:
@@ -95,15 +95,15 @@ class Game:
 class GameState:
     def __init__(self, board, marble=Marble.BLACK, prev_game_state=None):
         self._board = board
-        self._marble = marble
+        self._current_move_color = marble
         self._prev_game_state = prev_game_state
         self._moves = self.__generate_possible_moves()
 
     def get_board(self):
         return self._board
 
-    def get_marble(self):
-        return self._marble
+    def get_current_move_color(self):
+        return self._current_move_color
 
     def get_previous_game_state(self):
         return self._prev_game_state
@@ -122,13 +122,13 @@ class GameState:
                 if space_index == 0 or space_index == len(row) - 1:
                     continue
 
-                if space is self._marble:
+                if space is self._current_move_color:
                     # Select Groupings - Right
                     for group_size in range(0, 3):
                         first_ball_i = (row_index, space_index)
                         last_ball_i = (row_index, space_index + group_size)
 
-                        if self._board[last_ball_i[0]][last_ball_i[1]] is not self._marble:
+                        if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
                             break
 
                         if self.__check_groupings(first_ball_i, last_ball_i, row):
@@ -146,7 +146,7 @@ class GameState:
                         first_ball_i = (row_index, space_index)
                         last_ball_i = (row_index + group_size, space_index)
 
-                        if self._board[last_ball_i[0]][last_ball_i[1]] is not self._marble:
+                        if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
                             break
 
                         if self.__check_groupings(first_ball_i, last_ball_i, row):
@@ -165,7 +165,7 @@ class GameState:
                         last_ball_i = (row_index + group_size,
                                        space_index - group_size)
 
-                        if self._board[last_ball_i[0]][last_ball_i[1]] is not self._marble:
+                        if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
                             break
 
                         if self.__check_groupings(first_ball_i, last_ball_i, row):
@@ -231,7 +231,7 @@ class GameState:
         return new_board
 
     def __calc_move(self, **kwargs):
-        move = Move(self._marble, **kwargs)
+        move = Move(self._current_move_color, **kwargs)
         if self.__check_move(move):
             return move
         return None
@@ -270,7 +270,7 @@ class GameState:
 
             board_str += row_str.rstrip() + "\n"
 
-        current_turn = "Black" if self._marble == Marble.BLACK else "White"
+        current_turn = "Black" if self._current_move_color == Marble.BLACK else "White"
         return f"Current Turn: {current_turn}\nBoard:\n{board_str}"
 
 
