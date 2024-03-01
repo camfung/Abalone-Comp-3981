@@ -24,7 +24,7 @@ namespace Players {
     }
 
     class AbaloneAgent {
-        - generate_move()
+        - generate_move() : Move
 		+ calc_move() : Action
 		+ max_move(): Utility
 		+ min_move(): Utility
@@ -84,6 +84,7 @@ namespace Ui {
     class HUD {
 
     }
+
     class Board {
 
     }
@@ -135,7 +136,7 @@ namespace GameLogic {
         + get_state_space(): Move[]
         + get_previous_game_state(): GameState
         + calc_move(marble: Marble): Move
-        + check_move(move: Move): bool
+        - check_move(move: Move): bool
         + set_board(marble, move)
     }
 }

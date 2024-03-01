@@ -58,7 +58,7 @@ class GameManager(Observable):
         self._game = Game(formation)
 
     def stop_game(self):
-        self._game.get_record_history().export_records()
+        self._game.export_record_history()
 
     def pause_game(self):
         pass

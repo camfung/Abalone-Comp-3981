@@ -62,6 +62,9 @@ class Game:
     def get_record_history(self):
         return self._record_history
 
+    def export_record_history(self):
+        self._record_history.export_records()
+
 
 class GameState:
     def __init__(self, board, prev_game_state=None):
@@ -79,6 +82,9 @@ class GameState:
 
     def calc_move(self, marble):
         pass
+
+    def __check_move(self, move):
+        return True
 
     def set_board(self, marble, move):
         pass
