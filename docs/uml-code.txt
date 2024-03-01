@@ -123,10 +123,17 @@ namespace Gameplay {
 
     class GameState {
         - board : Marble[][]
+        - marble: Marble
         - prev_game_state : GameState
+        - moves: Move[]
+        + __init__(board: Marble[][]): GameState
+        + __init__(board: Marble[][], marble: Marble, prev_game_state: GameState): GameState
         + get_board(): Marble[][]
+        + get_marble(): Marble
         + get_previous_game_state(): GameState
-        + get_state_space(marble: Marble): Move[]
+        + get_possible_moves(): Move[]
+        - generate_possible_moves(marble: Marble): Move[]
+        + convert_moves_to_game_states(): GameState[]
         + generate_new_board_state(move: Move): Marble[][]
         - calc_move(marble: Marble, kwargs: Dict<args>): Move
         - check_move(move: Move): bool$

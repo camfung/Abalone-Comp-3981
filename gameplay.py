@@ -62,8 +62,18 @@ class Game:
             self._record_history.remove_last_record()
             return
 
+        next_marble = self._current_game_state.get_marble()
+        if next_marble is Marble.BLACK:
+            next_marble = Marble.WHITE
+        elif next_marble is Marble.WHITE:
+            next_marble = Marble.BLACK
+        else:
+            raise InvalidMarbleValue("No Marble Value provided in Set Move.")
+
         new_board_state = self._current_game_state.generate_new_board_state(move)
-        new_game_state = GameState(new_board_state, copy.deepcopy(self._current_game_state))
+        new_game_state = GameState(new_board_state,
+                                   next_marble,
+                                   copy.deepcopy(self._current_game_state))
         self._current_game_state = new_game_state
 
     def get_record_history(self):
@@ -74,17 +84,25 @@ class Game:
 
 
 class GameState:
-    def __init__(self, board, prev_game_state=None):
+    def __init__(self, board, marble=Marble.BLACK, prev_game_state=None):
         self._board = board
+        self._marble = marble
         self._prev_game_state = prev_game_state
+        self._moves = self.__generate_possible_moves()
 
     def get_board(self):
         return self._board
 
+    def get_marble(self):
+        return self._marble
+
     def get_previous_game_state(self):
         return self._prev_game_state
 
-    def get_state_space(self, marble):
+    def get_possible_moves(self):
+        return self._moves
+
+    def __generate_possible_moves(self):
         moves = []
 
         for row_index, row in enumerate(self._board):
@@ -95,68 +113,71 @@ class GameState:
                 if space_index == 0 or space_index == len(row) - 1:
                     continue
 
-                if space is marble:
+                if space is self._marble:
                     # Select Groupings - Right
                     for group_size in range(0, 3):
-                        first_ball_i = (self._board(row), row.index(space))
-                        last_ball_i = (self._board(row), row.index(space) + group_size)
+                        first_ball_i = (row_index, space_index)
+                        last_ball_i = (row_index, space_index + group_size)
 
-                        if self._board[last_ball_i[0]][last_ball_i[1]] is not marble:
+                        if self._board[last_ball_i[0]][last_ball_i[1]] is not self._marble:
                             break
 
-                        if self.__check_groupings(first_ball_i, last_ball_i):
+                        if self.__check_groupings(first_ball_i, last_ball_i, row):
                             continue
 
                         for direction in Direction:
-                            move = self.__calc_move(marble,
-                                                    first_ball_i=first_ball_i,
+                            move = self.__calc_move(first_ball_i=first_ball_i,
                                                     last_ball_i=last_ball_i,
-                                                    direction=direction,
-                                                    marble=marble)
+                                                    direction=direction)
                             if move is not None:
                                 moves.append(move)
 
                     # Select Groupings X Direction - DownRight
                     for group_size in range(0, 3):
-                        first_ball_i = (self._board(row), row.index(space))
-                        last_ball_i = (self._board(row) + group_size, row.index(space))
+                        first_ball_i = (row_index, space_index)
+                        last_ball_i = (row_index + group_size, space_index)
 
-                        if self._board[last_ball_i[0]][last_ball_i[1]] is not marble:
+                        if self._board[last_ball_i[0]][last_ball_i[1]] is not self._marble:
                             break
 
-                        if self.__check_groupings(first_ball_i, last_ball_i):
+                        if self.__check_groupings(first_ball_i, last_ball_i, row):
                             continue
 
                         for direction in Direction:
-                            move = self.__calc_move(marble,
-                                                    first_ball_i=first_ball_i,
+                            move = self.__calc_move(first_ball_i=first_ball_i,
                                                     last_ball_i=last_ball_i,
-                                                    direction=direction,
-                                                    marble=marble)
+                                                    direction=direction)
                             if move is not None:
                                 moves.append(move)
 
                     # Select Groupings X Direction - DownLeft
                     for group_size in range(0, 3):
-                        first_ball_i = (self._board(row), row.index(space))
-                        last_ball_i = (self._board(row) + group_size, row.index(space) - group_size)
+                        first_ball_i = (row_index, space_index)
+                        last_ball_i = (row_index + group_size, space_index - group_size)
 
-                        if self._board[last_ball_i[0]][last_ball_i[1]] is not marble:
+                        if self._board[last_ball_i[0]][last_ball_i[1]] is not self._marble:
                             break
 
-                        if self.__check_groupings(first_ball_i, last_ball_i):
+                        if self.__check_groupings(first_ball_i, last_ball_i, row):
                             continue
 
                         for direction in Direction:
-                            move = self.__calc_move(marble,
-                                                    first_ball_i=first_ball_i,
+                            move = self.__calc_move(first_ball_i=first_ball_i,
                                                     last_ball_i=last_ball_i,
-                                                    direction=direction,
-                                                    marble=marble)
+                                                    direction=direction)
                             if move is not None:
                                 moves.append(move)
 
         return moves
+
+    def convert_moves_to_game_states(self):
+        game_states = []
+
+        for move in self._moves:
+            new_game_state = self.generate_new_board_state(move)
+            game_states.append(new_game_state)
+
+        return game_states
 
     def generate_new_board_state(self, move):
         # Copy the Existing Board Value into the output variable
@@ -199,8 +220,8 @@ class GameState:
 
         return new_board
 
-    def __calc_move(self, marble, **kwargs):
-        move = Move(marble, **kwargs)
+    def __calc_move(self, **kwargs):
+        move = Move(self._marble, **kwargs)
         if self.__check_move(move):
             return move
         return None
