@@ -62,7 +62,11 @@ class GameManager(Observable):
         self._game.export_record_history()
 
     def pause_game(self):
-        pass
+        self.notify()
+
+    def commit_move(self, player, move):
+        self._game.set_move(player, move)
+        self.notify()
 
     def undo_last_move(self):
         self._game.set_move()

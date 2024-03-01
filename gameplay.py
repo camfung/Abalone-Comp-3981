@@ -75,6 +75,7 @@ class Game:
                                    next_marble,
                                    copy.deepcopy(self._current_game_state))
         self._current_game_state = new_game_state
+        self._record_history.add_record(move)
 
     def get_record_history(self):
         return self._record_history

@@ -105,6 +105,7 @@ namespace Communication {
         + stop_game() : void
         + pause_game() : void
         + reset_game() : void
+        + commit_move(player: Player, move: Move) : void
         + undo_last_move() : void
     }
 }
