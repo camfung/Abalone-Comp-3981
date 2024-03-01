@@ -86,14 +86,28 @@ class GameState:
 
     def get_state_space(self, marble):
         moves = []
-        for row in self._board:
-            for space in row:
+
+        for row_index, row in enumerate(self._board):
+            if row_index == 0 or row_index == len(self._board) - 1:
+                continue
+
+            for space_index, space in enumerate(row):
+                if space_index == 0 or space_index == len(row) - 1:
+                    continue
+
                 if space is marble:
-                    for direction in Direction:
-                        # Select Groupings X Direction
-                        for x in range(0, 4):
-                            first_ball_i = (self._board(row), row.index(space))
-                            last_ball_i = (self._board(row) + x, row.index(space))
+                    # Select Groupings - Right
+                    for group_size in range(0, 3):
+                        first_ball_i = (self._board(row), row.index(space))
+                        last_ball_i = (self._board(row), row.index(space) + group_size)
+
+                        if self._board[last_ball_i[0]][last_ball_i[1]] is not marble:
+                            break
+
+                        if self.__check_groupings(first_ball_i, last_ball_i):
+                            continue
+
+                        for direction in Direction:
                             move = self.__calc_move(marble,
                                                     first_ball_i=first_ball_i,
                                                     last_ball_i=last_ball_i,
@@ -101,6 +115,47 @@ class GameState:
                                                     marble=marble)
                             if move is not None:
                                 moves.append(move)
+
+                    # Select Groupings X Direction - DownRight
+                    for group_size in range(0, 3):
+                        first_ball_i = (self._board(row), row.index(space))
+                        last_ball_i = (self._board(row) + group_size, row.index(space))
+
+                        if self._board[last_ball_i[0]][last_ball_i[1]] is not marble:
+                            break
+
+                        if self.__check_groupings(first_ball_i, last_ball_i):
+                            continue
+
+                        for direction in Direction:
+                            move = self.__calc_move(marble,
+                                                    first_ball_i=first_ball_i,
+                                                    last_ball_i=last_ball_i,
+                                                    direction=direction,
+                                                    marble=marble)
+                            if move is not None:
+                                moves.append(move)
+
+                    # Select Groupings X Direction - DownLeft
+                    for group_size in range(0, 3):
+                        first_ball_i = (self._board(row), row.index(space))
+                        last_ball_i = (self._board(row) + group_size, row.index(space) - group_size)
+
+                        if self._board[last_ball_i[0]][last_ball_i[1]] is not marble:
+                            break
+
+                        if self.__check_groupings(first_ball_i, last_ball_i):
+                            continue
+
+                        for direction in Direction:
+                            move = self.__calc_move(marble,
+                                                    first_ball_i=first_ball_i,
+                                                    last_ball_i=last_ball_i,
+                                                    direction=direction,
+                                                    marble=marble)
+                            if move is not None:
+                                moves.append(move)
+
         return moves
 
     def generate_new_board_state(self, move):
@@ -152,6 +207,15 @@ class GameState:
 
     @staticmethod
     def __check_move(move):
+        return True
+
+    def __check_groupings(self, first_ball_i, last_ball_i, row):
+        if first_ball_i[0] >= len(self._board) - 1 or first_ball_i[1] >= len(row) - 1:
+            return False
+
+        if last_ball_i[0] >= len(self._board) - 1 or last_ball_i[1] >= len(row) - 1:
+            return False
+
         return True
 
 

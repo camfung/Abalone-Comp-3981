@@ -130,6 +130,7 @@ namespace Gameplay {
         + generate_new_board_state(move: Move): Marble[][]
         - calc_move(marble: Marble, kwargs: Dict<args>): Move
         - check_move(move: Move): bool$
+        - check_groupings(first_ball_i: tuple(int, int), last_ball_i: tuple(int, int), row: Marble[]) : bool
         + set_board(marble, move)
     }
 
