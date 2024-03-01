@@ -131,7 +131,7 @@ class GameState:
                         if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
                             break
 
-                        if self.__check_groupings(first_ball_i, last_ball_i, row):
+                        if self.__check_inbounds(first_ball_i, last_ball_i, row):
                             continue
 
                         for direction in Direction:
@@ -149,7 +149,7 @@ class GameState:
                         if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
                             break
 
-                        if self.__check_groupings(first_ball_i, last_ball_i, row):
+                        if self.__check_inbounds(first_ball_i, last_ball_i, row):
                             continue
 
                         for direction in Direction:
@@ -168,7 +168,7 @@ class GameState:
                         if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
                             break
 
-                        if self.__check_groupings(first_ball_i, last_ball_i, row):
+                        if self.__check_inbounds(first_ball_i, last_ball_i, row):
                             continue
 
                         for direction in Direction:
@@ -240,7 +240,7 @@ class GameState:
     def __check_move(move):
         return True
 
-    def __check_groupings(self, first_ball_i, last_ball_i, row):
+    def __check_inbounds(self, first_ball_i, last_ball_i, row):
         if first_ball_i[0] >= len(self._board) - 1 or first_ball_i[1] >= len(row) - 1:
             return False
 
