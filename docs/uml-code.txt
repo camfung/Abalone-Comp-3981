@@ -164,6 +164,15 @@ namespace Records {
     }
 }
 
+namespace Exceptions {
+    class DuplicateSingletons {
+        + message: String
+    }
+    class InvalidMarbleValue {
+        + message: String
+    }
+}
+
 namespace Enums {
     class Formation {
         <<enumeration>>
