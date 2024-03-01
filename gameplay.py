@@ -251,8 +251,8 @@ class GameState:
 
     def __str__(self):
         # Hard-coded leading spaces for each row to match the desired output
-        leading_spaces = ["", "         ", "        ", "       ", "     ",
-                          "   ", "    ", "     ", "       ", "        ", "         """]
+        leading_spaces = ["", "        I   ", "       H   ", "      G   ", "    F   ",
+                          "  E   ", "   D   ", "    C   ", "      B   ", "       A   ", "         """]
         board_str = ""
 
         for i, row in enumerate(self._board):
@@ -279,7 +279,7 @@ class Move:
         self._direction = direction
         self._marble = marble
         self._pos_i = (first_ball_i, last_ball_i)
-        self._pos_f = Move.__calc_pos_f(direction, first_ball_i, last_ball_i)
+        self._pos_f = Move.__calc_pos_f(first_ball_i, last_ball_i, direction)
 
     @staticmethod
     def __calc_pos_f(first_ball_i, last_ball_i, direction):
