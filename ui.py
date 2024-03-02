@@ -1,23 +1,64 @@
 from abc import ABC, abstractmethod
 import pygame
+import numpy as np
+
+from enums import Marble
 
 
 class Drawable(ABC):
     @abstractmethod
-    def draw(self):
+    def draw(self, surface, gamestate):
         pass
 
 
 class HUD(Drawable):
-    def draw(self, surface):
+    def draw(self, surface, gamestate):
         # Example for drawing to the screen
         pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(10, 10, 150, 100))
 
 
 class Board(Drawable):
-    def draw(self, surface):
-        # Example for drawing to the screen
-        pygame.draw.rect(surface, (0, 255, 0), pygame.Rect(170, 10, 150, 100))
+    def draw(self, surface, gamestate):
+        gamestate = gamestate.get_board()
+        BLACK = (0, 0, 0)
+        WHITE = (200, 200, 200)
+        GRAY = (128, 128, 128)
+        BLUE = (0, 0, 255)
+
+        CELL_SIZE = 70
+        MARGIN = 2
+        OFFSET = CELL_SIZE / 2
+
+        screen = surface
+        pygame.display.set_caption("Abalone Board")
+
+        screen.fill(BLACK)
+
+        for row in range(len(gamestate)):
+                for col in range(len(gamestate[row])):
+                    if gamestate[row][col] == Marble.NONE:
+                        color = GRAY
+                    elif gamestate[row][col] == Marble.BLACK:
+                        color = BLUE
+                    elif gamestate[row][col] == Marble.WHITE:
+                        color = WHITE
+                    else:
+                        color = BLACK
+
+                    # Calculate the offset
+                    offset = OFFSET if row % 2 != 0 else 0  # Apply offset to odd rows for Abalone layout
+
+                    pygame.draw.rect(
+                        screen,
+                        color,
+                        [
+                            (MARGIN + CELL_SIZE) * col + MARGIN + offset,
+                            (MARGIN + CELL_SIZE) * row + MARGIN,
+                            CELL_SIZE,
+                            CELL_SIZE,
+                        ],
+                    )
+
 
 
 class UI(ABC):
@@ -41,10 +82,10 @@ class PygameUI(UI):
         super().__init__()
         self.screen = pygame.display.set_mode((1000, 1000))
 
-    def run(self):
+    def run(self, gamestate):
         pygame.init()
         while True:
-            self.update()
+            self.update(gamestate)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -61,11 +102,11 @@ class PygameUI(UI):
                     elif event.button == 3:
                         print(f'Right click at {pos}')
 
-    def update(self):
+    def update(self, gamestate):
         self.screen.fill((0, 0, 0))
 
         for element in self.elements:
-            element.draw(self.screen)
+            element.draw(self.screen, gamestate)
 
         pygame.display.flip()
 

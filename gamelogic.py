@@ -89,15 +89,16 @@ class Game:
         for row in csv_reader:
             formatted_row = []
             for item in row:
-                if item == "None":
+                if item.strip() == "None":
                     formatted_row.append(None)
-                elif item == "Marble.White":
+                elif item.strip() == "Marble.WHITE":
                     formatted_row.append(Marble.WHITE)
-                elif item == "Marble.Black":
+                elif item.strip() == "Marble.BLACK":
                     formatted_row.append(Marble.BLACK)
-                elif item == "Marble.None":
+                elif item.strip() == "Marble.NONE":
                     formatted_row.append(Marble.NONE)
                 else:
+                    print(item)
                     raise Exception("Invalid Value")
             starting_board.append(formatted_row)
 
@@ -111,6 +112,9 @@ class Game:
 
     def set_move(self, player, move):
         pass
+
+    def get_board(self):
+        return self._current_game_state.get_board()
 
 
 class GameState:
@@ -126,5 +130,8 @@ class GameState:
 
     def calc_black_move(self):
         pass
+
+    def get_board(self):
+        return self._board
 
 

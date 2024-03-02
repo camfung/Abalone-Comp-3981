@@ -1,3 +1,5 @@
+from enums import Formation
+from gamelogic import Game
 from players import GameManager
 from ui import HUD, Board, PygameUI
 
@@ -17,3 +19,9 @@ class App:
 
     def run(self):
         self.gui.run()
+
+game = Game(Formation.BELGIAN_DAISY)
+
+ui = PygameUI()
+ui.elements.append(Board())
+ui.run(game)
