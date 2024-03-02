@@ -18,16 +18,15 @@ class HUD(Drawable):
 
 
 class Board(Drawable):
+    CELL_SIZE = 70
+    MARGIN = 2
+    OFFSET = CELL_SIZE / 2
     def draw(self, surface, gamestate):
         gamestate = gamestate.get_board()
         BLACK = (0, 0, 0)
         WHITE = (200, 200, 200)
         GRAY = (128, 128, 128)
         BLUE = (0, 0, 255)
-
-        CELL_SIZE = 70
-        MARGIN = 2
-        OFFSET = CELL_SIZE / 2
 
         screen = surface
         pygame.display.set_caption("Abalone Board")
@@ -46,19 +45,33 @@ class Board(Drawable):
                         color = BLACK
 
                     # Calculate the offset
-                    offset = OFFSET if row % 2 != 0 else 0  # Apply offset to odd rows for Abalone layout
+                    offset = self.OFFSET if row % 2 != 0 else 0  # Apply offset to odd rows for Abalone layout
 
                     pygame.draw.rect(
                         screen,
                         color,
                         [
-                            (MARGIN + CELL_SIZE) * col + MARGIN + offset,
-                            (MARGIN + CELL_SIZE) * row + MARGIN,
-                            CELL_SIZE,
-                            CELL_SIZE,
+                            (self.MARGIN + self.CELL_SIZE) * col + self.MARGIN + offset,
+                            (self.MARGIN + self.CELL_SIZE) * row + self.MARGIN,
+                            self.CELL_SIZE,
+                            self.CELL_SIZE,
                         ],
                     )
-
+    @classmethod
+    def get_cell(cls, pos, game):
+        board = game.get_board()
+        for row in range(len(board)):
+            for col in range(len(board[row])):
+                offset = cls.OFFSET if row % 2 != 0 else 0
+                rect = pygame.Rect(
+                    (cls.MARGIN + cls.CELL_SIZE) * col + cls.MARGIN + offset,
+                    (cls.MARGIN + cls.CELL_SIZE) * row + cls.MARGIN,
+                    cls.CELL_SIZE,
+                    cls.CELL_SIZE
+                )
+                if rect.collidepoint(pos):
+                    return row, col
+        return None, None
 
 
 class UI(ABC):
@@ -93,14 +106,17 @@ class PygameUI(UI):
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     # Get the mouse position
                     pos = pygame.mouse.get_pos()
+                    row, col = Board.get_cell(pos, gamestate)
+                    if row != None:
+                        gamestate.get_board()[row][col] = 1
 
                     # left click
                     if event.button == 1:
-                        print(f'Left click at {pos}')
+                        print(f'Left click at {row, col}')
 
                     # right click
                     elif event.button == 3:
-                        print(f'Right click at {pos}')
+                        print(f'Right click at {row, col}')
 
     def update(self, gamestate):
         self.screen.fill((0, 0, 0))
