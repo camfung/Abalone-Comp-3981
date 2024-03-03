@@ -18,8 +18,8 @@ class HUD(Drawable):
 
 
 class Board(Drawable):
-    CELL_SIZE = 70
-    MARGIN = 2
+    CELL_SIZE = 80
+    MARGIN = 7
     OFFSET = CELL_SIZE / 2
     def draw(self, surface, gamestate):
         gamestate = gamestate.get_board()
@@ -31,7 +31,9 @@ class Board(Drawable):
         screen = surface
         pygame.display.set_caption("Abalone Board")
 
-        screen.fill(BLACK)
+        background_image = pygame.image.load("images/AIBoard.png", "rb")
+        background_image = pygame.transform.scale(background_image, (1000, 1000))
+        screen.blit(background_image, (0, 0))
 
         for row in range(len(gamestate)):
                 for col in range(len(gamestate[row])):
@@ -42,29 +44,31 @@ class Board(Drawable):
                     elif gamestate[row][col] == Marble.WHITE:
                         color = WHITE
                     else:
-                        color = BLACK
+                        continue
 
                     # Calculate the offset
-                    offset = self.OFFSET if row % 2 != 0 else 0  # Apply offset to odd rows for Abalone layout
+                    offset = self.OFFSET if row % 2 == 0 else 0  # Apply offset to odd rows for Abalone layout
+                    total_grid_width = len(gamestate) * self.CELL_SIZE + (len(gamestate) - 1) * self.MARGIN
+                    total_grid_height = len(gamestate) * self.CELL_SIZE + (len(gamestate) - 1) * self.MARGIN
+                    start_x = (1000 - total_grid_width) // 2
+                    start_y = (1000 - total_grid_height) // 2
 
+                    cell_x = start_x + col * (self.CELL_SIZE + self.MARGIN) - offset
+                    cell_y = start_y + row * (self.CELL_SIZE + self.MARGIN)
                     pygame.draw.rect(
                         screen,
                         color,
-                        [
-                            (self.MARGIN + self.CELL_SIZE) * col + self.MARGIN + offset,
-                            (self.MARGIN + self.CELL_SIZE) * row + self.MARGIN,
-                            self.CELL_SIZE,
-                            self.CELL_SIZE,
-                        ],
+                        [cell_x, cell_y, self.CELL_SIZE, self.CELL_SIZE]
+
                     )
     @classmethod
     def get_cell(cls, pos, game):
         board = game.get_board()
         for row in range(len(board)):
             for col in range(len(board[row])):
-                offset = cls.OFFSET if row % 2 != 0 else 0
+                offset = cls.OFFSET if row % 2 == 0 else 0
                 rect = pygame.Rect(
-                    (cls.MARGIN + cls.CELL_SIZE) * col + cls.MARGIN + offset,
+                    (cls.MARGIN + cls.CELL_SIZE) * col + cls.MARGIN - offset,
                     (cls.MARGIN + cls.CELL_SIZE) * row + cls.MARGIN,
                     cls.CELL_SIZE,
                     cls.CELL_SIZE
