@@ -43,16 +43,10 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add .
-          if git diff --staged --quiet; then
-              echo "No changes to commit."
-              echo "::set-output name=changes::false"
-          else
-              echo "Changes detected."
-              echo "::set-output name=changes::true"
+          if ! git diff --staged --quiet; then
+            git commit -m "updated diagram"
           fi
-      
       - name: Push changes
-        if: steps.git-check.outputs.changes == 'true'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

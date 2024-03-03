@@ -24,7 +24,7 @@ namespace Players {
     }
 
     class AbaloneAgent {
-        - generate_move()
+        - generate_move() : Move
 		+ calc_move() : Action
 		+ max_move(): Utility
 		+ min_move(): Utility
@@ -39,21 +39,6 @@ namespace Driver {
        + run() 
     }
 
-}
-
-namespace API {
-    class Move {
-        - pos_i :  (first_ball_i : tuple(int, int), last_ball_i: tuple(int, int))
-        - pos_f : (first_ball_f: tuple(int, int), last_ball_f: tuple(int, int))
-        - direction : Direction(Enum)
-        - player : Marble
-        + __str__() : String
-    }
-
-    class Observer {
-        <<interface>>
-        + update() : void
-    }
 }
 
 namespace Ui {
@@ -84,37 +69,32 @@ namespace Ui {
     class HUD {
 
     }
+
     class Board {
 
     }
 }
 
-namespace GameLogic {
+namespace Communication {
+    class Observer {
+        <<interface>>
+        + update() : void
+    }
+
     class Observable {
         <<abstract>>
-        - game_state : Game
+        - game : Game
         - players : List[Observer]
         + join_room(player) : bool
         + leave_room(observer : Observer) : void
         + notify() : void
     }
 
-    class Game {
-        + id_counter : int$
-        - game_id : int
-        - current_game_state : GameState
-        - previous_game_state : GameState
-        - record_history : RecordHistory
-        + initialize_board_layout(formation: Formation) : GameState$
-        + set_move(player: Player, move: Move) : void
-        + get_current_game_state() : GameState
-        + get_previous_game_state() : GameState
-    }
-
     class GameManager {
         <<Singleton>>
         - instance : GameManager$
-        - players : List[Observer]
+        - observers : List<Observer>
+        - game: Game
         + get_instance(): GameManager$
         + __init__() : GameManager
         + join_game(room_id, player) : bool
@@ -125,15 +105,55 @@ namespace GameLogic {
         + stop_game() : void
         + pause_game() : void
         + reset_game() : void
+        + commit_move(player: Player, move: Move) : void
         + undo_last_move() : void
+    }
+}
+
+namespace Gameplay {
+    class Game {
+        + id_counter : int$
+        - game_id : int
+        - current_game_state : GameState
+        - record_history : RecordHistory
+        + initialize_board_layout(formation: Formation) : GameState$
+        + set_move(player: Player, move: Move) : void
+        + get_current_game_state() : GameState
+        + get_record_history(): RecordHistory
     }
 
     class GameState {
-        - board : list(list[int])
-        + get_state_space(): Move[]
-        + calc_white_move(): Move
-        + calc_black_move(): Move
-        + make_move(player, move)
+        - board : Marble[][]
+        - marble: Marble
+        - prev_game_state : GameState
+        - moves: Move[]
+        + __init__(board: Marble[][]): GameState
+        + __init__(board: Marble[][], marble: Marble, prev_game_state: GameState): GameState
+        + get_board(): Marble[][]
+        + get_marble(): Marble
+        + get_previous_game_state(): GameState
+        + get_possible_moves(): Move[]
+        - generate_possible_moves(marble: Marble): Move[]
+        + convert_moves_to_game_states(): GameState[]
+        + generate_new_board_state(move: Move): Marble[][]
+        - calc_move(marble: Marble, kwargs: Dict<args>): Move
+        - check_move(move: Move): bool$
+        - check_inbounds(first_ball_i: tuple(int, int), last_ball_i: tuple(int, int), row: Marble[]) : bool
+        + set_board(marble, move)
+    }
+
+    class Move {
+        - pos_i :  (first_ball_i : tuple(int, int), last_ball_i: tuple(int, int))
+        - pos_f : (first_ball_f: tuple(int, int), last_ball_f: tuple(int, int))
+        - direction : Direction
+        - marble : Marble
+        + __init__(first_ball_i : tuple(int, int), last_ball_i : tuple(int, int), direction: Direction, marble: Marble) : Move
+        - calc_pos_f(first_ball_i : tuple(int, int), last_ball_i : tuple(int, int), direction: Direction) : tuple(int, int)$
+        + get_pos_i(): tuple(tuple(int, int), tuple(int, int))
+        + get_pos_f(): tuple(tuple(int, int), tuple(int, int))
+        + get_direction(): Direction
+        + get_marble(): Marble
+        + __str__() : String
     }
 }
 
@@ -145,6 +165,8 @@ namespace Records {
         + get_game_id(): int
         + get_records(): Record[]
         + get_record(index: int): Record
+        + add_record(move: Move): void
+        + remove_last_record(): void
     }
 
     class Record {
@@ -184,10 +206,12 @@ namespace Enums {
 
     class Direction {
         <<enumeration>>
-        UP
-        DOWN
-        LEFT
+        UP_LEFT
+        UP_RIGHT
         RIGHT
+        DOWN_RIGHT
+        DOWN_LEFT
+        LEFT
     }
 }
 

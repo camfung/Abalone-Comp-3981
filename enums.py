@@ -1,5 +1,5 @@
 
-from enum import Enum, auto
+from enum import *
 
 
 class Formation(Enum):
@@ -25,7 +25,16 @@ class Direction(Enum):
     """
     Direction Enumeration for Move Directions
     """
-    UP = auto()
-    DOWN = auto()
-    LEFT = auto()
+    UP_LEFT = auto()
+    UP_RIGHT = auto()
     RIGHT = auto()
+    DOWN_RIGHT = auto()
+    DOWN_LEFT = auto()
+    LEFT = auto()
+
+
+class UIState(Enum):
+    MAIN_MENU = auto()
+    SETTINGS_MENU = auto()
+    PLAY_MENU = auto()
+    GAME_PLAY = auto()

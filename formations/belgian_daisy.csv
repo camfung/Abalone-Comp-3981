@@ -1,9 +1,9 @@
-None, None, None, Marble.WHITE, Marble.WHITE, Marble.NONE, Marble.BLACK, Marble.BLACK, None, None, None
-None, None, None, Marble.WHITE, Marble.WHITE, Marble.WHITE, Marble.BLACK, Marble.BLACK, Marble.BLACK, None, None
-None, None, Marble.NONE, Marble.WHITE, Marble.WHITE,Marble.NONE, Marble.BLACK, Marble.BLACK, Marble.NONE, None, None
-None, None, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, None
-None, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, None
-None, None, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, Marble.NONE, None
-None, None, Marble.NONE, Marble.BLACK, Marble.BLACK, Marble.NONE, Marble.WHITE, Marble.WHITE, Marble.NONE, None, None
-None, None, None, Marble.BLACK, Marble.BLACK, Marble.BLACK, Marble.WHITE, Marble.WHITE, Marble.WHITE, None, None
-None, None, None, Marble.BLACK, Marble.BLACK, Marble.NONE, Marble.WHITE, Marble.WHITE, None, None, None
+None,None,None,None,None,WHITE,WHITE,EMPTY,BLACK,BLACK,None
+None,None,None,None,WHITE,WHITE,WHITE,BLACK,BLACK,BLACK,None
+None,None,None,EMPTY,WHITE,WHITE,EMPTY,BLACK,BLACK,EMPTY,None
+None,None,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,None
+None,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,None
+None,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,EMPTY,None,None
+None,EMPTY,BLACK,BLACK,EMPTY,WHITE,WHITE,EMPTY,None,None,None
+None,BLACK,BLACK,BLACK,WHITE,WHITE,WHITE,None,None,None,None
+None,BLACK,BLACK,EMPTY,WHITE,WHITE,None,None,None,None,None
