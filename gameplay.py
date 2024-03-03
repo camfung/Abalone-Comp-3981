@@ -164,35 +164,41 @@ class GameState:
         first_ball_i_y = move.get_pos_i()[0][1]
         last_ball_i_x = move.get_pos_i()[1][0]
         last_ball_i_y = move.get_pos_i()[1][1]
-        new_board[first_ball_i_x][first_ball_i_y] = Marble.NONE
-        new_board[last_ball_i_x][last_ball_i_y] = Marble.NONE
+
 
         first_ball_f_x = move.get_pos_f()[0][0]
         first_ball_f_y = move.get_pos_f()[0][1]
         last_ball_f_x = move.get_pos_f()[1][0]
         last_ball_f_y = move.get_pos_f()[1][1]
-        new_board[first_ball_f_x][first_ball_f_y] = move.get_marble()
-        new_board[last_ball_f_x][last_ball_f_y] = move.get_marble()
 
         # Move any remaining Balls
         remain_ball_i_x = first_ball_i_x
         remain_ball_i_y = first_ball_i_y
-        if first_ball_i_x - last_ball_i_x > 1:
-            remain_ball_i_x = (first_ball_i_x + last_ball_i_x) / 2
+        if  abs(first_ball_i_x - last_ball_i_x) > 1:
+            remain_ball_i_x = (first_ball_i_x + last_ball_i_x) // 2
 
-        if first_ball_i_y - last_ball_i_y > 1:
-            remain_ball_i_y = (first_ball_i_y + last_ball_i_y) / 2
+        if abs(first_ball_i_y - last_ball_i_y) > 1:
+            remain_ball_i_y = (first_ball_i_y + last_ball_i_y) // 2
 
-        remain_ball_f_x = first_ball_i_x
-        remain_ball_f_y = first_ball_i_y
-        if first_ball_f_x - last_ball_i_x > 1:
-            remain_ball_f_x = (first_ball_i_x + last_ball_i_x) / 2
+        remain_ball_f_x = first_ball_f_x
+        remain_ball_f_y = first_ball_f_y
+        if  abs(first_ball_f_x - last_ball_f_x) > 1:
+            remain_ball_f_x = (first_ball_f_x + last_ball_f_x) // 2
 
-        if first_ball_i_y - last_ball_i_y > 1:
-            remain_ball_f_y = (first_ball_i_y + last_ball_i_y) / 2
+        if  abs(first_ball_f_y - last_ball_f_y) > 1:
+            remain_ball_f_y = (first_ball_f_y + last_ball_f_y) // 2
 
+        # remove the all the marbles in the move
+        new_board[first_ball_i_x][first_ball_i_y] = Marble.NONE
+        new_board[last_ball_i_x][last_ball_i_y] = Marble.NONE
         new_board[remain_ball_i_x][remain_ball_i_y] = Marble.NONE
+
+        # place the marbles back on the board
+        new_board[first_ball_f_x][first_ball_f_y] = move.get_marble()
+        new_board[last_ball_f_x][last_ball_f_y] = move.get_marble()
         new_board[remain_ball_f_x][remain_ball_f_y] = move.get_marble()
+
+        # if the marble is off the board delete it
 
         return new_board
 
@@ -224,7 +230,7 @@ class GameState:
         for i, row in enumerate(self._board):
             row_str = leading_spaces[i]
 
-            for space in row:
+            for index, space in enumerate(row):
                 if space is None or space == "None":
                     continue
                 elif space == Marble.WHITE:
@@ -236,6 +242,9 @@ class GameState:
 
             board_str += row_str.rstrip() + "\n"
 
+        board_str += "          "
+        for i in range(1, 6): 
+            board_str += f" {str(i)} " 
         current_turn = "Black" if self._current_move_color == Marble.BLACK else "White"
         return f"Current Turn: {current_turn}\nBoard:\n{board_str}"
 

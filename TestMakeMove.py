@@ -5,11 +5,11 @@ from enums import Direction, Formation, Marble
 game = Game(Formation.DEFAULT)
 print(game)
 moves = game.get_current_game_state().get_possible_moves()
-input("press enter when your ready for a move to be made.")
-move = Move((6, 3), (6, 5), Direction.UP_RIGHT, Marble.BLACK)
+move = Move((7, 3), (7, 5), Direction.UP_RIGHT, Marble.BLACK)
 print(move)
 game.set_move(Marble.BLACK, move)
 
+move = Move((1,5), (3,5), Direction.DOWN_RIGHT, Marble.WHITE)
+
+game.set_move(Marble.WHITE, move)
 print(game)
-while True:
-    pass
