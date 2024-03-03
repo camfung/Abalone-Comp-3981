@@ -10,9 +10,16 @@ class App:
             cls._instance = super().__new__(cls, *args, **kwargs)
             cls.game = GameManager()
             cls.gui = PygameUI()
+            hud = HUD()
+            board = Board()
 
-            cls.gui.elements.append(HUD())
-            cls.gui.elements.append(Board())
+            # add the drawables
+            cls.gui.drawable_elements.append(hud)
+            cls.gui.drawable_elements.append(board)
+
+            # add the event handlers
+            cls.gui.event_handlers.append(hud)
+            cls.gui.event_handlers.append(board)
         return cls._instance
 
     def run(self):

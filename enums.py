@@ -31,3 +31,10 @@ class Direction(Enum):
     DOWN_RIGHT = auto()
     DOWN_LEFT = auto()
     LEFT = auto()
+
+
+class UIState(Enum):
+    MAIN_MENU = auto()
+    SETTINGS_MENU = auto()
+    PLAY_MENU = auto()
+    GAME_PLAY = auto()
