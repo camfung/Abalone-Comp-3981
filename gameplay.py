@@ -207,8 +207,8 @@ class GameState:
         # Move Subsequent Pieces in Same Direction
         if move.get_move_type() == MoveType.INLINE:
             # Declare Multipliers to Search for Subsequent Balls
-            sub_x_mult = 1 if first_ball_i_x > first_ball_f_x else (-1 if first_ball_i_x < first_ball_f_x else 0)
-            sub_y_mult = 1 if first_ball_i_y > first_ball_f_y else (-1 if first_ball_i_y < first_ball_f_y else 0)
+            sub_x_mult = 1 if first_ball_f_x > first_ball_i_x else (-1 if first_ball_f_x < first_ball_i_x else 0)
+            sub_y_mult = 1 if first_ball_f_y > first_ball_i_y else (-1 if first_ball_f_y < first_ball_i_y else 0)
 
             # Declare Variables for Initial and Final Ball Positions
             sub_ball_i_x = copy.copy(last_ball_f_x) if sub_x_mult > 0 else copy.copy(first_ball_f_x)
