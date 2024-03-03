@@ -128,7 +128,8 @@ class GameState:
                         start_range = 0 if mod_row == 0 else 1
                         for group_size in range(start_range, 3):
                             first_ball_i = (row_index, space_index)
-                            last_ball_i = (row_index + group_size * mod_row, space_index + group_size * mod_col)
+                            last_ball_i = (
+                                row_index + group_size * mod_row, space_index + group_size * mod_col)
 
                             if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
                                 break
@@ -196,7 +197,7 @@ class GameState:
         return new_board
 
     def __calc_move(self, **kwargs):
-        move = Move(self._current_move_color, **kwargs)
+        move = Move(marble=self._current_move_color, **kwargs)
         if self.__check_move(move):
             return move
         return None
