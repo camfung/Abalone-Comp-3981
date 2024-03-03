@@ -147,12 +147,17 @@ namespace Gameplay {
         - pos_f : (first_ball_f: tuple(int, int), last_ball_f: tuple(int, int))
         - direction : Direction
         - marble : Marble
-        + __init__(first_ball_i : tuple(int, int), last_ball_i : tuple(int, int), direction: Direction, marble: Marble) : Move
+        - selection_type : MarbleSelection
+        - move_type : MoveType
+        + __init__(first_ball_i : tuple(int, int), last_ball_i : tuple(int, int), direction: Direction, marble: Marble, selection: MarbleSelection) : Move
         - calc_pos_f(first_ball_i : tuple(int, int), last_ball_i : tuple(int, int), direction: Direction) : tuple(int, int)$
+        - calc_move_type(first_ball_i : tuple(int, int), last_ball_i : tuple(int, int), direction: Direction, selection: MarbleSelection) : MoveType$
         + get_pos_i(): tuple(tuple(int, int), tuple(int, int))
         + get_pos_f(): tuple(tuple(int, int), tuple(int, int))
         + get_direction(): Direction
         + get_marble(): Marble
+        + get_selection_type: MarbleSelection
+        + get_move_type(): MoveType
         + __str__() : String
     }
 }
@@ -212,6 +217,20 @@ namespace Enums {
         DOWN_RIGHT
         DOWN_LEFT
         LEFT
+    }
+
+    class MarbleSelection {
+        <<enumeration>>
+        HORIZONTAL
+        BACKWARD_SLASH
+        FORWARD_SLASH
+    }
+
+    class MoveType {
+        <<enumeration>>
+        SINGLE
+        INLINE
+        SIDE_STEP
     }
 }
 

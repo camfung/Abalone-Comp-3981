@@ -31,3 +31,21 @@ class Direction(Enum):
     DOWN_RIGHT = auto()
     DOWN_LEFT = auto()
     LEFT = auto()
+
+
+class MarbleSelection(Enum):
+    """
+    Marble Selection Enumeration for Marble Selections in Generate Possible Moves.
+    """
+    HORIZONTAL = auto()
+    BACKWARD_SLASH = auto()
+    FORWARD_SLASH = auto()
+
+
+class MoveType(Enum):
+    """
+    Move Type Enumeration for type of move made by Player
+    """
+    SINGLE = auto()
+    INLINE = auto()
+    SIDE_STEP = auto()
