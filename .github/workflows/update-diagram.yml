@@ -43,11 +43,9 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add .
-          if git diff --staged --quiet; then
-          else
-              git commit -m "updated diagram"
+          if ! git diff --staged --quiet; then
+            git commit -m "updated diagram"
           fi
-      
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
