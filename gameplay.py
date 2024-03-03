@@ -134,7 +134,7 @@ class GameState:
                             if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
                                 break
 
-                            if self.__check_inbounds(first_ball_i, last_ball_i, row):
+                            if not self.__check_inbounds(first_ball_i, last_ball_i, row):
                                 continue
 
                             for direction in Direction:
