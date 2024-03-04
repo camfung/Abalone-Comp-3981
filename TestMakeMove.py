@@ -23,6 +23,18 @@ game.set_move(Marble.BLACK, move)
 
 print(game)
 
+move = Move((8, 2), (8, 4), Direction.UP_RIGHT,
+            Marble.BLACK, MarbleSelection.HORIZONTAL)
+game.set_move(Marble.BLACK, move)
+
+print(game)
+
+move = Move((7, 3), (7, 5), Direction.UP_RIGHT,
+            Marble.BLACK, MarbleSelection.HORIZONTAL)
+game.set_move(Marble.BLACK, move)
+
+print(game)
+
 move = Move((2, 5), (4, 5), Direction.DOWN_RIGHT,
             Marble.WHITE, MarbleSelection.BACKWARD_SLASH)
 game.set_move(Marble.WHITE, move)

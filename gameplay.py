@@ -207,12 +207,12 @@ class GameState:
         # Move Subsequent Pieces in Same Direction
         if move.get_move_type() == MoveType.INLINE:
             # Declare Multipliers to Search for Subsequent Balls
-            sub_x_mult = 1 if first_ball_f_x > first_ball_i_x else (-1 if first_ball_f_x < first_ball_i_x else 0)
-            sub_y_mult = 1 if first_ball_f_y > first_ball_i_y else (-1 if first_ball_f_y < first_ball_i_y else 0)
+            move_x = 1 if first_ball_f_x > first_ball_i_x else (-1 if first_ball_f_x < first_ball_i_x else 0)
+            move_y = 1 if first_ball_f_y > first_ball_i_y else (-1 if first_ball_f_y < first_ball_i_y else 0)
 
             # Declare Variables for Initial and Final Ball Positions
-            sub_ball_i_x = copy.copy(last_ball_f_x) if sub_x_mult > 0 else copy.copy(first_ball_f_x)
-            sub_ball_i_y = copy.copy(last_ball_f_y) if sub_y_mult > 0 else copy.copy(first_ball_f_y)
+            sub_ball_i_x = copy.copy(last_ball_i_x) if move_x > 0 else copy.copy(first_ball_i_x)
+            sub_ball_i_y = copy.copy(last_ball_i_y) if move_y > 0 else copy.copy(first_ball_i_y)
             sub_ball_f_x = copy.copy(sub_ball_i_x)
             sub_ball_f_y = copy.copy(sub_ball_i_y)
 
@@ -221,8 +221,8 @@ class GameState:
             org_ball_y = copy.copy(sub_ball_i_y)
 
             # Adjust Final Positions to Start Loop
-            sub_ball_f_x += sub_x_mult
-            sub_ball_f_y += sub_y_mult
+            sub_ball_f_x += move_x
+            sub_ball_f_y += move_y
 
             # Safety Lock Prevents Spaces from being shifted if there are no opposing pieces being pushed
             safety_lock = False
@@ -233,31 +233,31 @@ class GameState:
             # Search for the End of the Line
             while (new_board[sub_ball_f_x][sub_ball_f_y] is not Marble.NONE
                    and new_board[sub_ball_f_x][sub_ball_f_y] is not None):
-                sub_ball_i_x += sub_x_mult
-                sub_ball_f_x += sub_x_mult
-                sub_ball_i_y += sub_y_mult
-                sub_ball_f_y += sub_y_mult
+                sub_ball_i_x += move_x
+                sub_ball_f_x += move_x
+                sub_ball_i_y += move_y
+                sub_ball_f_y += move_y
 
             # Move Marbles to New Locations
-            while ((sub_ball_i_x >= org_ball_x and sub_x_mult > 0
-                    or sub_ball_i_x <= org_ball_x and sub_x_mult < 0
-                    or sub_ball_i_x == org_ball_x and sub_x_mult == 0)
+            while ((sub_ball_i_x > org_ball_x and move_x > 0
+                    or sub_ball_i_x < org_ball_x and move_x < 0
+                    or sub_ball_i_x == org_ball_x and move_x == 0)
                    and
-                   (sub_ball_i_y >= org_ball_y and sub_y_mult > 0
-                    or sub_ball_i_y <= org_ball_y and sub_y_mult < 0
-                    or sub_ball_i_y == org_ball_y and sub_y_mult == 0)
+                   (sub_ball_i_y > org_ball_y and move_y > 0
+                    or sub_ball_i_y < org_ball_y and move_y < 0
+                    or sub_ball_i_y == org_ball_y and move_y == 0)
                    and not safety_lock):
-                marble_color = copy.copy(new_board[sub_ball_i_x][sub_ball_i_y])
+                marble_color = copy.deepcopy(new_board[sub_ball_i_x][sub_ball_i_y])
                 new_board[sub_ball_i_x][sub_ball_i_y] = Marble.NONE
 
                 # If the Marble is Off the Board, Delete it. Otherwise, Move Marble to Space
                 if self._board[sub_ball_f_x][sub_ball_f_y] is not None:
                     new_board[sub_ball_f_x][sub_ball_f_y] = marble_color
 
-                sub_ball_i_x -= sub_x_mult
-                sub_ball_f_x -= sub_x_mult
-                sub_ball_i_y -= sub_y_mult
-                sub_ball_f_y -= sub_y_mult
+                sub_ball_i_x -= move_x
+                sub_ball_f_x -= move_x
+                sub_ball_i_y -= move_y
+                sub_ball_f_y -= move_y
 
         # Remove the all the Mover's marbles in the move
         new_board[first_ball_i_x][first_ball_i_y] = Marble.NONE
