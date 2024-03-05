@@ -11,7 +11,7 @@ class App:
         if not cls._instance:
             cls._instance = super().__new__(cls, *args, **kwargs)
             cls.game = GameManager()
-            cls.game.start_game(Formation.DEFAULT)
+            cls.game.start_game(Formation.GERMAN_DAISY)
             cls.gui = PygameUI()
             hud = HUD()
             board = Board()
