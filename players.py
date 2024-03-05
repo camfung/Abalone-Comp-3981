@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import random
+import time
 from typing import Any
 
 
@@ -63,3 +65,27 @@ class Player(ABC):
     @abstractmethod
     def undo_last_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
         pass
+
+
+class HumanPlayer(Player):
+
+    def make_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
+        gameManager.commit_move(move)
+
+    def undo_last_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
+        print("Undoing last move.")
+
+
+class AbaloneAgent(Player):
+
+    def generate_move(gameManager: GameManager):
+        # sample for making a random move
+        move = random.choice(gameManager.get_game(
+        ).get_current_game_state().get_possible_moves())
+
+    def make_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
+        time.sleep(1)
+        gameManager.commit_move(move)
+
+    def undo_last_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
+        print("Agent undoing last move.")
