@@ -133,6 +133,7 @@ class PygameUI(UI):
         self.screen = pygame.display.set_mode(
             (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self._app = app
+        self.waiting_for_player_input = False
 
     def start_the_game(self, config):
 
@@ -204,7 +205,7 @@ class PygameUI(UI):
         menu = pygame_menu.Menu(
             'Play', PygameUI.SCREEN_WIDTH, PygameUI.SCREEN_HEIGHT, theme=self.theme)
         opponent_type = menu.add.selector(
-            'Opponent: ', [('Human', GameType.PLAYER_VS_PLAYER), ('CPU', GameType.PLAYER_VS_CPU)])
+            'Opponent: ', [('CPU', GameType.PLAYER_VS_CPU), ('Human', GameType.PLAYER_VS_PLAYER)])
         cpu_level = menu.add.dropselect('CPU Level: ', [(
             'Easy', 1), ('Medium', 2), ('Hard', 3)], default=1, onchange=self.update_play_button)
         formation = menu.add.dropselect('Formation: ', [(

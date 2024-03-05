@@ -39,15 +39,14 @@ class App:
                 # if the first player to move is a cpu make the move
                 self.gui.run_game()
             if event == "MakeFirstMove":
-                player = self.players[0] if self.players[0].color == self.game_manager.get_current_player_to_move(
-                ) else self.players[1]
+                player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
                 if type(player) == AbaloneAgent:
                     # trigger the agent to make a move
-                    move = player.generate_move()
+                    move = player.generate_move(self.game_manager)
                     player.make_move(self.game_manager, player.color, move)
                 else:
                     # set a flag in the ui to let it know that we are waiting for a move to be made
-                    pass
+                    self.gui.waiting_for_player_input = True
 
     def initialize_players(self, game_type: GameType):
         if game_type == GameType.CPU_VS_CPU:

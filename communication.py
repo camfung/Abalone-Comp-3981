@@ -31,6 +31,13 @@ class GameManager():
         self._game.set_move()
         self.notify()
 
+    @property
+    def current_player_to_move(self):
+        return self._game.get_current_game_state().get_current_move_color()
+
+    def get_possible_moves(self):
+        return self._game.get_current_game_state().get_possible_moves()
+
     def get_board(self):
         return self._game.get_current_game_state().get_board()
 

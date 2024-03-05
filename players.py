@@ -67,15 +67,15 @@ class HumanPlayer(Player):
 
 class AbaloneAgent(Player):
 
-    def generate_move(gameManager: GameManager):
+    def generate_move(self, gameManager: GameManager):
         # sample for making a random move
-        move = random.choice(gameManager.get_game(
-        ).get_current_game_state().get_possible_moves())
+        move = random.choice(
+            gameManager.get_possible_moves())
         return move
 
     def make_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
         time.sleep(1)
-        gameManager.commit_move(move)
+        gameManager.commit_move(player, move)
 
     def undo_last_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
         print("Agent undoing last move.")
