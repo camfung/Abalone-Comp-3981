@@ -134,6 +134,7 @@ class PygameUI(UI):
             (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self._app = app
         self.waiting_for_player_input = False
+        self.start_button_clicked = False
 
     def start_the_game(self, config):
 

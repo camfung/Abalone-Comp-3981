@@ -58,4 +58,4 @@ class GameManager():
 
     def notify(self):
         for observer in self._observers:
-            observer.update()
+            observer.update(self)

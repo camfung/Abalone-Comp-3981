@@ -3,13 +3,8 @@ import random
 import time
 from typing import Any
 
-
-class GameManager:
-    pass
-
-
-class Move:
-    pass
+from communication import GameManager
+from gameplay import Move
 
 
 class Player(ABC):

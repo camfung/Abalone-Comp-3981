@@ -22,6 +22,8 @@ class App:
         self.gui.event_handlers.append(hud)
         self.gui.event_handlers.append(board)
 
+        self.game_manager.join_room(self.gui)
+
     def notify(self, sender, event, **kwargs):
         if sender == self.gui:
             if event == "StartGame":
@@ -44,6 +46,7 @@ class App:
                     # trigger the agent to make a move
                     move = player.generate_move(self.game_manager)
                     player.make_move(self.game_manager, player.color, move)
+                    self.gui.start_button_clicked = True
                 else:
                     # set a flag in the ui to let it know that we are waiting for a move to be made
                     self.gui.waiting_for_player_input = True
