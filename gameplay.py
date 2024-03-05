@@ -1,4 +1,3 @@
-
 import copy
 from enums import *
 from records import RecordHistory
@@ -124,8 +123,18 @@ class GameState:
                     continue
 
                 if space is self._current_move_color:
-                    for mod_row, mod_col in row_col_modifiers:
+                    for mod_index, (mod_row, mod_col) in enumerate(row_col_modifiers):
                         start_range = 0 if mod_row == 0 else 1
+
+                        selection = None
+
+                        if mod_index == 0:
+                            selection = MarbleSelection.HORIZONTAL
+                        elif mod_index == 1:
+                            selection = MarbleSelection.BACKWARD_SLASH
+                        elif mod_index == 2:
+                            selection = MarbleSelection.FORWARD_SLASH
+
                         for group_size in range(start_range, 3):
                             first_ball_i = (row_index, space_index)
                             last_ball_i = (
@@ -140,7 +149,8 @@ class GameState:
                             for direction in Direction:
                                 move = self.__calc_move(first_ball_i=first_ball_i,
                                                         last_ball_i=last_ball_i,
-                                                        direction=direction)
+                                                        direction=direction,
+                                                        selection=selection)
                                 if move is not None:
                                     moves.append(move)
 
@@ -156,25 +166,31 @@ class GameState:
         return game_states
 
     def generate_new_board_state(self, move):
+        """
+        Takes a given valid move and returns a new generated board state
+        :param move: a move
+        :precondition: move has been previously validated by check_move upon generation of move
+        :return: a Marble 2D array representing the new board state
+        """
         # Copy the Existing Board Value into the output variable
         new_board = copy.deepcopy(self._board)
 
-        # Move the First and Last Balls
+        # Fetch Initial Ball Positions
         first_ball_i_x = move.get_pos_i()[0][0]
         first_ball_i_y = move.get_pos_i()[0][1]
         last_ball_i_x = move.get_pos_i()[1][0]
         last_ball_i_y = move.get_pos_i()[1][1]
 
-
+        # Fetch Final Ball Positions
         first_ball_f_x = move.get_pos_f()[0][0]
         first_ball_f_y = move.get_pos_f()[0][1]
         last_ball_f_x = move.get_pos_f()[1][0]
         last_ball_f_y = move.get_pos_f()[1][1]
 
-        # Move any remaining Balls
+        # Fetch Middle Ball Positions
         remain_ball_i_x = first_ball_i_x
         remain_ball_i_y = first_ball_i_y
-        if  abs(first_ball_i_x - last_ball_i_x) > 1:
+        if abs(first_ball_i_x - last_ball_i_x) > 1:
             remain_ball_i_x = (first_ball_i_x + last_ball_i_x) // 2
 
         if abs(first_ball_i_y - last_ball_i_y) > 1:
@@ -182,23 +198,76 @@ class GameState:
 
         remain_ball_f_x = first_ball_f_x
         remain_ball_f_y = first_ball_f_y
-        if  abs(first_ball_f_x - last_ball_f_x) > 1:
+        if abs(first_ball_f_x - last_ball_f_x) > 1:
             remain_ball_f_x = (first_ball_f_x + last_ball_f_x) // 2
 
-        if  abs(first_ball_f_y - last_ball_f_y) > 1:
+        if abs(first_ball_f_y - last_ball_f_y) > 1:
             remain_ball_f_y = (first_ball_f_y + last_ball_f_y) // 2
 
-        # remove the all the marbles in the move
+        # Move Subsequent Pieces in Same Direction
+        if move.get_move_type() == MoveType.INLINE:
+            # Declare Multipliers to Search for Subsequent Balls
+            move_x = 1 if first_ball_f_x > first_ball_i_x else (-1 if first_ball_f_x < first_ball_i_x else 0)
+            move_y = 1 if first_ball_f_y > first_ball_i_y else (-1 if first_ball_f_y < first_ball_i_y else 0)
+
+            # Declare Variables for Initial and Final Ball Positions
+            sub_ball_i_x = copy.copy(last_ball_i_x) if move_x > 0 else copy.copy(first_ball_i_x)
+            sub_ball_i_y = copy.copy(last_ball_i_y) if move_y > 0 else copy.copy(first_ball_i_y)
+            sub_ball_f_x = copy.copy(sub_ball_i_x)
+            sub_ball_f_y = copy.copy(sub_ball_i_y)
+
+            # Save Original Ball Positions to keep track when Tracing Backwards
+            org_ball_x = copy.copy(sub_ball_i_x)
+            org_ball_y = copy.copy(sub_ball_i_y)
+
+            # Adjust Final Positions to Start Loop
+            sub_ball_f_x += move_x
+            sub_ball_f_y += move_y
+
+            # Safety Lock Prevents Spaces from being shifted if there are no opposing pieces being pushed
+            safety_lock = False
+            if (new_board[sub_ball_f_x][sub_ball_f_y] is Marble.NONE
+                    or new_board[sub_ball_f_x][sub_ball_f_y] is None):
+                safety_lock = True
+
+            # Search for the End of the Line
+            while (new_board[sub_ball_f_x][sub_ball_f_y] is not Marble.NONE
+                   and new_board[sub_ball_f_x][sub_ball_f_y] is not None):
+                sub_ball_i_x += move_x
+                sub_ball_f_x += move_x
+                sub_ball_i_y += move_y
+                sub_ball_f_y += move_y
+
+            # Move Marbles to New Locations
+            while ((sub_ball_i_x > org_ball_x and move_x > 0
+                    or sub_ball_i_x < org_ball_x and move_x < 0
+                    or sub_ball_i_x == org_ball_x and move_x == 0)
+                   and
+                   (sub_ball_i_y > org_ball_y and move_y > 0
+                    or sub_ball_i_y < org_ball_y and move_y < 0
+                    or sub_ball_i_y == org_ball_y and move_y == 0)
+                   and not safety_lock):
+                marble_color = copy.deepcopy(new_board[sub_ball_i_x][sub_ball_i_y])
+                new_board[sub_ball_i_x][sub_ball_i_y] = Marble.NONE
+
+                # If the Marble is Off the Board, Delete it. Otherwise, Move Marble to Space
+                if self._board[sub_ball_f_x][sub_ball_f_y] is not None:
+                    new_board[sub_ball_f_x][sub_ball_f_y] = marble_color
+
+                sub_ball_i_x -= move_x
+                sub_ball_f_x -= move_x
+                sub_ball_i_y -= move_y
+                sub_ball_f_y -= move_y
+
+        # Remove the all the Mover's marbles in the move
         new_board[first_ball_i_x][first_ball_i_y] = Marble.NONE
         new_board[last_ball_i_x][last_ball_i_y] = Marble.NONE
         new_board[remain_ball_i_x][remain_ball_i_y] = Marble.NONE
 
-        # place the marbles back on the board
+        # Place the Mover's marbles back on the board
         new_board[first_ball_f_x][first_ball_f_y] = move.get_marble()
         new_board[last_ball_f_x][last_ball_f_y] = move.get_marble()
         new_board[remain_ball_f_x][remain_ball_f_y] = move.get_marble()
-
-        # if the marble is off the board delete it
 
         return new_board
 
@@ -243,23 +312,23 @@ class GameState:
             board_str += row_str.rstrip() + "\n"
 
         board_str += "          "
-        for i in range(1, 6): 
-            board_str += f" {str(i)} " 
+        for i in range(1, 6):
+            board_str += f" {str(i)} "
         current_turn = "Black" if self._current_move_color == Marble.BLACK else "White"
         return f"Current Turn: {current_turn}\nBoard:\n{board_str}"
 
 
 class Move:
-    def __init__(self, first_ball_i, last_ball_i, direction, marble):
+    def __init__(self, first_ball_i, last_ball_i, direction, marble, selection):
         self._direction = direction
         self._marble = marble
+        self._selection_type = selection
         self._pos_i = (first_ball_i, last_ball_i)
         self._pos_f = Move.__calc_pos_f(first_ball_i, last_ball_i, direction)
+        self._move_type = Move.__calc_move_type(first_ball_i, last_ball_i, direction, selection)
 
     @staticmethod
     def __calc_pos_f(first_ball_i, last_ball_i, direction):
-        position = None
-
         if direction == Direction.UP_LEFT:
             position = ((first_ball_i[0] - 1, first_ball_i[1]),
                         (last_ball_i[0] - 1, last_ball_i[1]))
@@ -283,6 +352,29 @@ class Move:
 
         return position
 
+    @staticmethod
+    def __calc_move_type(first_ball_i, last_ball_i, direction, selection):
+        # Return Single if First and Last Ball are the same
+        if first_ball_i == last_ball_i:
+            return MoveType.SINGLE
+
+        # Return Inline if Horizontal Selection and Directions is Left or Right
+        if (selection == MarbleSelection.HORIZONTAL
+                and (Direction.LEFT == direction or Direction.RIGHT == direction)):
+            return MoveType.INLINE
+
+        # Return Inline if Selection is Backward Slash and Directions is UpLeft or DownRight
+        if (selection == MarbleSelection.BACKWARD_SLASH
+                and (Direction.UP_LEFT == direction or Direction.DOWN_RIGHT == direction)):
+            return MoveType.INLINE
+
+        # Return Inline if Selection is Forward Slash and Directions is UpRight or DownLeft
+        if (selection == MarbleSelection.FORWARD_SLASH
+                and (Direction.UP_RIGHT == direction or Direction.DOWN_LEFT == direction)):
+            return MoveType.INLINE
+
+        return MoveType.SIDE_STEP
+
     def get_pos_i(self):
         return self._pos_i
 
@@ -294,6 +386,12 @@ class Move:
 
     def get_marble(self):
         return self._marble
+
+    def get_selection_type(self):
+        return self._selection_type
+
+    def get_move_type(self):
+        return self._move_type
 
     def __str__(self):
         return f"{self._pos_i} -> {self._pos_f}"

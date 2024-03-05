@@ -71,3 +71,6 @@ class GameManager(Observable):
     def undo_last_move(self):
         self._game.set_move()
         self.notify()
+
+    def get_board(self):
+        return self._game.get_current_game_state().get_board()

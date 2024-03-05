@@ -1,4 +1,6 @@
-from players import GameManager
+from enums import Formation
+from gameplay import Game
+from communication import GameManager
 from ui import HUD, Board, PygameUI
 
 
@@ -9,6 +11,7 @@ class App:
         if not cls._instance:
             cls._instance = super().__new__(cls, *args, **kwargs)
             cls.game = GameManager()
+            cls.game.start_game(Formation.GERMAN_DAISY)
             cls.gui = PygameUI()
             hud = HUD()
             board = Board()
@@ -23,4 +26,4 @@ class App:
         return cls._instance
 
     def run(self):
-        self.gui.run()
+        self.gui.run(self.game)
