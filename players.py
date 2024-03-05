@@ -13,7 +13,7 @@ class Move:
 
 
 class Player(ABC):
-    def __init__(self, time_limit: int, move_limit: int, numBalls: int, color: int):
+    def __init__(self, time_limit: int, move_limit: int, color: int, numBalls: int = 14):
         self._time_limit = time_limit
         self._move_limit = move_limit
         self._current_move = 0
@@ -48,17 +48,6 @@ class Player(ABC):
         return self._color
 
     @abstractmethod
-    def update(self) -> None:
-        pass
-
-    # I'm not sure if this is necessary.
-    # wouldnt all the interaction with the game state be in the make move function.
-    # if so then the child classes can get the state from the gamemanager since it will be in the scope of the function
-    @abstractmethod
-    def get_game_state(self, gameManager: GameManager) -> None:
-        return gameManager.get_game_state()
-
-    @abstractmethod
     def make_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
         pass
 
@@ -82,6 +71,7 @@ class AbaloneAgent(Player):
         # sample for making a random move
         move = random.choice(gameManager.get_game(
         ).get_current_game_state().get_possible_moves())
+        return move
 
     def make_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
         time.sleep(1)

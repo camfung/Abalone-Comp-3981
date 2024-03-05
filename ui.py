@@ -1,32 +1,15 @@
 from abc import ABC, abstractmethod
+import sys
 import pygame
 from enums import GameType, Marble
 import pygame_menu
 from enums import Formation, UIState
-
-"""
-Essentially what this interface is meant to do is replace the event handling in the pygameUI main game loop. 
-The idea is that in the main game loop the handle event will be called on every event for all the ui components. 
-The behavior for the events will be definied in the concrete class
-"""
-
-
-class EventHandler(ABC):
-    @abstractmethod
-    def handle_event(self, event):
-        pass
-
-
-class Drawable(ABC):
-    @abstractmethod
-    def draw(self, surface, game_manager):
-        pass
+from ui_components import Button, Drawable, EventHandler
 
 
 class HUD(Drawable, EventHandler):
-    def __init__(self, app) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self._app = app
 
     def draw(self, surface, game_manager):
         # Example for drawing to the screen
@@ -43,9 +26,8 @@ class Board(Drawable, EventHandler):
     OFFSET = CELL_SIZE / 2 + SIDE_MARGIN - 5
     ALIGNMENT = [0, -2, -1, -1, 0, 0, 1, 1, 2, 2, 0]
 
-    def __init__(self, app) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self._app = app
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -56,6 +38,7 @@ class Board(Drawable, EventHandler):
             # left click
             if event.button == 1:
                 print(f'Left click at {row, col}')
+                print(pos)
 
             # right click
             elif event.button == 3:
@@ -138,54 +121,45 @@ class UI(ABC):
 
 
 class PygameUI(UI):
-    _instance = None
     SCREEN_HEIGHT = 1000
-    SCREEN_WIDTH = 1000
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super().__new__(cls, *args, **kwargs)
-        return cls._instance
+    SCREEN_WIDTH = 1300
+    button_color = (0, 128, 255)
+    button_highlight_color = (255, 255, 0)
+    text_color = (255, 255, 255)
 
     def __init__(self, app) -> None:
         super().__init__()
         self.theme = pygame_menu.themes.THEME_DARK
-        self.screen = pygame.display.set_mode((1000, 1000))
-        self.state = UIState.MAIN_MENU
+        self.screen = pygame.display.set_mode(
+            (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self._app = app
-        self.state_actions = {
-            UIState.GAME_PLAY: self.run_game,
-            UIState.MAIN_MENU: self.main_menu,
-            UIState.SETTINGS_MENU: self.settings_menu,
-            UIState.PLAY_MENU: self.play_menu,
-        }
 
     def start_the_game(self, config):
+
         # Placeholder for starting the game with the selected configuration
         print(f"Starting game with config: {config}")
+
+        def start_button_cb(): return self._app.notify(self, "MakeFirstMove")
+
+        start_button = Button(1000, 100, 200, 50, PygameUI.button_color,
+                              PygameUI.button_highlight_color, "Start", PygameUI.text_color, 32, start_button_cb)
+        self.drawable_elements.append(start_button)
+        self.event_handlers.append(start_button)
         self._app.notify(self, "StartGame", config=config)
-        self.run_game()
 
     def run_game(self):
         while True:
-            self.update(self._game_manager)
             for event in pygame.event.get():
                 for event_handler in self.event_handlers:
                     event_handler.handle_event(event)
 
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    return
+                    sys.exit()
 
-    def run(self, game_manager):
-        self._game_manager = game_manager
+    def run(self):
         pygame.init()
-        action = self.state_actions.get(self.state)
-        if action:
-            action()
-        else:
-            # Handle unknown state or default action
-            print("Unknown state or default action")
+        self.main_menu()
 
     def update(self, game_manager):
         self.screen.fill((0, 0, 0))
@@ -230,13 +204,13 @@ class PygameUI(UI):
         menu = pygame_menu.Menu(
             'Play', PygameUI.SCREEN_WIDTH, PygameUI.SCREEN_HEIGHT, theme=self.theme)
         opponent_type = menu.add.selector(
-            'Opponent: ', [('Human', GameType.PLAYER_VS_PLAYER), ('CPU', GameType.PLAYER_VS_CPU), ('CPU vs CPU', GameType.CPU_VS_CPU)])
+            'Opponent: ', [('Human', GameType.PLAYER_VS_PLAYER), ('CPU', GameType.PLAYER_VS_CPU)])
         cpu_level = menu.add.dropselect('CPU Level: ', [(
             'Easy', 1), ('Medium', 2), ('Hard', 3)], default=1, onchange=self.update_play_button)
         formation = menu.add.dropselect('Formation: ', [(
             f.name, f) for f in Formation], default=0, onchange=self.update_play_button)
 
-        menu.add.button('Play', lambda: self.start_the_game({'opponent_type': opponent_type.get_value(),
+        menu.add.button('Play', lambda: self.start_the_game({'game_type': opponent_type.get_value(),
                                                              'cpu_level': cpu_level.get_value(),
                                                              'formation': formation.get_value()}))
 
