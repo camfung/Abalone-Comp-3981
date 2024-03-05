@@ -2,11 +2,12 @@ from abc import ABC, abstractmethod
 import pygame
 import pygame_menu
 from enums import Formation, UIState
+from records import RecordHistory
 
 """
 Essentially what this interface is meant to do is replace the event handling in the pygameUI main game loop. 
 The idea is that in the main game loop the handle event will be called on every event for all the ui components. 
-The behavior for the events will be definied in the concrete class
+The behavior for the events will be defined in the concrete class
 """
 
 
@@ -18,17 +19,38 @@ class EventHandler(ABC):
 
 class Drawable(ABC):
     @abstractmethod
-    def draw(self):
+    def draw(self, surface):
         pass
 
 
 class HUD(Drawable, EventHandler):
+    HUD_WIDTH = 1000
+    HUD_HEIGHT = 150
+    SCREEN_HEIGHT = 1000
+
+    def __init__(self):
+        self.theme = pygame_menu.themes.THEME_DARK
+        self.theme.widget_width = 100
+        self.ui_instance = PygameUI()
+
     def handle_event(self, event):
         pass
 
     def draw(self, surface):
-        # Example for drawing to the screen
-        pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(10, 10, 150, 100))
+        menu = pygame_menu.Menu("Abalone", self.HUD_WIDTH, self.HUD_HEIGHT,
+                                theme=self.theme, position=(0, 0, True), columns=5, rows=2)
+        menu.add.button("Stop Game", pygame_menu.events.EXIT, align=pygame_menu.locals.ALIGN_CENTER)
+        menu.add.button("Pause", align=pygame_menu.locals.ALIGN_CENTER) #TODO implementation
+        menu.add.button("Reset", self.ui_instance.play_menu, align=pygame_menu.locals.ALIGN_CENTER)
+        menu.add.button("Undo Last Move", align=pygame_menu.locals.ALIGN_CENTER) #TODO implementation
+        menu.add.button("Show Move History", self.ui_instance.display_move_history,
+                        align=pygame_menu.locals.ALIGN_CENTER)
+        menu.add.clock(font_size=25, font_name=pygame_menu.font.FONT_DIGITAL)
+
+        menu.mainloop(surface)
+
+        # TODO Timer
+        # TODO Score
 
 
 class Board(Drawable, EventHandler):
@@ -37,7 +59,8 @@ class Board(Drawable, EventHandler):
 
     def draw(self, surface):
         # Example for drawing to the screen
-        pygame.draw.rect(surface, (0, 255, 0), pygame.Rect(170, 10, 150, 100))
+        # pygame.draw.rect(surface, (0, 255, 0), pygame.Rect(170, 10, 150, 100))
+        pass
 
 
 class UI(ABC):
@@ -120,7 +143,7 @@ class PygameUI(UI):
     def update_screen(self, game_state):
         pass
 
-    def display_score(self, record):
+    def display_score(self, game_manager):
         pass
 
     def display_moves(self, record):
@@ -171,4 +194,22 @@ class PygameUI(UI):
         # Settings options will go here
 
         menu.add.button('Back', self.main_menu)
+        menu.mainloop(self.screen)
+
+    def display_move_history(self):
+        menu = pygame_menu.Menu("Move History", self.SCREEN_WIDTH, self.SCREEN_HEIGHT, theme=self.theme)
+        table = menu.add.table(table_id='records_table', font_size=20, font_color="Black")
+        table.default_cell_padding = 5
+        table.default_row_background_color = 'white'
+        table.add_row(['Turn #', 'White Moves', 'Black Moves'],
+                      cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+
+        # Hardcoded for now
+        records = ["Example move"]
+
+        # Modify this to match formatting of record history
+        for index, record in enumerate(records, start=1):
+            table.add_row([index-1, record, record])
+
+        menu.add.button('Back', self.run_game)
         menu.mainloop(self.screen)
