@@ -1,10 +1,96 @@
 from abc import ABC, abstractmethod
 import sys
 import pygame
-from enums import GameType, Marble
+from enums import Direction, GameType, Marble, PlayerInputEvents
 import pygame_menu
 from enums import Formation, UIState
 from ui_components import Button, Drawable, EventHandler
+
+
+class PlayerGameInputHandler:
+    def __init__(self):
+        self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
+        self.first_marble = None
+        self.second_marble = None
+        self.execute_move = None
+
+    def set_execute_move_cb(self, cb):
+        self.execute_move = cb
+
+    def on_marble_click(self, marble_position):
+        if self.state == PlayerInputEvents.AWAITING_FIRST_MARBLE:
+            self.first_marble = marble_position
+            self.state = PlayerInputEvents.AWAITING_SECOND_MARBLE
+        elif self.state == PlayerInputEvents.AWAITING_SECOND_MARBLE:
+            if self.is_adjacent(self.first_marble, marble_position):
+                # Here we handle a single marble move
+                self.second_marble = self.first_marble
+                direction = self.calculate_direction(
+                    self.first_marble, marble_position)
+                if direction is not None:
+                    self.execute_move(self, "PlayerMakeMove", first_marble=self.first_marble,
+                                      second_marble=self.second_marble, direction=direction)
+                    self.reset_state()
+                else:
+                    # Handle invalid direction (optional)
+                    pass
+            else:
+                self.first_marble = marble_position
+                # Remain in AWAITING_SECOND_MARBLE state for a new second selection
+        elif self.state == PlayerInputEvents.AWAITING_DIRECTION:
+            # This block may no longer be necessary for single marble moves
+            # but kept for handling moves involving more than one marble.
+            if self.is_valid_direction(self.second_marble, marble_position):
+                direction = self.calculate_direction(
+                    self.second_marble, marble_position)
+                self.execute_move(self, "PlayerMakeMove", first_marble=self.first_marble,
+                                  second_marble=self.second_marble, direction=direction)
+                self.reset_state()
+            else:
+                # Invalid direction selection; maybe handle error or prompt user
+                pass
+
+    def is_adjacent(self, first_position, second_position):
+        # Calculate row and column differences
+        row_diff = abs(first_position[0] - second_position[0])
+        col_diff = abs(first_position[1] - second_position[1])
+
+        # Adjacency logic for a hexagonal grid
+        if row_diff > 1 or col_diff > 1:
+            return False
+        if row_diff == 1 and col_diff == 1:
+            return False
+        return True
+
+    def is_valid_direction(self, from_position, to_position):
+        # Reuse is_adjacent logic for direction validity
+        return self.is_adjacent(from_position, to_position)
+
+    def calculate_direction(self, from_position, to_position):
+        # Direction is calculated based on row and column differences
+        row_diff = to_position[0] - from_position[0]
+        col_diff = to_position[1] - from_position[1]
+
+        # Mapping differences to directions based on the Direction enum
+        if row_diff == -1 and col_diff == 0:
+            return Direction.UP_LEFT
+        elif row_diff == -1 and col_diff == 1:
+            return Direction.UP_RIGHT
+        elif row_diff == 0 and col_diff == 1:
+            return Direction.RIGHT
+        elif row_diff == 1 and col_diff == 0:
+            return Direction.DOWN_RIGHT
+        elif row_diff == 1 and col_diff == -1:
+            return Direction.DOWN_LEFT
+        elif row_diff == 0 and col_diff == -1:
+            return Direction.LEFT
+        else:
+            return None  # Invalid direction or positions are not adjacent
+
+    def reset_state(self):
+        self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
+        self.first_marble = None
+        self.second_marble = None
 
 
 class HUD(Drawable, EventHandler):
@@ -28,21 +114,26 @@ class Board(Drawable, EventHandler):
 
     def __init__(self) -> None:
         super().__init__()
+        self.waiting_for_player_input = False
+        self.input_handler = PlayerGameInputHandler()
+
+    def set_execute_move_cb(self, cb):
+        self.input_handler.set_execute_move_cb(cb)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Get the mouse position
             pos = pygame.mouse.get_pos()
-            row, col = Board.get_cell(pos)
-
-            # left click
-            if event.button == 1:
-                print(f'Left click at {row, col}')
-                print(pos)
-
-            # right click
-            elif event.button == 3:
-                print(f'Right click at {row, col}')
+            # handle input for players turn
+            if self.waiting_for_player_input:
+                row, col = Board.get_cell(pos)
+                print(f"({row}, {col})")
+                # left click
+                if event.button == 1:
+                    self.input_handler.on_marble_click(pos)
+                # right click
+                elif event.button == 3:
+                    self.input_handler.reset_state()
 
     def draw(self, surface, game_manager):
         game_manager = game_manager.get_board()
@@ -133,15 +224,29 @@ class PygameUI(UI):
         self.screen = pygame.display.set_mode(
             (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self._app = app
-        self.waiting_for_player_input = False
         self.start_button_clicked = False
+
+        hud = HUD()
+        board = Board()
+
+        # add the drawables
+        self.drawable_elements.append(hud)
+        self.drawable_elements.append(board)
+
+        # add the event handlers
+        self.event_handlers.append(hud)
+        self.event_handlers.append(board)
+
+        self.board = board
+        board.set_execute_move_cb(
+            lambda move: self._app.notify(self, "PlayerMakeMove", move=move))
 
     def start_the_game(self, config):
 
         # Placeholder for starting the game with the selected configuration
         print(f"Starting game with config: {config}")
 
-        def start_button_cb(): return self._app.notify(self, "MakeFirstMove")
+        def start_button_cb(): return self._app.notify(self, "AiMakeMove")
 
         start_button = Button(1000, 100, 200, 50, PygameUI.button_color,
                               PygameUI.button_highlight_color, "Start", PygameUI.text_color, 32, start_button_cb)
@@ -171,7 +276,14 @@ class PygameUI(UI):
 
         pygame.display.flip()
 
-    # In these methods we update the state in the board and the Hud and the changes are reflected by the update method
+    @property
+    def waiting_for_player_input(self):
+        return self.board.waiting_for_player_input
+
+    @waiting_for_player_input.setter
+    def waiting_for_player_input(self, value):
+        self.board.waiting_for_player_input = value
+
     def update_screen(self, game_manager):
         pass
 
