@@ -1,5 +1,5 @@
 from enums import Formation, GameType, Marble
-from gameplay import Game
+from gameplay import Game, Move
 from communication import GameManager
 from players import AbaloneAgent, HumanPlayer
 from ui import HUD, Board, PygameUI
@@ -7,20 +7,10 @@ from ui import HUD, Board, PygameUI
 
 class App:
     def __init__(self):
+
         self.game_manager = GameManager(self)
         self.gui = PygameUI(self)
         self.players = []
-
-        hud = HUD()
-        board = Board()
-
-        # add the drawables
-        self.gui.drawable_elements.append(hud)
-        self.gui.drawable_elements.append(board)
-
-        # add the event handlers
-        self.gui.event_handlers.append(hud)
-        self.gui.event_handlers.append(board)
 
         self.game_manager.join_room(self.gui)
 
@@ -40,16 +30,26 @@ class App:
 
                 # if the first player to move is a cpu make the move
                 self.gui.run_game()
-            if event == "MakeFirstMove":
-                player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
-                if type(player) == AbaloneAgent:
-                    # trigger the agent to make a move
-                    move = player.generate_move(self.game_manager)
-                    player.make_move(self.game_manager, player.color, move)
-                    self.gui.start_button_clicked = True
-                else:
-                    # set a flag in the ui to let it know that we are waiting for a move to be made
-                    self.gui.waiting_for_player_input = True
+        if event == "AiMakeMove":
+            player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
+            if type(player) == AbaloneAgent:
+                # trigger the agent to make a move
+                move = player.generate_move(self.game_manager)
+                player.make_move(self.game_manager, player.color, move)
+                self.gui.start_button_clicked = True
+            self.gui.waiting_for_player_input = True
+
+        if event == "PlayerMakeMove":
+            first_marble = kwargs["first_marble"]
+            second_marble = kwargs["second_marble"]
+            direction = kwargs["direction"]
+            move = Move(first_marble, second_marble, direction)
+            # either here or in commit move we want to do isvalidmove(move)
+            # if move not valid then set the state of the player event handler back to waiting for first marble
+            # if is valid make move and prompt ai to make move
+            player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
+            self.game_manager.commit_move(move=move, player=move.marble)
+            self.notify(self, "AiMakeMove")
 
     def initialize_players(self, game_type: GameType):
         if game_type == GameType.CPU_VS_CPU:
