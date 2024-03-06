@@ -36,6 +36,7 @@ class PlayerGameInputHandler:
         # direction clicked for more than 1 marble move
         elif self.state == PlayerInputEvents.AWAITING_DIRECTION:
             self.__on_awaiting_direction(marble_position)
+        print("final state: ", str(self))
 
     def __on_awaiting_first_marble(self, marble_position):
         if self.is_marble_player_to_move(marble_position):
@@ -47,7 +48,13 @@ class PlayerGameInputHandler:
 
     def __on_awaiting_second_marble(self, marble_position):
         print("second marble clicked")
-        if self.is_adjacent(self.first_marble, marble_position):
+        # clicked first_marble
+        # so deselected it go back to awaiting first marble
+        if self.first_marble == marble_position:
+            self.first_marble = None
+            self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
+
+        elif self.is_adjacent(self.first_marble, marble_position):
 
             # Here we handle a single marble move
             if self.is_valid_direction(self.first_marble, marble_position):
@@ -62,12 +69,6 @@ class PlayerGameInputHandler:
             self.second_marble = marble_position
             self.state = PlayerInputEvents.AWAITING_DIRECTION
 
-        # clicked first_marble
-        # so deselected it go back to awaiting first marble
-        elif self.first_marble == marble_position:
-            self.first_marble = None
-            self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
-
     def __on_awaiting_direction(self, marble_position):
         if self.is_marble_player_to_move(marble_position):
             self.first_marble = marble_position
@@ -75,7 +76,7 @@ class PlayerGameInputHandler:
         else:
             direction = self.calculate_direction(
                 self.second_marble, marble_position)
-            if self.is_valid_direction(self.second_marble, direction):
+            if self.is_valid_direction(self.second_marble, marble_position):
                 self.execute_move(self.first_marble,
                                   self.second_marble, direction)
                 self.reset_state()
@@ -84,7 +85,7 @@ class PlayerGameInputHandler:
                 return
 
     def __str__(
-        self): return f'State: {self.state}, First Marble: {self.first_marble}, Second Marble: {self.second_marble}'
+        self): return f'{self.state}, First: {self.first_marble}, Second: {self.second_marble}'
 
     # checks if second positoin is within dist of first position
     def is_adjacent(self, first_position, second_position, dist=2):
@@ -101,7 +102,7 @@ class PlayerGameInputHandler:
     def is_valid_direction(self, from_position, to_position):
 
         # check if occupied by your own
-        if self.is_marble_player_to_move(from_position):
+        if self.is_marble_player_to_move(to_position):
             return
 
         # Reuse is_adjacent logic for direction validity
@@ -172,6 +173,8 @@ class Board(Drawable, EventHandler):
             if self.waiting_for_player_input:
                 row, col = Board.get_cell(pos)
                 print(f"({row}, {col})")
+                center_y, center_x = Board.get_circle_center(row, col)
+                print(center_x, center_y)
                 # left click
                 if event.button == 1:
                     if row is not None and col is not None:
@@ -244,6 +247,30 @@ class Board(Drawable, EventHandler):
                 if rect.collidepoint(pos):
                     return row, col
         return None, None
+
+    @classmethod
+    def get_circle_center(cls, row, col):
+        # Calculate total width and height based on the board's alignment and margins
+        # Assuming max alignment + number of cells gives max width
+        max_row_width = max(cls.ALIGNMENT) + len(cls.ALIGNMENT)
+        total_grid_width = max_row_width * cls.CELL_SIZE + \
+            (max_row_width - 1) * cls.SIDE_MARGIN
+        total_grid_height = len(cls.ALIGNMENT) * cls.CELL_SIZE + \
+            (len(cls.ALIGNMENT) - 1) * cls.TOP_MARGIN
+        start_x = (1000 - total_grid_width) // 2
+        start_y = (1000 - total_grid_height) // 2
+
+        # Adjust start_x based on the alignment of the specific row
+        adjusted_start_x = start_x + \
+            cls.ALIGNMENT[row] * (cls.CELL_SIZE + cls.SIDE_MARGIN)
+
+        # Calculate the center of the cell for the given row and column
+        cell_x = adjusted_start_x + col * \
+            (cls.CELL_SIZE + cls.SIDE_MARGIN) + cls.CELL_SIZE // 2
+        cell_y = start_y + row * \
+            (cls.CELL_SIZE + cls.TOP_MARGIN) + cls.CELL_SIZE // 2
+
+        return cell_x, cell_y
 
 
 class UI(ABC):
