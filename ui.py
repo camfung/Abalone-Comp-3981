@@ -23,75 +23,89 @@ class PlayerGameInputHandler:
 
     def on_marble_click(self, marble_position):
 
-        # clicking on a non marble
-        print("marbleClicked is player to move: ",
-              self.is_marble_player_to_move(marble_position))
+        print("initial state: ", str(self))
+
         # first marble click
         if self.state == PlayerInputEvents.AWAITING_FIRST_MARBLE:
-            print("first marble clicked ")
-            self.first_marble = marble_position
-            self.state = PlayerInputEvents.AWAITING_SECOND_MARBLE
+            self.__on_awaiting_first_marble(marble_position)
 
         # second marble click
         elif self.state == PlayerInputEvents.AWAITING_SECOND_MARBLE:
-            print("second marble clicked")
-            if self.is_adjacent(self.first_marble, marble_position):
-                # Here we handle a single marble move
-                self.second_marble = self.first_marble
-                direction = self.calculate_direction(
-                    self.first_marble, marble_position)
-                if direction is not None:
-                    self.execute_move(self, "PlayerMakeMove", first_marble=self.first_marble,
-                                      second_marble=self.second_marble, direction=direction)
-                    self.reset_state()
-                else:
-                    # Handle invalid direction (optional)
-                    pass
-
-            # clicked the first one clicked
-            # so deslected it
-            elif self.first_marble == marble_position:
-                self.first_marble = None
-                self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
-            else:
-                self.first_marble = marble_position
-                # Remain in AWAITING_SECOND_MARBLE state for a new second selection
+            self.__on_awaiting_second_marble(marble_position)
 
         # direction clicked for more than 1 marble move
         elif self.state == PlayerInputEvents.AWAITING_DIRECTION:
-            # This block may no longer be necessary for single marble moves
-            # but kept for handling moves involving more than one marble.
-            print("direction clicked")
-            if self.is_valid_direction(self.second_marble, marble_position):
+            self.__on_awaiting_direction(marble_position)
+
+    def __on_awaiting_first_marble(self, marble_position):
+        if self.is_marble_player_to_move(marble_position):
+            self.first_marble = marble_position
+            self.state = PlayerInputEvents.AWAITING_SECOND_MARBLE
+        else:
+            # do nothing
+            pass
+
+    def __on_awaiting_second_marble(self, marble_position):
+        print("second marble clicked")
+        if self.is_adjacent(self.first_marble, marble_position):
+
+            # Here we handle a single marble move
+            if self.is_valid_direction(self.first_marble, marble_position):
+                self.second_marble = self.first_marble
                 direction = self.calculate_direction(
-                    self.second_marble, marble_position)
-                self.execute_move(self, "PlayerMakeMove", first_marble=self.first_marble,
-                                  second_marble=self.second_marble, direction=direction)
+                    self.first_marble, marble_position)
+                self.execute_move(self.first_marble,
+                                  self.second_marble, direction)
                 self.reset_state()
 
-            # if first or second marble are selected then we set the first marble to be the user selected marble
-            elif self.second_marble == marble_position or self.first_marble == marble_position:
-                self.first_marble = marble_position
-                self.state = PlayerInputEvents.AWAITING_SECOND_MARBLE
-            else:
-                # Invalid direction selection; maybe handle error or prompt user
-                pass
+            # handle second marble selected
+            self.second_marble = marble_position
+            self.state = PlayerInputEvents.AWAITING_DIRECTION
 
-    def is_adjacent(self, first_position, second_position):
+        # clicked first_marble
+        # so deselected it go back to awaiting first marble
+        elif self.first_marble == marble_position:
+            self.first_marble = None
+            self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
+
+    def __on_awaiting_direction(self, marble_position):
+        if self.is_marble_player_to_move(marble_position):
+            self.first_marble = marble_position
+            self.state = PlayerInputEvents.AWAITING_SECOND_MARBLE
+        else:
+            direction = self.calculate_direction(
+                self.second_marble, marble_position)
+            if self.is_valid_direction(self.second_marble, direction):
+                self.execute_move(self.first_marble,
+                                  self.second_marble, direction)
+                self.reset_state()
+            else:
+                # not a valid direction
+                return
+
+    def __str__(
+        self): return f'State: {self.state}, First Marble: {self.first_marble}, Second Marble: {self.second_marble}'
+
+    # checks if second positoin is within dist of first position
+    def is_adjacent(self, first_position, second_position, dist=2):
         # Calculate row and column differences
         row_diff = abs(first_position[0] - second_position[0])
         col_diff = abs(first_position[1] - second_position[1])
 
         # Adjacency logic for a hexagonal grid
-        if row_diff > 1 or col_diff > 1:
-            return False
-        if row_diff == 1 and col_diff == 1:
+        if row_diff > dist or col_diff > dist:
             return False
         return True
 
+    # checks if the to position is adjacent and not occupied
     def is_valid_direction(self, from_position, to_position):
+
+        # check if occupied by your own
+        if self.is_marble_player_to_move(from_position):
+            return
+
         # Reuse is_adjacent logic for direction validity
-        return self.is_adjacent(from_position, to_position)
+        return self.is_adjacent(from_position, to_position, 1)
 
     def calculate_direction(self, from_position, to_position):
         # Direction is calculated based on row and column differences
@@ -161,7 +175,7 @@ class Board(Drawable, EventHandler):
                 # left click
                 if event.button == 1:
                     if row is not None and col is not None:
-                        self.input_handler.on_marble_click(pos)
+                        self.input_handler.on_marble_click((row, col))
                 # right click
                 elif event.button == 3:
                     self.input_handler.reset_state()
@@ -271,7 +285,8 @@ class PygameUI(UI):
         self.board = board
 
         board.set_execute_move_cb(
-            lambda move: self._app.notify(self, "PlayerMakeMove", move=move))
+            lambda first_marble, second_marble, direction: self._app.notify(self, "PlayerMakeMove", first_marble=first_marble,
+                                                                            second_marble=second_marble, direction=direction))
         board.set_marble_player_to_move(
             lambda marble_pos: self._app.notify(self, "IsMarblePlayerToMove", marble_pos=marble_pos))
 
