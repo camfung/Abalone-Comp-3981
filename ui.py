@@ -26,31 +26,40 @@ class Drawable(ABC):
 class HUD(Drawable, EventHandler):
     HUD_WIDTH = 1000
     HUD_HEIGHT = 150
-    SCREEN_HEIGHT = 1000
+    menu = None
 
     def __init__(self):
         self.theme = pygame_menu.themes.THEME_DARK
         self.theme.widget_width = 100
         self.ui_instance = PygameUI()
 
-    def handle_event(self, event):
-        pass
-
-    def draw(self, surface, game_manager):
+    def create_hud(self):
         menu = pygame_menu.Menu("Abalone", self.HUD_WIDTH, self.HUD_HEIGHT,
                                 theme=self.theme, position=(0, 0, True), columns=5, rows=2)
         menu.add.button("Stop Game", pygame_menu.events.EXIT, align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Pause", align=pygame_menu.locals.ALIGN_CENTER) #TODO implementation
+        menu.add.button("Pause", align=pygame_menu.locals.ALIGN_CENTER)  # TODO implementation
         menu.add.button("Reset", self.ui_instance.play_menu, align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Undo Last Move", align=pygame_menu.locals.ALIGN_CENTER) #TODO implementation
+        menu.add.button("Undo Last Move", align=pygame_menu.locals.ALIGN_CENTER)  # TODO implementation
         menu.add.button("Show Move History", self.ui_instance.display_move_history,
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.clock(font_size=25, font_name=pygame_menu.font.FONT_DIGITAL)
 
-        menu.mainloop(surface)
+        return menu
 
-        # TODO Timer
-        # TODO Score
+    def get_menu(self):
+        if self.menu is None:
+            self.menu = self.create_hud()
+        return self.menu
+
+    def handle_event(self, event):
+        pass
+
+
+    def draw(self, surface, game_manager):
+        menu = self.get_menu()
+        menu.draw(surface)
+        menu.update(pygame.event.get())
+
 
 
 class Board(Drawable, EventHandler):
@@ -59,6 +68,7 @@ class Board(Drawable, EventHandler):
     TOP_MARGIN = 2
     OFFSET = CELL_SIZE / 2 + SIDE_MARGIN - 5
     ALIGNMENT = [0, -2, -1, -1, 0, 0, 1, 1, 2, 2, 0]
+
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Get the mouse position
@@ -72,6 +82,7 @@ class Board(Drawable, EventHandler):
             # right click
             elif event.button == 3:
                 print(f'Right click at {row, col}')
+
     def draw(self, surface, game_manager):
         game_manager = game_manager.get_board()
 
@@ -106,24 +117,24 @@ class Board(Drawable, EventHandler):
     def get_cell(cls, pos):
         board = cls.ALIGNMENT
         for row in range(len(board)):
-                for col in range(len(board)):
-                    # Calculate the offset
-                    offset = cls.OFFSET if row % 2 == 0 else 0  # Apply offset to odd rows for Abalone layout
-                    total_grid_width = len(board) * cls.CELL_SIZE + (len(board) - 1) * cls.SIDE_MARGIN
-                    total_grid_height = len(board) * cls.CELL_SIZE + (len(board) - 1) * cls.TOP_MARGIN
-                    start_x = (1000 - total_grid_width) // 2
-                    start_y = (1000 - total_grid_height) // 2
+            for col in range(len(board)):
+                # Calculate the offset
+                offset = cls.OFFSET if row % 2 == 0 else 0  # Apply offset to odd rows for Abalone layout
+                total_grid_width = len(board) * cls.CELL_SIZE + (len(board) - 1) * cls.SIDE_MARGIN
+                total_grid_height = len(board) * cls.CELL_SIZE + (len(board) - 1) * cls.TOP_MARGIN
+                start_x = (1000 - total_grid_width) // 2
+                start_y = (1000 - total_grid_height) // 2
 
-                    cell_x = start_x + (cls.ALIGNMENT[row] + col) * (cls.CELL_SIZE + cls.SIDE_MARGIN) - offset
-                    cell_y = start_y + row * (cls.CELL_SIZE + cls.TOP_MARGIN)
-                    rect = pygame.Rect(
-                        cell_x,
-                        cell_y,
-                        cls.CELL_SIZE,
-                        cls.CELL_SIZE
-                    )
-                    if rect.collidepoint(pos):
-                        return row, col
+                cell_x = start_x + (cls.ALIGNMENT[row] + col) * (cls.CELL_SIZE + cls.SIDE_MARGIN) - offset
+                cell_y = start_y + row * (cls.CELL_SIZE + cls.TOP_MARGIN)
+                rect = pygame.Rect(
+                    cell_x,
+                    cell_y,
+                    cls.CELL_SIZE,
+                    cls.CELL_SIZE
+                )
+                if rect.collidepoint(pos):
+                    return row, col
         return None, None
 
 
