@@ -50,6 +50,10 @@ class App:
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
             self.game_manager.commit_move(move=move, player=move.marble)
             self.notify(self, "AiMakeMove")
+        if event == "IsMarblePlayerToMove":
+            # check what marble color is at the marble_pos
+            marble_row, marble_col = kwargs["marble_pos"]
+            return self.game_manager.get_board()[marble_row][marble_col] == self.game_manager.current_player_to_move
 
     def initialize_players(self, game_type: GameType):
         if game_type == GameType.CPU_VS_CPU:

@@ -13,15 +13,28 @@ class PlayerGameInputHandler:
         self.first_marble = None
         self.second_marble = None
         self.execute_move = None
+        self.is_marble_player_to_move = None
+
+    def set_is_marble_player_to_move_cb(self, cb):
+        self.is_marble_player_to_move = cb
 
     def set_execute_move_cb(self, cb):
         self.execute_move = cb
 
     def on_marble_click(self, marble_position):
+
+        # clicking on a non marble
+        print("marbleClicked is player to move: ",
+              self.is_marble_player_to_move(marble_position))
+        # first marble click
         if self.state == PlayerInputEvents.AWAITING_FIRST_MARBLE:
+            print("first marble clicked ")
             self.first_marble = marble_position
             self.state = PlayerInputEvents.AWAITING_SECOND_MARBLE
+
+        # second marble click
         elif self.state == PlayerInputEvents.AWAITING_SECOND_MARBLE:
+            print("second marble clicked")
             if self.is_adjacent(self.first_marble, marble_position):
                 # Here we handle a single marble move
                 self.second_marble = self.first_marble
@@ -34,18 +47,32 @@ class PlayerGameInputHandler:
                 else:
                     # Handle invalid direction (optional)
                     pass
+
+            # clicked the first one clicked
+            # so deslected it
+            elif self.first_marble == marble_position:
+                self.first_marble = None
+                self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
             else:
                 self.first_marble = marble_position
                 # Remain in AWAITING_SECOND_MARBLE state for a new second selection
+
+        # direction clicked for more than 1 marble move
         elif self.state == PlayerInputEvents.AWAITING_DIRECTION:
             # This block may no longer be necessary for single marble moves
             # but kept for handling moves involving more than one marble.
+            print("direction clicked")
             if self.is_valid_direction(self.second_marble, marble_position):
                 direction = self.calculate_direction(
                     self.second_marble, marble_position)
                 self.execute_move(self, "PlayerMakeMove", first_marble=self.first_marble,
                                   second_marble=self.second_marble, direction=direction)
                 self.reset_state()
+
+            # if first or second marble are selected then we set the first marble to be the user selected marble
+            elif self.second_marble == marble_position or self.first_marble == marble_position:
+                self.first_marble = marble_position
+                self.state = PlayerInputEvents.AWAITING_SECOND_MARBLE
             else:
                 # Invalid direction selection; maybe handle error or prompt user
                 pass
@@ -117,6 +144,9 @@ class Board(Drawable, EventHandler):
         self.waiting_for_player_input = False
         self.input_handler = PlayerGameInputHandler()
 
+    def set_marble_player_to_move(self, cb):
+        self.input_handler.set_is_marble_player_to_move_cb(cb)
+
     def set_execute_move_cb(self, cb):
         self.input_handler.set_execute_move_cb(cb)
 
@@ -130,7 +160,8 @@ class Board(Drawable, EventHandler):
                 print(f"({row}, {col})")
                 # left click
                 if event.button == 1:
-                    self.input_handler.on_marble_click(pos)
+                    if row is not None and col is not None:
+                        self.input_handler.on_marble_click(pos)
                 # right click
                 elif event.button == 3:
                     self.input_handler.reset_state()
@@ -238,8 +269,11 @@ class PygameUI(UI):
         self.event_handlers.append(board)
 
         self.board = board
+
         board.set_execute_move_cb(
             lambda move: self._app.notify(self, "PlayerMakeMove", move=move))
+        board.set_marble_player_to_move(
+            lambda marble_pos: self._app.notify(self, "IsMarblePlayerToMove", marble_pos=marble_pos))
 
     def start_the_game(self, config):
 
