@@ -126,15 +126,6 @@ class GameState:
                     for mod_index, (mod_row, mod_col) in enumerate(row_col_modifiers):
                         start_range = 0 if mod_row == 0 else 1
 
-                        selection = None
-
-                        if mod_index == 0:
-                            selection = MarbleSelection.HORIZONTAL
-                        elif mod_index == 1:
-                            selection = MarbleSelection.BACKWARD_SLASH
-                        elif mod_index == 2:
-                            selection = MarbleSelection.FORWARD_SLASH
-
                         for group_size in range(start_range, 3):
                             first_ball_i = (row_index, space_index)
                             last_ball_i = (
@@ -149,8 +140,7 @@ class GameState:
                             for direction in Direction:
                                 move = self.__calc_move(first_ball_i=first_ball_i,
                                                         last_ball_i=last_ball_i,
-                                                        direction=direction,
-                                                        selection=selection)
+                                                        direction=direction)
                                 if move is not None:
                                     moves.append(move)
 
@@ -319,13 +309,13 @@ class GameState:
 
 
 class Move:
-    def __init__(self, first_ball_i, last_ball_i, direction, marble, selection):
+    def __init__(self, first_ball_i, last_ball_i, direction, marble):
         self._direction = direction
         self._marble = marble
-        self._selection_type = selection
         self._pos_i = (first_ball_i, last_ball_i)
         self._pos_f = Move.__calc_pos_f(first_ball_i, last_ball_i, direction)
-        self._move_type = Move.__calc_move_type(first_ball_i, last_ball_i, direction, selection)
+        self._selection_type = Move.__calc_selection_type(first_ball_i, last_ball_i)
+        self._move_type = Move.__calc_move_type(first_ball_i, last_ball_i, direction, self._selection_type)
 
     @staticmethod
     def __calc_pos_f(first_ball_i, last_ball_i, direction):
@@ -351,6 +341,19 @@ class Move:
             raise InvalidDirection("Invalid direction passed to Move")
 
         return position
+
+    @staticmethod
+    def __calc_selection_type(first_ball_i, last_ball_i):
+        # Return Horizontal if Rows are Same
+        if first_ball_i[0] == last_ball_i[0]:
+            return MarbleSelection.HORIZONTAL
+
+        # Return Back-slash if Columns are Same
+        if first_ball_i[1] == last_ball_i[1]:
+            return MarbleSelection.BACKWARD_SLASH
+
+        # Return Forward-slash if Rows and Columns are different
+        return MarbleSelection.FORWARD_SLASH
 
     @staticmethod
     def __calc_move_type(first_ball_i, last_ball_i, direction, selection):
