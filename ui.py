@@ -42,7 +42,7 @@ class HUD(Drawable, EventHandler):
         menu.add.button("Undo Last Move", align=pygame_menu.locals.ALIGN_CENTER)  # TODO implementation
         menu.add.button("Show Move History", self.ui_instance.display_move_history,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.clock(font_size=25, font_name=pygame_menu.font.FONT_DIGITAL)
+        menu.add.label(f"White Score:    Black Score:    ") #TODO use Player.get_balls_remaining method
 
         return menu
 
@@ -54,12 +54,10 @@ class HUD(Drawable, EventHandler):
     def handle_event(self, event):
         pass
 
-
     def draw(self, surface, game_manager):
         menu = self.get_menu()
         menu.draw(surface)
         menu.update(pygame.event.get())
-
 
 
 class Board(Drawable, EventHandler):
@@ -94,24 +92,24 @@ class Board(Drawable, EventHandler):
         screen.blit(background_image, (0, 0))
 
         for row in range(len(game_manager)):
-                for col in range(len(game_manager[row])):
-                    if game_manager[row][col] == Marble.BLACK:
-                        ball_image = pygame.image.load("images/black_ball.png")
-                    elif game_manager[row][col] == Marble.WHITE:
-                        ball_image = pygame.image.load("images/white_ball.png")
-                    else:
-                        continue
+            for col in range(len(game_manager[row])):
+                if game_manager[row][col] == Marble.BLACK:
+                    ball_image = pygame.image.load("images/black_ball.png")
+                elif game_manager[row][col] == Marble.WHITE:
+                    ball_image = pygame.image.load("images/white_ball.png")
+                else:
+                    continue
 
-                    # Calculate the offset
-                    offset = self.OFFSET if row % 2 == 0 else 0  # Apply offset to odd rows for Abalone layout
-                    total_grid_width = len(game_manager) * self.CELL_SIZE + (len(game_manager) - 1) * self.SIDE_MARGIN
-                    total_grid_height = len(game_manager) * self.CELL_SIZE + (len(game_manager) - 1) * self.TOP_MARGIN
-                    start_x = (1000 - total_grid_width) // 2
-                    start_y = (1000 - total_grid_height) // 2
+                # Calculate the offset
+                offset = self.OFFSET if row % 2 == 0 else 0  # Apply offset to odd rows for Abalone layout
+                total_grid_width = len(game_manager) * self.CELL_SIZE + (len(game_manager) - 1) * self.SIDE_MARGIN
+                total_grid_height = len(game_manager) * self.CELL_SIZE + (len(game_manager) - 1) * self.TOP_MARGIN
+                start_x = (1000 - total_grid_width) // 2
+                start_y = (1000 - total_grid_height) // 2
 
-                    cell_x = start_x + (self.ALIGNMENT[row] + col) * (self.CELL_SIZE + self.SIDE_MARGIN) - offset
-                    cell_y = start_y + row * (self.CELL_SIZE + self.TOP_MARGIN)
-                    screen.blit(ball_image, (cell_x, cell_y))
+                cell_x = start_x + (self.ALIGNMENT[row] + col) * (self.CELL_SIZE + self.SIDE_MARGIN) - offset
+                cell_y = start_y + row * (self.CELL_SIZE + self.TOP_MARGIN)
+                screen.blit(ball_image, (cell_x, cell_y))
 
     @classmethod
     def get_cell(cls, pos):
@@ -274,7 +272,7 @@ class PygameUI(UI):
 
         # Modify this to match formatting of record history
         for index, record in enumerate(records, start=1):
-            table.add_row([index-1, record, record])
+            table.add_row([index - 1, record, record])
 
         menu.add.button('Back', self.run_game)
         menu.mainloop(self.screen)
