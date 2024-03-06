@@ -152,6 +152,7 @@ namespace Gameplay {
         + __init__(first_ball_i : tuple(int, int), last_ball_i : tuple(int, int), direction: Direction, marble: Marble, selection: MarbleSelection) : Move
         - calc_pos_f(first_ball_i : tuple(int, int), last_ball_i : tuple(int, int), direction: Direction) : tuple(int, int)$
         - calc_move_type(first_ball_i : tuple(int, int), last_ball_i : tuple(int, int), direction: Direction, selection: MarbleSelection) : MoveType$
+        - calc_selection_type(first_ball_i : tuple(int, int), last_ball_i : tuple(int, int)): MarbleSelection$
         + get_pos_i(): tuple(tuple(int, int), tuple(int, int))
         + get_pos_f(): tuple(tuple(int, int), tuple(int, int))
         + get_direction(): Direction
