@@ -36,6 +36,7 @@ class HUD(Drawable, EventHandler):
     def create_hud(self):
         menu = pygame_menu.Menu("Abalone", self.HUD_WIDTH, self.HUD_HEIGHT,
                                 theme=self.theme, position=(0, 0, True), columns=5, rows=2)
+        # menu.add.button("Start Game", align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Stop Game", pygame_menu.events.EXIT, align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Pause", align=pygame_menu.locals.ALIGN_CENTER)  # TODO implementation
         menu.add.button("Reset", self.ui_instance.play_menu, align=pygame_menu.locals.ALIGN_CENTER)
