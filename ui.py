@@ -36,7 +36,7 @@ class HUD(Drawable, EventHandler):
     def handle_event(self, event):
         pass
 
-    def draw(self, surface):
+    def draw(self, surface, game_manager):
         menu = pygame_menu.Menu("Abalone", self.HUD_WIDTH, self.HUD_HEIGHT,
                                 theme=self.theme, position=(0, 0, True), columns=5, rows=2)
         menu.add.button("Stop Game", pygame_menu.events.EXIT, align=pygame_menu.locals.ALIGN_CENTER)
