@@ -15,21 +15,20 @@ class App:
         self.game_manager.join_room(self.gui)
 
     def notify(self, sender, event, **kwargs):
-        if sender == self.gui:
-            if event == "StartGame":
-                # define the params for the game
-                formation = kwargs["config"]["formation"][0][1]
-                game_type = kwargs["config"]["game_type"][0][1]
-                self.game_manager.game_type = game_type
+        if event == "StartGame":
+            # define the params for the game
+            formation = kwargs["config"]["formation"][0][1]
+            game_type = kwargs["config"]["game_type"][0][1]
+            self.game_manager.game_type = game_type
 
-                # make the correct players depending on the config
-                self.players = self.initialize_players(game_type)
+            # make the correct players depending on the config
+            self.players = self.initialize_players(game_type)
 
-                self.game_manager.start_game(formation)
-                self.gui.update(self.game_manager)
+            self.game_manager.start_game(formation)
+            self.gui.update(self.game_manager)
 
-                # if the first player to move is a cpu make the move
-                self.gui.run_game()
+            # if the first player to move is a cpu make the move
+            self.gui.run_game()
         if event == "AiMakeMove":
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
             if type(player) == AbaloneAgent:
@@ -43,7 +42,8 @@ class App:
             first_marble = kwargs["first_marble"]
             second_marble = kwargs["second_marble"]
             direction = kwargs["direction"]
-            move = Move(first_marble, second_marble, direction)
+            move = Move(first_marble, second_marble, direction,
+                        self.game_manager.current_player_to_move)
             # either here or in commit move we want to do isvalidmove(move)
             # if move not valid then set the state of the player event handler back to waiting for first marble
             # if is valid make move and prompt ai to make move
