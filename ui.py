@@ -23,7 +23,7 @@ class PlayerGameInputHandler:
 
     def on_marble_click(self, marble_position):
 
-        print("initial state: ", str(self))
+        # print("initial state: ", str(self))
 
         # first marble click
         if self.state == PlayerInputEvents.AWAITING_FIRST_MARBLE:
@@ -36,7 +36,7 @@ class PlayerGameInputHandler:
         # direction clicked for more than 1 marble move
         elif self.state == PlayerInputEvents.AWAITING_DIRECTION:
             self.__on_awaiting_direction(marble_position)
-        print("final state: ", str(self))
+        # print("final state: ", str(self))
 
     def __on_awaiting_first_marble(self, marble_position):
         if self.is_marble_player_to_move(marble_position):
@@ -47,7 +47,7 @@ class PlayerGameInputHandler:
             pass
 
     def __on_awaiting_second_marble(self, marble_position):
-        print("second marble clicked")
+        # print("second marble clicked")
         # clicked first_marble
         # so deselected it go back to awaiting first marble
         if self.first_marble == marble_position:
@@ -172,9 +172,9 @@ class Board(Drawable, EventHandler):
             # handle input for players turn
             if self.waiting_for_player_input:
                 row, col = Board.get_cell(pos)
-                print(f"({row}, {col})")
-                center_y, center_x = Board.get_circle_center(row, col)
-                print(center_x, center_y)
+                # print(f"({row}, {col})")
+                # center_y, center_x = Board.get_circle_center(row, col)
+                # print(center_x, center_y)
                 # left click
                 if event.button == 1:
                     if row is not None and col is not None:
@@ -320,7 +320,7 @@ class PygameUI(UI):
     def start_the_game(self, config):
 
         # Placeholder for starting the game with the selected configuration
-        print(f"Starting game with config: {config}")
+        # print(f"Starting game with config: {config}")
 
         def start_button_cb(): return self._app.notify(self, "AiMakeMove")
 
@@ -386,7 +386,7 @@ class PygameUI(UI):
         menu.mainloop(self.screen)
 
     def update_play_button(self, *args):
-        print(args)
+        # print(args)
         # Logic to activate the play button based on selections
         pass
 
@@ -395,8 +395,8 @@ class PygameUI(UI):
             'Play', PygameUI.SCREEN_WIDTH, PygameUI.SCREEN_HEIGHT, theme=self.theme)
         opponent_type = menu.add.selector(
             'Opponent: ', [('CPU', GameType.PLAYER_VS_CPU), ('Human', GameType.PLAYER_VS_PLAYER)])
-        cpu_level = menu.add.dropselect('CPU Level: ', [(
-            'Easy', 1), ('Medium', 2), ('Hard', 3)], default=1, onchange=self.update_play_button)
+        cpu_level = menu.add.dropselect('Agent:     ', [(
+            'Random moves', 1), ('Cameron', 2), ('Joey', 3), ('Elsa', 4), ('Callum', 5)], default=0, onchange=self.update_play_button)
         formation = menu.add.dropselect('Formation: ', [(
             f.name, f) for f in Formation], default=0, onchange=self.update_play_button)
 
