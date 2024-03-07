@@ -67,10 +67,10 @@ class GameManager(Observable):
     def commit_move(self, player, move):
         self._game.set_move(player, move)
         self.notify()
-        self._move_history.append(self._game.get_current_game_state())
+        self._move_history.append(copy.deepcopy(self._game.get_current_game_state()))
 
     def undo_last_move(self):
-        if len(self._move_history):
+        if len(self._move_history) != 0:
             self._game.set_game_state(self._move_history.pop())
             self._game.get_current_game_state().remove_last_record()
             self.notify()
