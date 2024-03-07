@@ -173,12 +173,12 @@ class HUD(Drawable, EventHandler):
         return self.menu
 
     def handle_event(self, event):
-        pass
+        menu = self.get_menu()
+        menu.update([event])
 
     def draw(self, surface, game_manager):
         menu = self.get_menu()
         menu.draw(surface)
-        menu.update(pygame.event.get())
 
 
 class Board(Drawable, EventHandler):
@@ -328,6 +328,7 @@ class PygameUI(UI):
         )
         board = Board(callbacks)
         self.board = board
+        self.hud = hud
 
         # add the drawables
         self.drawable_elements.append(board)
@@ -352,6 +353,9 @@ class PygameUI(UI):
     def run_game(self):
         while True:
             for event in pygame.event.get():
+                if event == pygame.MOUSEBUTTONDOWN:
+                    pos = pygame.mouse.get_pos()
+                    print(pos)
                 for event_handler in self.event_handlers:
                     event_handler.handle_event(event)
 
