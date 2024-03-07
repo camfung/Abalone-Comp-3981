@@ -181,6 +181,7 @@ class HUD(Drawable, EventHandler):
 class Board(Drawable, EventHandler):
     CELL_SIZE = 76
     SIDE_MARGIN = 13
+    TOP_OFFSET = 100
     TOP_MARGIN = 2
     OFFSET = CELL_SIZE / 2 + SIDE_MARGIN - 5
     ALIGNMENT = [0, -2, -1, -1, 0, 0, 1, 1, 2, 2, 0]
@@ -225,7 +226,7 @@ class Board(Drawable, EventHandler):
             background_image, (1000, 1000))
         background_image = pygame.transform.scale(
             background_image, (1000, 1000))
-        screen.blit(background_image, (0, 0))
+        screen.blit(background_image, (0, self.TOP_OFFSET))
 
         for row in range(len(game_manager)):
             for col in range(len(game_manager[row])):
@@ -249,7 +250,8 @@ class Board(Drawable, EventHandler):
                 cell_x = start_x + \
                     (self.ALIGNMENT[row] + col) * \
                     (self.CELL_SIZE + self.SIDE_MARGIN) - offset
-                cell_y = start_y + row * (self.CELL_SIZE + self.TOP_MARGIN)
+                cell_y = start_y + row * \
+                    (self.CELL_SIZE + self.TOP_MARGIN) + self.TOP_OFFSET
                 screen.blit(ball_image, (cell_x, cell_y))
 
     @classmethod
@@ -270,7 +272,8 @@ class Board(Drawable, EventHandler):
                 cell_x = start_x + \
                     (cls.ALIGNMENT[row] + col) * \
                     (cls.CELL_SIZE + cls.SIDE_MARGIN) - offset
-                cell_y = start_y + row * (cls.CELL_SIZE + cls.TOP_MARGIN)
+                cell_y = start_y + row * \
+                    (cls.CELL_SIZE + cls.TOP_MARGIN) + cls.TOP_OFFSET
                 rect = pygame.Rect(
                     cell_x,
                     cell_y,
@@ -280,30 +283,6 @@ class Board(Drawable, EventHandler):
                 if rect.collidepoint(pos):
                     return row, col
         return None, None
-
-    @classmethod
-    def get_circle_center(cls, row, col):
-        # Calculate total width and height based on the board's alignment and margins
-        # Assuming max alignment + number of cells gives max width
-        max_row_width = max(cls.ALIGNMENT) + len(cls.ALIGNMENT)
-        total_grid_width = max_row_width * cls.CELL_SIZE + \
-            (max_row_width - 1) * cls.SIDE_MARGIN
-        total_grid_height = len(cls.ALIGNMENT) * cls.CELL_SIZE + \
-            (len(cls.ALIGNMENT) - 1) * cls.TOP_MARGIN
-        start_x = (1000 - total_grid_width) // 2
-        start_y = (1000 - total_grid_height) // 2
-
-        # Adjust start_x based on the alignment of the specific row
-        adjusted_start_x = start_x + \
-            cls.ALIGNMENT[row] * (cls.CELL_SIZE + cls.SIDE_MARGIN)
-
-        # Calculate the center of the cell for the given row and column
-        cell_x = adjusted_start_x + col * \
-            (cls.CELL_SIZE + cls.SIDE_MARGIN) + cls.CELL_SIZE // 2
-        cell_y = start_y + row * \
-            (cls.CELL_SIZE + cls.TOP_MARGIN) + cls.CELL_SIZE // 2
-
-        return cell_x, cell_y
 
 
 class UI(ABC):

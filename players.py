@@ -4,13 +4,14 @@ import time
 from typing import Any
 
 from communication import GameManager
+from enums import Marble
 from gameplay import Move
 
 
 class Player(ABC):
     INIT_NUM_BALLS = 14
 
-    def __init__(self, time_limit: int, move_limit: int, numBalls: int, color: int):
+    def __init__(self, time_limit: int, move_limit: int,  color: Marble, numBalls: int = 14):
         self._time_limit = time_limit
         self._move_limit = move_limit
         self._current_move = 0
