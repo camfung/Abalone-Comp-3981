@@ -7,12 +7,14 @@ from ui import HUD, Board, PygameUI
 
 class App:
     """
-    The main application class that orchestrates the game by integrating the game manager, user interface (UI), and players. It handles events and notifications across these components to manage game flow and state.
+    The main application class that orchestrates the game by integrating the game manager, user interface (UI),
+    and players. It handles events and notifications across these components to manage game flow and state.
     """
 
     def __init__(self):
         """
-        Initializes the application, setting up the game manager, UI, and player list. It also registers the UI with the game manager for updates.
+        Initializes the application, setting up the game manager, UI, and player list.
+        It also registers the UI with the game manager for updates.
         """
         self.game_manager = GameManager(self)
         self.gui = PygameUI(self)
@@ -22,7 +24,8 @@ class App:
 
     def notify(self, sender, event, **kwargs):
         """
-        Handles notifications sent from different parts of the application, acting upon various events like starting the game, making moves, undoing moves, and querying game state.
+        Handles notifications sent from different parts of the application,
+        acting upon various events like starting the game, making moves, undoing moves, and querying game state.
 
         Parameters:
         - sender: The component that sent the notification.
@@ -116,7 +119,8 @@ class App:
         Initializes players based on the selected game type and player colors.
 
         Parameters:
-        - game_type: An enumeration value of GameType indicating whether it's player vs. CPU, CPU vs. CPU, or player vs. player.
+        - game_type: An enumeration value of GameType indicating whether it's player vs. CPU, CPU vs. CPU,
+        or player vs. player.
         - player_color: An enumeration value of Marble indicating the color chosen by the player.
 
         Returns:
