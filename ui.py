@@ -8,12 +8,11 @@ from ui_components import Button, Drawable, EventHandler
 
 
 class PlayerGameInputHandler:
-    def __init__(self):
+    def __init__(self, callbacks):
         self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
         self.first_marble = None
         self.second_marble = None
-        self.execute_move = None
-        self.is_marble_player_to_move = None
+        self.execute_move, self.is_marble_player_to_move = callbacks
 
     def set_is_marble_player_to_move_cb(self, cb):
         self.is_marble_player_to_move = cb
@@ -139,10 +138,12 @@ class HUD(Drawable, EventHandler):
     HUD_HEIGHT = 150
     menu = None
 
-    def __init__(self, gui):
+    def __init__(self, gui, callbacks):
         self.ui_instance = gui
         self.theme = self.ui_instance.theme
         self.theme.widget_width = 100
+
+        start_game_cb, undo_move_cb, pause_game_cb = callbacks
 
     def create_hud(self):
         menu = pygame_menu.Menu("Abalone", self.ui_instance.SCREEN_WIDTH, self.HUD_HEIGHT,
@@ -186,16 +187,10 @@ class Board(Drawable, EventHandler):
     OFFSET = CELL_SIZE / 2 + SIDE_MARGIN - 5
     ALIGNMENT = [0, -2, -1, -1, 0, 0, 1, 1, 2, 2, 0]
 
-    def __init__(self) -> None:
+    def __init__(self, callbacks) -> None:
         super().__init__()
         self.waiting_for_player_input = False
-        self.input_handler = PlayerGameInputHandler()
-
-    def set_marble_player_to_move(self, cb):
-        self.input_handler.set_is_marble_player_to_move_cb(cb)
-
-    def set_execute_move_cb(self, cb):
-        self.input_handler.set_execute_move_cb(cb)
+        self.input_handler = PlayerGameInputHandler(callbacks)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -309,9 +304,28 @@ class PygameUI(UI):
             (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self._app = app
         self.start_button_clicked = False
+        def start_game_cb(): return self._app.notify(self, "AiMakeMove")
+        def undo_move_cb(): return self._app.notify(self, "UndoLastMove")
+        def pause_game_cb(): return self._app.notfy(self, "PauseGame")
+        callbacks = (
+            start_game_cb,
+            undo_move_cb,
+            pause_game_cb,
+        )
+        hud = HUD(self, callbacks)
 
-        hud = HUD(self)
-        board = Board()
+        def execute_move_cb(first_marble, second_marble, direction):
+            return self._app.notify(self, "PlayerMakeMove", first_marble=first_marble,
+                                    second_marble=second_marble, direction=direction)
+
+        def marble_player_to_move_cb(marble_pos):
+            return self._app.notify(self, "IsMarblePlayerToMove", marble_pos=marble_pos)
+        callbacks = (
+            execute_move_cb,
+            marble_player_to_move_cb
+        )
+        board = Board(callbacks)
+        self.board = board
 
         # add the drawables
         self.drawable_elements.append(hud)
@@ -320,14 +334,6 @@ class PygameUI(UI):
         # add the event handlers
         self.event_handlers.append(hud)
         self.event_handlers.append(board)
-
-        self.board = board
-
-        board.set_execute_move_cb(
-            lambda first_marble, second_marble, direction: self._app.notify(self, "PlayerMakeMove", first_marble=first_marble,
-                                                                            second_marble=second_marble, direction=direction))
-        board.set_marble_player_to_move(
-            lambda marble_pos: self._app.notify(self, "IsMarblePlayerToMove", marble_pos=marble_pos))
 
     def start_the_game(self, config):
 
