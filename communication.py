@@ -64,8 +64,8 @@ class GameManager(Observable):
     def pause_game(self):
         self.notify()
 
-    def commit_move(self, player, move):
-        self._game.set_move(player, move)
+    def commit_move(self, player, move, timestamp):
+        self._game.set_move(player, move, timestamp)
         self.notify()
 
     def undo_last_move(self):

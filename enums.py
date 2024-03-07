@@ -32,6 +32,7 @@ class Direction(Enum):
     DOWN_LEFT = auto()
     LEFT = auto()
 
+
 class MarbleSelection(Enum):
     """
     Marble Selection Enumeration for Marble Selections in Generate Possible Moves.
@@ -48,7 +49,8 @@ class MoveType(Enum):
     SINGLE = auto()
     INLINE = auto()
     SIDE_STEP = auto()
-    
+
+
 class UIState(Enum):
     MAIN_MENU = auto()
     SETTINGS_MENU = auto()
