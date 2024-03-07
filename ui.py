@@ -10,19 +10,26 @@ from ui_components import Button, Drawable, EventHandler
 
 class PlayerGameInputHandler:
     def __init__(self, callbacks):
+        """
+        Initialize the game input handler with specific callbacks.
+
+        Parameters:
+        - callbacks (tuple): A tuple containing two functions, execute_move and is_marble_player_to_move,
+          used to handle game logic and check if a marble belongs to the player making the move.
+        """
+
         self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
         self.first_marble = None
         self.second_marble = None
         self.execute_move, self.is_marble_player_to_move = callbacks
 
-    def set_is_marble_player_to_move_cb(self, cb):
-        self.is_marble_player_to_move = cb
-
-    def set_execute_move_cb(self, cb):
-        self.execute_move = cb
-
     def on_marble_click(self, marble_position):
+        """
+        Handle marble click events based on the current state of the game.
 
+        Parameters:
+        - marble_position (tuple): The position of the marble that was clicked.
+        """
         # print("initial state: ", str(self))
 
         # first marble click
@@ -39,6 +46,12 @@ class PlayerGameInputHandler:
         # print("final state: ", str(self))
 
     def __on_awaiting_first_marble(self, marble_position):
+        """
+        Handle the event when awaiting the first marble selection.
+
+        Parameters:
+        - marble_position (tuple): The position of the marble that was clicked.
+        """
         if self.is_marble_player_to_move(marble_position):
             self.first_marble = marble_position
             self.state = PlayerInputEvents.AWAITING_SECOND_MARBLE
@@ -47,6 +60,12 @@ class PlayerGameInputHandler:
             pass
 
     def __on_awaiting_second_marble(self, marble_position):
+        """
+        Handle the event when awaiting the second marble selection.
+
+        Parameters:
+        - marble_position (tuple): The position of the marble that was clicked.
+        """
         # print("second marble clicked")
         # clicked first_marble
         # so deselected it go back to awaiting first marble
@@ -70,6 +89,12 @@ class PlayerGameInputHandler:
             self.state = PlayerInputEvents.AWAITING_DIRECTION
 
     def __on_awaiting_direction(self, marble_position):
+        """
+        Handle the event when awaiting the direction selection after selecting two marbles.
+
+        Parameters:
+        - marble_position (tuple): The position of the direction or third marble clicked.
+        """
         if self.is_marble_player_to_move(marble_position):
             self.first_marble = marble_position
             self.state = PlayerInputEvents.AWAITING_SECOND_MARBLE
@@ -84,12 +109,28 @@ class PlayerGameInputHandler:
                 # not a valid direction
                 return
 
-    def __str__(
-            self):
+    def __str__(self):
+        """
+        Returns a string representation of the current game state.
+
+        Returns:
+        - str: A string representation of the current game state.
+        """
         return f'{self.state}, First: {self.first_marble}, Second: {self.second_marble}'
 
     # checks if second positoin is within dist of first position
     def is_adjacent(self, first_position, second_position, dist=2):
+        """
+        Check if two positions are adjacent based on a specified distance.
+
+        Parameters:
+        - first_position (tuple): The first position.
+        - second_position (tuple): The second position.
+        - dist (int): The maximum distance for two positions to be considered adjacent.
+
+        Returns:
+        - bool: True if the positions are adjacent, False otherwise.
+        """
         # Calculate row and column differences
         row_diff = abs(first_position[0] - second_position[0])
         col_diff = abs(first_position[1] - second_position[1])
@@ -101,6 +142,16 @@ class PlayerGameInputHandler:
 
     # checks if the to position is adjacent and not occupied
     def is_valid_direction(self, from_position, to_position):
+        """
+        Check if moving from one position to another is a valid direction and not occupied by the player's own marble.
+
+        Parameters:
+        - from_position (tuple): The starting position.
+        - to_position (tuple): The target position.
+
+        Returns:
+        - bool/None: True if the direction is valid, False or None otherwise.
+        """
 
         # check if occupied by your own
         if self.is_marble_player_to_move(to_position):
@@ -110,6 +161,16 @@ class PlayerGameInputHandler:
         return self.is_adjacent(from_position, to_position, 1)
 
     def calculate_direction(self, from_position, to_position):
+        """
+        Calculate the direction of movement from one position to another.
+
+        Parameters:
+        - from_position (tuple): The starting position.
+        - to_position (tuple): The target position.
+
+        Returns:
+        - Direction: The direction of movement.
+        """
         # Direction is calculated based on row and column differences
         row_diff = to_position[0] - from_position[0]
         col_diff = to_position[1] - from_position[1]
@@ -131,16 +192,30 @@ class PlayerGameInputHandler:
             return None  # Invalid direction or positions are not adjacent
 
     def reset_state(self):
+        """
+        Reset the game state to its initial conditions, awaiting the first marble selection.
+        """
         self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
         self.first_marble = None
         self.second_marble = None
 
 
 class HUD(Drawable, EventHandler):
+    """
+    A Heads-Up Display (HUD) class that handles the creation and management of the game's interface elements.
+    It extends both Drawable and EventHandler interfaces to allow for drawing the HUD and handling input events.
+    """
     HUD_HEIGHT = 150
     menu = None
 
     def __init__(self, gui, callbacks):
+        """
+        Initializes the HUD with a reference to the GUI instance and a tuple of callback functions.
+
+        Parameters:
+        - gui: An instance of the GUI class, used to access GUI-related attributes and methods.
+        - callbacks: A tuple containing references to callback functions for game actions like start, undo, and pause.
+        """
         self.ui_instance = gui
         self.theme = self.ui_instance.theme
         self.theme.widget_width = 100
@@ -151,6 +226,12 @@ class HUD(Drawable, EventHandler):
         self.start_game_cb, self.undo_move_cb, self.pause_game_cb = callbacks
 
     def create_hud(self):
+        """
+        Creates the HUD menu with game control buttons like start, stop, pause, reset, undo last move, and show move history.
+
+        Returns:
+        - menu: A pygame_menu.Menu instance representing the HUD with all the control buttons.
+        """
         menu = pygame_menu.Menu("Abalone", self.ui_instance.SCREEN_WIDTH, self.HUD_HEIGHT,
                                 theme=self.theme, position=(0, 0, True), columns=5, rows=2)
         menu.add.button("Start Game", self.start_game_cb,
@@ -172,10 +253,22 @@ class HUD(Drawable, EventHandler):
 
     @property
     def white_balls(self):
+        """
+        Property getter for the number of white balls.
+
+        Returns:
+        - _white_balls: The current number of white balls.
+        """
         return self._white_balls
 
     @white_balls.setter
     def white_balls(self, value):
+        """
+        Property setter for the number of white balls. Updates the score label with the new value.
+
+        Parameters:
+        - value: The new number of white balls.
+        """
         self._white_balls = value
         if self.score_label is not None:
             self.score_label.set_title(
@@ -183,30 +276,66 @@ class HUD(Drawable, EventHandler):
 
     @property
     def black_balls(self):
+        """
+        Property getter for the number of black balls.
+
+        Returns:
+        - _black_balls: The current number of black balls.
+        """
         return self._black_balls
 
     @black_balls.setter
     def black_balls(self, value):
+        """
+        Property setter for the number of black balls. Updates the score label with the new value.
+
+        Parameters:
+        - value: The new number of black balls.
+        """
         self._black_balls = value
         if self.score_label is not None:
             self.score_label.set_title(
                 f"White Score: {self._white_balls}   Black Score:  {self._black_balls}  ")
 
     def get_menu(self):
+        """
+        Retrieves the HUD menu, creating it if it does not already exist.
+
+        Returns:
+        - menu: The pygame_menu.Menu instance representing the HUD.
+        """
         if self.menu is None:
             self.menu = self.create_hud()
         return self.menu
 
     def handle_event(self, event):
+        """
+        Handles an input event, passing it to the HUD menu for processing.
+
+        Parameters:
+        - event: The event to be handled, typically from the pygame event queue.
+        """
         menu = self.get_menu()
         menu.update([event])
 
     def draw(self, surface, game_manager):
+        """
+        Draws the HUD menu onto the specified surface.
+
+        Parameters:
+        - surface: The pygame surface to draw the HUD on.
+        - game_manager: The game manager instance, used to access game-related data and methods.
+        """
         menu = self.get_menu()
         menu.draw(surface)
 
 
 class Board(Drawable, EventHandler):
+    """
+    A class representing the game board, responsible for drawing the board and handling events related to it.
+    It implements the Drawable and EventHandler interfaces for graphical display and event handling, respectively.
+    """
+
     CELL_SIZE = 76
     SIDE_MARGIN = 13
     TOP_OFFSET = 100
@@ -215,11 +344,23 @@ class Board(Drawable, EventHandler):
     ALIGNMENT = [0, -2, -1, -1, 0, 0, 1, 1, 2, 2, 0]
 
     def __init__(self, callbacks) -> None:
+        """
+        Initializes the Board class with callback functions for handling game inputs.
+
+        Parameters:
+        - callbacks: A tuple or list containing callback functions to handle various player actions.
+        """
         super().__init__()
         self.waiting_for_player_input = False
         self.input_handler = PlayerGameInputHandler(callbacks)
 
     def handle_event(self, event):
+        """
+        Handles user input events, specifically mouse button presses for selecting marbles or resetting the game state.
+
+        Parameters:
+        - event: The event to be handled, usually a mouse event from the pygame event queue.
+        """
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Get the mouse position
             pos = pygame.mouse.get_pos()
@@ -238,6 +379,13 @@ class Board(Drawable, EventHandler):
                     self.input_handler.reset_state()
 
     def draw(self, surface, game_manager):
+        """
+        Draws the game board, including the background and marbles, onto the specified surface.
+
+        Parameters:
+        - surface: The pygame Surface object where the board should be drawn.
+        - game_manager: An instance of the GameManager class, used to access the current state of the game board.
+        """
         game_manager = game_manager.get_board()
 
         screen = surface
@@ -278,6 +426,15 @@ class Board(Drawable, EventHandler):
 
     @classmethod
     def get_cell(cls, pos):
+        """
+        Calculates which cell of the board is at a given pixel position.
+
+        Parameters:
+        - pos: A tuple containing the (x, y) coordinates of the pixel position.
+
+        Returns:
+        - A tuple (row, col) indicating the cell's row and column. Returns (None, None) if the position is outside any cell.
+        """
         board = cls.ALIGNMENT
         for row in range(len(board)):
             for col in range(len(board)):
@@ -308,16 +465,36 @@ class Board(Drawable, EventHandler):
 
 
 class UI(ABC):
+    """
+    An abstract base class representing the user interface (UI) of the game. It defines a standard interface for UI components,
+    ensuring that all drawable elements and event handlers are consistently managed across different implementations of the game UI.
+
+    Attributes:
+    - drawable_elements (list): A list of elements that can be drawn to the screen. These elements should implement a `draw` method.
+    - event_handlers (list): A list of objects that can handle events. These objects should implement a `handle_event` method.
+    """
     drawable_elements = []
     event_handlers = []
 
     # displays the board and the hud
     @abstractmethod
     def update(self, game_manager):
+        """
+        An abstract method that updates the UI components based on the game's current state. This method must be implemented
+        by subclasses to ensure the UI reflects the latest game state.
+
+        Parameters:
+        - game_manager: An instance of the GameManager class, or similar, providing access to the game's current state
+        and logic for updating UI components accordingly.
+        """
         pass
 
 
 class PygameUI(UI):
+    """
+    A concrete implementation of the UI class for a Pygame-based application. This class manages the game's graphical user interface, including drawing the game board and HUD, handling user inputs, and displaying menus.
+    """
+
     SCREEN_HEIGHT = 1000
     SCREEN_WIDTH = 1300
     button_color = (0, 128, 255)
@@ -325,6 +502,12 @@ class PygameUI(UI):
     text_color = (255, 255, 255)
 
     def __init__(self, app) -> None:
+        """
+        Initializes the PygameUI with an application reference, sets up the screen, and initializes UI components like the HUD and game board.
+
+        Parameters:
+        - app: A reference to the main application object, used for callback notifications.
+        """
         super().__init__()
         self.theme = pygame_menu.themes.THEME_DARK
         self.screen = pygame.display.set_mode(
@@ -369,18 +552,18 @@ class PygameUI(UI):
         self.event_handlers.append(hud)
 
     def start_the_game(self, config):
+        """
+        Starts the game using the selected configuration.
 
-        # Placeholder for starting the game with the selected configuration
-        # print(f"Starting game with config: {config}")
-
-        # def start_button_cb(): return self._app.notify(self, "AiMakeMove")
-
-        # start_button = Button(1000, 100, 200, 50, PygameUI.button_color, PygameUI.button_highlight_color, "Start", PygameUI.text_color, 32, start_button_cb)
-        # self.drawable_elements.append(start_button)
-        # self.event_handlers.append(start_button)
+        Parameters:
+        - config: A dictionary containing the game configuration, such as player types, colors, and game rules.
+        """
         self._app.notify(self, "StartGame", config=config)
 
     def run_game(self):
+        """
+        The main game loop. Handles events, updates the game state, and redraws the screen.
+        """
         while True:
             for event in pygame.event.get():
                 if event == pygame.MOUSEBUTTONDOWN:
@@ -395,10 +578,19 @@ class PygameUI(UI):
             self.update(self._app.game_manager)
 
     def run(self):
+        """
+        Initializes Pygame and displays the main menu of the game.
+        """
         pygame.init()
         self.main_menu()
 
     def update(self, game_manager):
+        """
+        Updates and redraws the game UI based on the current state of the game.
+
+        Parameters:
+        - game_manager: An instance of the game manager class that holds the current state of the game.
+        """
         self.screen.fill((0, 0, 0))
 
         # update the score in the menu

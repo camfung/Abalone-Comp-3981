@@ -6,8 +6,14 @@ from ui import HUD, Board, PygameUI
 
 
 class App:
-    def __init__(self):
+    """
+    The main application class that orchestrates the game by integrating the game manager, user interface (UI), and players. It handles events and notifications across these components to manage game flow and state.
+    """
 
+    def __init__(self):
+        """
+        Initializes the application, setting up the game manager, UI, and player list. It also registers the UI with the game manager for updates.
+        """
         self.game_manager = GameManager(self)
         self.gui = PygameUI(self)
         self.players = []
@@ -15,6 +21,14 @@ class App:
         self.game_manager.join_room(self.gui)
 
     def notify(self, sender, event, **kwargs):
+        """
+        Handles notifications sent from different parts of the application, acting upon various events like starting the game, making moves, undoing moves, and querying game state.
+
+        Parameters:
+        - sender: The component that sent the notification.
+        - event: A string representing the type of event that occurred.
+        - **kwargs: Additional keyword arguments providing context and data needed to handle the event.
+        """
         if event == "StartGame":
             # define the params for the game
             formation = kwargs["config"]["formation"][0][1]
@@ -69,6 +83,16 @@ class App:
             return self.game_manager.game_score
 
     def initialize_players(self, game_type: GameType, player_color: Marble):
+        """
+        Initializes players based on the selected game type and player colors.
+
+        Parameters:
+        - game_type: An enumeration value of GameType indicating whether it's player vs. CPU, CPU vs. CPU, or player vs. player.
+        - player_color: An enumeration value of Marble indicating the color chosen by the player.
+
+        Returns:
+        A list of initialized player objects for the game.
+        """
         if game_type == GameType.CPU_VS_CPU:
             return [AbaloneAgent(10, 100, Marble.BLACK), AbaloneAgent(10, 100, Marble.WHITE)]
         elif game_type == GameType.PLAYER_VS_CPU:
@@ -80,4 +104,7 @@ class App:
             return [HumanPlayer(10, 100, Marble.BLACK), HumanPlayer(10, 100, Marble.WHITE)]
 
     def run(self):
+        """
+        Starts the application by displaying the main menu and initializing the game loop.
+        """
         self.gui.run()
