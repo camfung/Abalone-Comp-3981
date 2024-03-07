@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import datetime
 import random
 import time
 from typing import Any
@@ -46,17 +47,6 @@ class Player(ABC):
         return self._color
 
     @abstractmethod
-    def update(self) -> None:
-        pass
-
-    # I'm not sure if this is necessary.
-    # wouldnt all the interaction with the game state be in the make move function.
-    # if so then the child classes can get the state from the gamemanager since it will be in the scope of the function
-    @abstractmethod
-    def get_game_state(self, game_manager) -> None:
-        return game_manager.get_game_state()
-
-    @abstractmethod
     def make_move(self, game_manager, player, move) -> None:
         pass
 
@@ -70,24 +60,27 @@ class Player(ABC):
 
 class HumanPlayer(Player):
 
-    def make_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
-        gameManager.commit_move(move)
+    def make_move(self, gameManager: GameManager, player: Marble, move: Move) -> None:
+        gameManager.commit_move(move=move, player=player, timestamp=1)
 
-    def undo_last_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
+    def undo_last_move(self, gameManager: GameManager, player: Marble, move: Move) -> None:
         print("Undoing last move.")
 
 
 class AbaloneAgent(Player):
 
     def generate_move(self, gameManager: GameManager):
+        initial_time = datetime.datetime.now()
         # sample for making a random move
         move = random.choice(
             gameManager.get_possible_moves())
-        return move
+        final_time = datetime.datetime.now()
+        timeDelta = final_time - initial_time
+        return move, timeDelta.total_seconds()
 
-    def make_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
+    def make_move(self, gameManager: GameManager, player: Marble, move: Move, time_stamp: float) -> None:
         time.sleep(1)
-        gameManager.commit_move(player, move)
+        gameManager.commit_move(player, move, time_stamp)
 
     def undo_last_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
         print("Agent undoing last move.")
