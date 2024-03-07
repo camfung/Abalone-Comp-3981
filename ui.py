@@ -330,12 +330,12 @@ class PygameUI(UI):
         self.board = board
 
         # add the drawables
-        self.drawable_elements.append(hud)
         self.drawable_elements.append(board)
+        self.drawable_elements.append(hud)
 
         # add the event handlers
-        self.event_handlers.append(hud)
         self.event_handlers.append(board)
+        self.event_handlers.append(hud)
 
     def start_the_game(self, config):
 
@@ -358,6 +358,7 @@ class PygameUI(UI):
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+            self.update(self._app.game_manager)
 
     def run(self):
         pygame.init()
