@@ -32,7 +32,7 @@ class GameManager():
     def undo_last_move(self):
         if len(self._move_history) != 0:
             self._game.set_game_state(self._move_history.pop())
-            self._game.get_current_game_state().remove_last_record()
+            self._game.get_record_history().remove_last_record()
             self.notify()
         else:
             pass
