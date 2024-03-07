@@ -36,7 +36,7 @@ class App:
                 # trigger the agent to make a move
                 move, time_stamp = player.generate_move(self.game_manager)
                 player.make_move(self.game_manager,
-                                 player.color, move, time_stamp=1)
+                                 player.color, move, time_stamp=time_stamp)
                 self.gui.start_button_clicked = True
             self.gui.waiting_for_player_input = True
 
