@@ -139,8 +139,8 @@ class HUD(Drawable, EventHandler):
     HUD_HEIGHT = 150
     menu = None
 
-    def __init__(self):
-        self.ui_instance = PygameUI()
+    def __init__(self, gui):
+        self.ui_instance = gui
         self.theme = self.ui_instance.theme
         self.theme.widget_width = 100
 
@@ -331,7 +331,7 @@ class PygameUI(UI):
         self._app = app
         self.start_button_clicked = False
 
-        hud = HUD()
+        hud = HUD(self)
         board = Board()
 
         # add the drawables
