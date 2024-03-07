@@ -78,7 +78,7 @@ class Game:
                                    next_marble,
                                    copy.deepcopy(self._current_game_state))
         self._current_game_state = new_game_state
-        self._record_history.add_record(move, player.color, timestamp)
+        self._record_history.add_record(move, player, timestamp)
 
     def get_record_history(self):
         return self._record_history
@@ -98,6 +98,8 @@ class GameState:
     def __init__(self, board, marble=Marble.BLACK, prev_game_state=None):
         self._board = board
         self._current_move_color = marble
+        self._white_balls = 14
+        self._black_balls = 14
         self._prev_game_state = prev_game_state
         self._moves = self.__generate_possible_moves()
 
@@ -200,12 +202,16 @@ class GameState:
         # Move Subsequent Pieces in Same Direction
         if move.get_move_type() == MoveType.INLINE:
             # Declare Multipliers to Search for Subsequent Balls
-            move_x = 1 if first_ball_f_x > first_ball_i_x else (-1 if first_ball_f_x < first_ball_i_x else 0)
-            move_y = 1 if first_ball_f_y > first_ball_i_y else (-1 if first_ball_f_y < first_ball_i_y else 0)
+            move_x = 1 if first_ball_f_x > first_ball_i_x else (
+                -1 if first_ball_f_x < first_ball_i_x else 0)
+            move_y = 1 if first_ball_f_y > first_ball_i_y else (
+                -1 if first_ball_f_y < first_ball_i_y else 0)
 
             # Declare Variables for Initial and Final Ball Positions
-            sub_ball_i_x = copy.copy(last_ball_i_x) if move_x > 0 else copy.copy(first_ball_i_x)
-            sub_ball_i_y = copy.copy(last_ball_i_y) if move_y > 0 else copy.copy(first_ball_i_y)
+            sub_ball_i_x = copy.copy(
+                last_ball_i_x) if move_x > 0 else copy.copy(first_ball_i_x)
+            sub_ball_i_y = copy.copy(
+                last_ball_i_y) if move_y > 0 else copy.copy(first_ball_i_y)
             sub_ball_f_x = copy.copy(sub_ball_i_x)
             sub_ball_f_y = copy.copy(sub_ball_i_y)
 
@@ -240,7 +246,8 @@ class GameState:
                     or sub_ball_i_y < org_ball_y and move_y < 0
                     or sub_ball_i_y == org_ball_y and move_y == 0)
                    and not safety_lock):
-                marble_color = copy.deepcopy(new_board[sub_ball_i_x][sub_ball_i_y])
+                marble_color = copy.deepcopy(
+                    new_board[sub_ball_i_x][sub_ball_i_y])
                 new_board[sub_ball_i_x][sub_ball_i_y] = Marble.NONE
 
                 # If the Marble is Off the Board, Delete it. Otherwise, Move Marble to Space
@@ -317,11 +324,15 @@ class Move:
         self._marble = marble
         self._pos_i = (first_ball_i, last_ball_i)
         self._pos_f = Move.__calc_pos_f(first_ball_i, last_ball_i, direction)
-        self._selection_type = Move.__calc_selection_type(first_ball_i, last_ball_i)
-        self._move_type = Move.__calc_move_type(first_ball_i, last_ball_i, direction, self._selection_type)
-    @property 
-    def marble(self): 
+        self._selection_type = Move.__calc_selection_type(
+            first_ball_i, last_ball_i)
+        self._move_type = Move.__calc_move_type(
+            first_ball_i, last_ball_i, direction, self._selection_type)
+
+    @property
+    def marble(self):
         return self._marble
+
     @staticmethod
     def __calc_pos_f(first_ball_i, last_ball_i, direction):
         if direction == Direction.UP_LEFT:
