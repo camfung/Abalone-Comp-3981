@@ -24,7 +24,6 @@ class Drawable(ABC):
 
 
 class HUD(Drawable, EventHandler):
-    HUD_WIDTH = 1000
     HUD_HEIGHT = 150
     menu = None
 
@@ -34,16 +33,22 @@ class HUD(Drawable, EventHandler):
         self.ui_instance = PygameUI()
 
     def create_hud(self):
-        menu = pygame_menu.Menu("Abalone", self.HUD_WIDTH, self.HUD_HEIGHT,
+        menu = pygame_menu.Menu("Abalone", self.ui_instance.SCREEN_WIDTH, self.HUD_HEIGHT,
                                 theme=self.theme, position=(0, 0, True), columns=5, rows=2)
         # menu.add.button("Start Game", align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Stop Game", pygame_menu.events.EXIT, align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Pause", align=pygame_menu.locals.ALIGN_CENTER)  # TODO implementation
-        menu.add.button("Reset", self.ui_instance.play_menu, align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Undo Last Move", align=pygame_menu.locals.ALIGN_CENTER)  # TODO implementation
+        menu.add.button("Stop Game", pygame_menu.events.EXIT,
+                        align=pygame_menu.locals.ALIGN_CENTER)
+        # TODO implementation
+        menu.add.button("Pause", align=pygame_menu.locals.ALIGN_CENTER)
+        menu.add.button("Reset", self.ui_instance.play_menu,
+                        align=pygame_menu.locals.ALIGN_CENTER)
+        # TODO implementation
+        menu.add.button("Undo Last Move",
+                        align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Show Move History", self.ui_instance.display_move_history,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.label(f"White Score:    Black Score:    ") #TODO use Player.get_balls_remaining method
+        # TODO use Player.get_balls_remaining method
+        menu.add.label(f"White Score:    Black Score:    ")
 
         return menu
 
@@ -89,7 +94,8 @@ class Board(Drawable, EventHandler):
         pygame.display.set_caption("Abalone Board")
 
         background_image = pygame.image.load("images/final_board.png", "rb")
-        background_image = pygame.transform.scale(background_image, (1000, 1000))
+        background_image = pygame.transform.scale(
+            background_image, (1000, 1000))
         screen.blit(background_image, (0, 0))
 
         for row in range(len(game_manager)):
@@ -102,13 +108,18 @@ class Board(Drawable, EventHandler):
                     continue
 
                 # Calculate the offset
-                offset = self.OFFSET if row % 2 == 0 else 0  # Apply offset to odd rows for Abalone layout
-                total_grid_width = len(game_manager) * self.CELL_SIZE + (len(game_manager) - 1) * self.SIDE_MARGIN
-                total_grid_height = len(game_manager) * self.CELL_SIZE + (len(game_manager) - 1) * self.TOP_MARGIN
+                # Apply offset to odd rows for Abalone layout
+                offset = self.OFFSET if row % 2 == 0 else 0
+                total_grid_width = len(
+                    game_manager) * self.CELL_SIZE + (len(game_manager) - 1) * self.SIDE_MARGIN
+                total_grid_height = len(
+                    game_manager) * self.CELL_SIZE + (len(game_manager) - 1) * self.TOP_MARGIN
                 start_x = (1000 - total_grid_width) // 2
                 start_y = (1000 - total_grid_height) // 2
 
-                cell_x = start_x + (self.ALIGNMENT[row] + col) * (self.CELL_SIZE + self.SIDE_MARGIN) - offset
+                cell_x = start_x + \
+                    (self.ALIGNMENT[row] + col) * \
+                    (self.CELL_SIZE + self.SIDE_MARGIN) - offset
                 cell_y = start_y + row * (self.CELL_SIZE + self.TOP_MARGIN)
                 screen.blit(ball_image, (cell_x, cell_y))
 
@@ -118,13 +129,18 @@ class Board(Drawable, EventHandler):
         for row in range(len(board)):
             for col in range(len(board)):
                 # Calculate the offset
-                offset = cls.OFFSET if row % 2 == 0 else 0  # Apply offset to odd rows for Abalone layout
-                total_grid_width = len(board) * cls.CELL_SIZE + (len(board) - 1) * cls.SIDE_MARGIN
-                total_grid_height = len(board) * cls.CELL_SIZE + (len(board) - 1) * cls.TOP_MARGIN
+                # Apply offset to odd rows for Abalone layout
+                offset = cls.OFFSET if row % 2 == 0 else 0
+                total_grid_width = len(
+                    board) * cls.CELL_SIZE + (len(board) - 1) * cls.SIDE_MARGIN
+                total_grid_height = len(
+                    board) * cls.CELL_SIZE + (len(board) - 1) * cls.TOP_MARGIN
                 start_x = (1000 - total_grid_width) // 2
                 start_y = (1000 - total_grid_height) // 2
 
-                cell_x = start_x + (cls.ALIGNMENT[row] + col) * (cls.CELL_SIZE + cls.SIDE_MARGIN) - offset
+                cell_x = start_x + \
+                    (cls.ALIGNMENT[row] + col) * \
+                    (cls.CELL_SIZE + cls.SIDE_MARGIN) - offset
                 cell_y = start_y + row * (cls.CELL_SIZE + cls.TOP_MARGIN)
                 rect = pygame.Rect(
                     cell_x,
@@ -160,7 +176,8 @@ class PygameUI(UI):
     def __init__(self) -> None:
         super().__init__()
         self.theme = pygame_menu.themes.THEME_DARK
-        self.screen = pygame.display.set_mode((1000, 1000))
+        self.screen = pygame.display.set_mode(
+            (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self.state = UIState.MAIN_MENU
         self.state_actions = {
             UIState.GAME_PLAY: self.run_game,
@@ -261,8 +278,10 @@ class PygameUI(UI):
         menu.mainloop(self.screen)
 
     def display_move_history(self):
-        menu = pygame_menu.Menu("Move History", self.SCREEN_WIDTH, self.SCREEN_HEIGHT, theme=self.theme)
-        table = menu.add.table(table_id='records_table', font_size=20, font_color="Black")
+        menu = pygame_menu.Menu(
+            "Move History", self.SCREEN_WIDTH, self.SCREEN_HEIGHT, theme=self.theme)
+        table = menu.add.table(table_id='records_table',
+                               font_size=20, font_color="Black")
         table.default_cell_padding = 5
         table.default_row_background_color = 'white'
         table.add_row(['Turn #', 'White Moves', 'Black Moves'],
