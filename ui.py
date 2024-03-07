@@ -118,7 +118,7 @@ class PlayerGameInputHandler:
         """
         return f'{self.state}, First: {self.first_marble}, Second: {self.second_marble}'
 
-    # checks if second positoin is within dist of first position
+    # checks if second position is within dist of first position
     def is_adjacent(self, first_position, second_position, dist=2):
         """
         Check if two positions are adjacent based on a specified distance.
@@ -227,7 +227,8 @@ class HUD(Drawable, EventHandler):
 
     def create_hud(self):
         """
-        Creates the HUD menu with game control buttons like start, stop, pause, reset, undo last move, and show move history.
+        Creates the HUD menu with game control buttons like start, stop, pause, reset, undo last move,
+        and show move history.
 
         Returns:
         - menu: A pygame_menu.Menu instance representing the HUD with all the control buttons.
