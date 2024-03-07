@@ -105,6 +105,7 @@ class AbaloneAgent(Player):
         # sample for making a random move
         move = random.choice(
             gameManager.get_possible_moves())
+        time.sleep(random.uniform(1, 3))
         final_time = datetime.datetime.now()
         timeDelta = final_time - initial_time
         return move, timeDelta.total_seconds()
@@ -119,5 +120,4 @@ class AbaloneAgent(Player):
         - move: The Move object representing the move to be made.
         - time_stamp: The timestamp when the move was generated.
         """
-        time.sleep(1)
         gameManager.commit_move(player, move, time_stamp)
