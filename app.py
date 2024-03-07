@@ -30,6 +30,13 @@ class App:
         - **kwargs: Additional keyword arguments providing context and data needed to handle the event.
         """
         if event == "StartGame":
+            """
+            Starts a new game with the specified configuration. This event initializes players, sets up the game board, and starts the game loop.
+
+            Parameters:
+            - config: A dictionary containing the game configuration such as formation, game type, and player color.
+            """
+
             # define the params for the game
             formation = kwargs["config"]["formation"][0][1]
             game_type = kwargs["config"]["game_type"][0][1]
@@ -45,6 +52,11 @@ class App:
             # if the first player to move is a cpu make the move
             self.gui.run_game()
         if event == "AiMakeMove":
+            """
+            Triggers the AI agent to calculate and make a move. This event is called when it's the AI's turn to play.
+
+            No specific parameters are required for this event as the AI's decision-making process is internal and based on the current game state.
+            """
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
             if type(player) == AbaloneAgent:
                 # trigger the agent to make a move
@@ -55,6 +67,14 @@ class App:
             self.gui.waiting_for_player_input = True
 
         if event == "PlayerMakeMove":
+            """
+            Processes a move made by a player. This includes validating the move, updating the game state, and possibly triggering the AI to make its move.
+
+            Parameters:
+            - first_marble: The position of the first marble selected by the player.
+            - second_marble: The position of the second marble selected by the player (if applicable).
+            - direction: The direction in which the player wishes to move the selected marbles.
+            """
             first_marble = kwargs["first_marble"]
             second_marble = kwargs["second_marble"]
             direction = kwargs["direction"]
@@ -69,6 +89,15 @@ class App:
                 move=move, player=move.marble, timestamp=time_stamp)
             self.notify(self, "AiMakeMove")
         if event == "IsMarblePlayerToMove":
+            """
+            Checks if the marble at a given position belongs to the current player to move.
+
+            Parameters:
+            - marble_pos: The board position of the marble to check.
+
+            Returns:
+            - A boolean indicating whether the marble at the specified position belongs to the current player.
+            """
             # check what marble color is at the marble_pos
             marble_row, marble_col = kwargs["marble_pos"]
             return self.game_manager.get_board()[marble_row][marble_col] == self.game_manager.current_player_to_move
