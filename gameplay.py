@@ -58,8 +58,8 @@ class Game:
     def get_current_game_state(self):
         return self._current_game_state
 
-    def set_move(self, player=None, move=None):
-        if player is None and move is None:
+    def set_move(self, player=None, move=None, timestamp=None):
+        if player is None and move is None and timestamp is None:
             self._current_game_state = self._current_game_state.get_previous_game_state()
             self._record_history.remove_last_record()
             return
@@ -78,7 +78,7 @@ class Game:
                                    next_marble,
                                    copy.deepcopy(self._current_game_state))
         self._current_game_state = new_game_state
-        self._record_history.add_record(move)
+        self._record_history.add_record(move, player.color, timestamp)
 
     def get_record_history(self):
         return self._record_history

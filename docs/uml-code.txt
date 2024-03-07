@@ -117,7 +117,7 @@ namespace Communication {
         + stop_game() : void
         + pause_game() : void
         + reset_game() : void
-        + commit_move(player: Player, move: Move) : void
+        + commit_move(player: Player, move: Move, timestamp: float) : void
         + undo_last_move() : void
     }
 }
@@ -129,7 +129,7 @@ namespace Gameplay {
         - current_game_state : GameState
         - record_history : RecordHistory
         + initialize_board_layout(formation: Formation) : GameState$
-        + set_move(player: Player, move: Move) : void
+        + set_move(player: Player, move: Move, timestamp: float) : void
         + get_current_game_state() : GameState
         + get_record_history(): RecordHistory
     }
@@ -195,7 +195,7 @@ namespace Records {
         - time_taken: float
         + __init__(index: int, game_id: int, move: Move, player_turn: Marble, time_taken: float): Record
         + get_index(): int
-        + get_game_id: int
+        + get_game_id(): int
         + get_move(): String
         + __str__(): String
     }
