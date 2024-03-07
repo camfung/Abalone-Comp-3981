@@ -28,9 +28,9 @@ class HUD(Drawable, EventHandler):
     menu = None
 
     def __init__(self):
-        self.theme = pygame_menu.themes.THEME_DARK
-        self.theme.widget_width = 100
         self.ui_instance = PygameUI()
+        self.theme = self.ui_instance.theme
+        self.theme.widget_width = 100
 
     def create_hud(self):
         menu = pygame_menu.Menu("Abalone", self.ui_instance.SCREEN_WIDTH, self.HUD_HEIGHT,
