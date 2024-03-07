@@ -270,10 +270,10 @@ class Board(Drawable, EventHandler):
                 start_y = (1000 - total_grid_height) // 2
 
                 cell_x = start_x + \
-                         (self.ALIGNMENT[row] + col) * \
-                         (self.CELL_SIZE + self.SIDE_MARGIN) - offset
+                    (self.ALIGNMENT[row] + col) * \
+                    (self.CELL_SIZE + self.SIDE_MARGIN) - offset
                 cell_y = start_y + row * \
-                         (self.CELL_SIZE + self.TOP_MARGIN) + self.TOP_OFFSET
+                    (self.CELL_SIZE + self.TOP_MARGIN) + self.TOP_OFFSET
                 screen.blit(ball_image, (cell_x, cell_y))
 
     @classmethod
@@ -292,10 +292,10 @@ class Board(Drawable, EventHandler):
                 start_y = (1000 - total_grid_height) // 2
 
                 cell_x = start_x + \
-                         (cls.ALIGNMENT[row] + col) * \
-                         (cls.CELL_SIZE + cls.SIDE_MARGIN) - offset
+                    (cls.ALIGNMENT[row] + col) * \
+                    (cls.CELL_SIZE + cls.SIDE_MARGIN) - offset
                 cell_y = start_y + row * \
-                         (cls.CELL_SIZE + cls.TOP_MARGIN) + cls.TOP_OFFSET
+                    (cls.CELL_SIZE + cls.TOP_MARGIN) + cls.TOP_OFFSET
                 rect = pygame.Rect(
                     cell_x,
                     cell_y,
@@ -442,7 +442,7 @@ class PygameUI(UI):
             'I Play As: ', [('Black', Marble.BLACK), ('White', Marble.WHITE)])  # Adding selector for player color
         cpu_level = menu.add.dropselect('Agent:     ', [(
             'Random moves', 1), ('Cameron', 2), ('Joey', 3), ('Elsa', 4), ('Callum', 5)], default=0,
-                                        onchange=self.update_play_button)
+            onchange=self.update_play_button)
         formation = menu.add.dropselect('Formation: ', [(
             f.name, f) for f in Formation], default=0, onchange=self.update_play_button)
 

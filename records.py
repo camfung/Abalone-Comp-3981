@@ -37,7 +37,7 @@ class Record:
         :return: String including index, player turn, move, move type and timestamp
         """
         # return f"{self._index}: {self._player_turn} {self._move} - {int(self._time_taken)} seconds"
-        return f"{self._index}: {self._player_turn.name} {self._move} {self._move.get_move_type().name} seconds"
+        return f"{self._index}: {self._player_turn.name} {self._move} {self._move.get_move_type().name}  {int(self._time_taken)} seconds"
 
 
 class RecordHistory:
@@ -79,7 +79,8 @@ class RecordHistory:
         :param timestamp: Time Calculated
         :return:
         """
-        self._records.append(Record(len(self._records) + 1, self._game_id, move, turn, timestamp))
+        self._records.append(
+            Record(len(self._records) + 1, self._game_id, move, turn, timestamp))
 
     def remove_last_record(self):
         """
@@ -115,4 +116,3 @@ class RecordHistory:
             return current_record
         else:
             raise StopIteration
-
