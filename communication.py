@@ -25,7 +25,8 @@ class GameManager():
         GameManager.__instance = self
 
     def commit_move(self, player, move, timestamp):
-        self._move_history.append(copy.deepcopy(self._game.get_current_game_state()))
+        self._move_history.append(copy.deepcopy(
+            self._game.get_current_game_state()))
         self._game.set_move(player, move, timestamp)
         self.notify()
 
@@ -33,9 +34,25 @@ class GameManager():
         if len(self._move_history) != 0:
             self._game.set_game_state(self._move_history.pop())
             self._game.get_record_history().remove_last_record()
+            self._game.update_ball_count()
             self.notify()
         else:
             pass
+
+    @property
+    def game_score(self):
+        """
+        Retrieves the current score of the game.
+
+        This property provides access to the current score by returning a tuple
+        containing the count of white balls and black balls in the game. It utilizes
+        the current game state to fetch these values.
+
+        Returns:
+            tuple: A tuple where the first element is the count of white balls and
+                the second element is the count of black balls in the game.
+        """
+        return (self._game._white_balls, self._game._black_balls)
 
     @property
     def current_player_to_move(self):

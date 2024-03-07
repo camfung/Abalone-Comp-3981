@@ -13,6 +13,8 @@ class Game:
         self._game_id = Game.id_counter
         self._current_game_state = Game.initialize_board_layout(formation)
         self._record_history = RecordHistory(self._game_id)
+        self._white_balls = 14
+        self._black_balls = 14
 
     @staticmethod
     def initialize_board_layout(formation):
@@ -78,7 +80,21 @@ class Game:
                                    next_marble,
                                    copy.deepcopy(self._current_game_state))
         self._current_game_state = new_game_state
+        self.update_ball_count()
         self._record_history.add_record(move, player, timestamp)
+
+    def update_ball_count(self):
+        board = self.get_current_game_state().get_board()
+        white_count = 0
+        black_count = 0
+        for row in board:
+            for col in row:
+                if col == Marble.BLACK:
+                    black_count += 1
+                elif col == Marble.WHITE:
+                    white_count += 1
+        self._white_balls = white_count
+        self._black_balls = black_count
 
     def get_record_history(self):
         return self._record_history
@@ -98,8 +114,6 @@ class GameState:
     def __init__(self, board, marble=Marble.BLACK, prev_game_state=None):
         self._board = board
         self._current_move_color = marble
-        self._white_balls = 14
-        self._black_balls = 14
         self._prev_game_state = prev_game_state
         self._moves = self.__generate_possible_moves()
 
