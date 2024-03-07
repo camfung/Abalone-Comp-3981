@@ -69,21 +69,3 @@ class Player(ABC):
     def get_balls_remaining(self):
         return self.INIT_NUM_BALLS - self.numBalls
 
-
-class AbaloneAgent(Player):
-
-    def __init__(self, time_limit: int, move_limit: int, numBalls: int, color: int):
-        super().__init__(time_limit, move_limit, numBalls, color)
-
-    def update(self) -> None:
-        pass
-
-    def get_game_state(self, gameManager) -> None:
-        pass
-
-    def make_move(self, gameManager, player, move) -> None:
-        pass
-
-    def undo_last_move(self, gameManager, player, move) -> None:
-        pass
-

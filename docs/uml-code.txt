@@ -179,10 +179,13 @@ namespace Records {
         - index: int
         - game_id: int
         - move: Move
-        + __init__(): Record
+        - player_turn: Marble
+        - time_taken: float
+        + __init__(index: int, game_id: int, move: Move, player_turn: Marble, time_taken: float): Record
         + get_index(): int
         + get_game_id: int
         + get_move(): String
+        + __str__(): String
     }
 }
 
