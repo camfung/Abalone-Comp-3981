@@ -40,6 +40,7 @@ class MarbleSelection(Enum):
     HORIZONTAL = auto()
     BACKWARD_SLASH = auto()
     FORWARD_SLASH = auto()
+    SINGLE = auto()
 
 
 class MoveType(Enum):
@@ -56,3 +57,15 @@ class UIState(Enum):
     SETTINGS_MENU = auto()
     PLAY_MENU = auto()
     GAME_PLAY = auto()
+
+
+class GameType(Enum):
+    PLAYER_VS_PLAYER = auto()
+    PLAYER_VS_CPU = auto()
+    CPU_VS_CPU = auto()
+
+
+class PlayerInputEvents(Enum):
+    AWAITING_FIRST_MARBLE = auto()
+    AWAITING_SECOND_MARBLE = auto()
+    AWAITING_DIRECTION = auto()

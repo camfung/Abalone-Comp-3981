@@ -316,7 +316,9 @@ class Move:
         self._pos_f = Move.__calc_pos_f(first_ball_i, last_ball_i, direction)
         self._selection_type = Move.__calc_selection_type(first_ball_i, last_ball_i)
         self._move_type = Move.__calc_move_type(first_ball_i, last_ball_i, direction, self._selection_type)
-
+    @property 
+    def marble(self): 
+        return self._marble
     @staticmethod
     def __calc_pos_f(first_ball_i, last_ball_i, direction):
         if direction == Direction.UP_LEFT:
