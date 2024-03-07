@@ -308,7 +308,7 @@ class PygameUI(UI):
         self.start_button_clicked = False
         def start_game_cb(): return self._app.notify(self, "AiMakeMove")
         def undo_move_cb(): return self._app.notify(self, "UndoLastMove")
-        def pause_game_cb(): return self._app.notfy(self, "PauseGame")
+        def pause_game_cb(): return self._app.notify(self, "PauseGame")
         callbacks = (
             start_game_cb,
             undo_move_cb,
