@@ -34,9 +34,10 @@ class Record:
     def __str__(self):
         """
         A pretty string representation of the Record.
-        :return: String including index, player turn, move and timestamp
+        :return: String including index, player turn, move, move type and timestamp
         """
-        return f"{self._index}: {self._player_turn} {self._move} - {int(self._time_taken)} seconds"
+        # return f"{self._index}: {self._player_turn} {self._move} - {int(self._time_taken)} seconds"
+        return f"{self._index}: {self._player_turn.name} {self._move} {self._move.get_move_type().name} seconds"
 
 
 class RecordHistory:
@@ -102,3 +103,16 @@ class RecordHistory:
                     f.write(record)
                 except Exception as e:
                     raise e
+
+    def __iter__(self):
+        self.current_index = 0
+        return self
+
+    def __next__(self):
+        if self.current_index < len(self._records):
+            current_record = self._records[self.current_index]
+            self.current_index += 1
+            return current_record
+        else:
+            raise StopIteration
+

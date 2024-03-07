@@ -46,17 +46,6 @@ class Player(ABC):
         return self._color
 
     @abstractmethod
-    def update(self) -> None:
-        pass
-
-    # I'm not sure if this is necessary.
-    # wouldnt all the interaction with the game state be in the make move function.
-    # if so then the child classes can get the state from the gamemanager since it will be in the scope of the function
-    @abstractmethod
-    def get_game_state(self, game_manager) -> None:
-        return game_manager.get_game_state()
-
-    @abstractmethod
     def make_move(self, game_manager, player, move) -> None:
         pass
 
@@ -87,7 +76,7 @@ class AbaloneAgent(Player):
 
     def make_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
         time.sleep(1)
-        gameManager.commit_move(player, move)
+        gameManager.commit_move(player, move, None)
 
     def undo_last_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
         print("Agent undoing last move.")

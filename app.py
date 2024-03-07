@@ -49,12 +49,14 @@ class App:
             # if move not valid then set the state of the player event handler back to waiting for first marble
             # if is valid make move and prompt ai to make move
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
-            self.game_manager.commit_move(move=move, player=move.marble)
+            self.game_manager.commit_move(move=move, player=move.marble, timestamp=None)
             self.notify(self, "AiMakeMove")
         if event == "IsMarblePlayerToMove":
             # check what marble color is at the marble_pos
             marble_row, marble_col = kwargs["marble_pos"]
             return self.game_manager.get_board()[marble_row][marble_col] == self.game_manager.current_player_to_move
+        if event == "getRecordHistory":
+            return self.game_manager.get_record_history()
 
     def initialize_players(self, game_type: GameType, player_color: Marble):
         if game_type == GameType.CPU_VS_CPU:

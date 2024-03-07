@@ -63,3 +63,6 @@ class GameManager():
     def notify(self):
         for observer in self._observers:
             observer.update(self)
+
+    def get_record_history(self):
+        return self._game.get_record_history()
