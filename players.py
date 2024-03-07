@@ -8,7 +8,9 @@ from gameplay import Move
 
 
 class Player(ABC):
-    def __init__(self, time_limit: int, move_limit: int, color: int, numBalls: int = 14):
+    INIT_NUM_BALLS = 14
+
+    def __init__(self, time_limit: int, move_limit: int, numBalls: int, color: int):
         self._time_limit = time_limit
         self._move_limit = move_limit
         self._current_move = 0
@@ -49,6 +51,9 @@ class Player(ABC):
     @abstractmethod
     def undo_last_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
         pass
+
+    def get_balls_remaining(self):
+        return self.INIT_NUM_BALLS - self.numBalls
 
 
 class HumanPlayer(Player):

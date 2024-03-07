@@ -136,15 +136,46 @@ class PlayerGameInputHandler:
 
 
 class HUD(Drawable, EventHandler):
-    def __init__(self) -> None:
-        super().__init__()
+    HUD_HEIGHT = 150
+    menu = None
 
-    def draw(self, surface, game_manager):
-        # Example for drawing to the screen
-        pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(10, 10, 150, 100))
+    def __init__(self):
+        self.ui_instance = PygameUI()
+        self.theme = self.ui_instance.theme
+        self.theme.widget_width = 100
+
+    def create_hud(self):
+        menu = pygame_menu.Menu("Abalone", self.ui_instance.SCREEN_WIDTH, self.HUD_HEIGHT,
+                                theme=self.theme, position=(0, 0, True), columns=5, rows=2)
+        # menu.add.button("Start Game", align=pygame_menu.locals.ALIGN_CENTER)
+        menu.add.button("Stop Game", pygame_menu.events.EXIT,
+                        align=pygame_menu.locals.ALIGN_CENTER)
+        # TODO implementation
+        menu.add.button("Pause", align=pygame_menu.locals.ALIGN_CENTER)
+        menu.add.button("Reset", self.ui_instance.play_menu,
+                        align=pygame_menu.locals.ALIGN_CENTER)
+        # TODO implementation
+        menu.add.button("Undo Last Move",
+                        align=pygame_menu.locals.ALIGN_CENTER)
+        menu.add.button("Show Move History", self.ui_instance.display_move_history,
+                        align=pygame_menu.locals.ALIGN_CENTER)
+        # TODO use Player.get_balls_remaining method
+        menu.add.label(f"White Score:    Black Score:    ")
+
+        return menu
+
+    def get_menu(self):
+        if self.menu is None:
+            self.menu = self.create_hud()
+        return self.menu
 
     def handle_event(self, event):
         pass
+
+    def draw(self, surface, game_manager):
+        menu = self.get_menu()
+        menu.draw(surface)
+        menu.update(pygame.event.get())
 
 
 class Board(Drawable, EventHandler):
@@ -190,6 +221,8 @@ class Board(Drawable, EventHandler):
         pygame.display.set_caption("Abalone Board")
 
         background_image = pygame.image.load("images/final_board.png", "rb")
+        background_image = pygame.transform.scale(
+            background_image, (1000, 1000))
         background_image = pygame.transform.scale(
             background_image, (1000, 1000))
         screen.blit(background_image, (0, 0))
@@ -363,7 +396,7 @@ class PygameUI(UI):
     def update_screen(self, game_manager):
         pass
 
-    def display_score(self, record):
+    def display_score(self, game_manager):
         pass
 
     def display_moves(self, record):
@@ -414,4 +447,24 @@ class PygameUI(UI):
         # Settings options will go here
 
         menu.add.button('Back', self.main_menu)
+        menu.mainloop(self.screen)
+
+    def display_move_history(self):
+        menu = pygame_menu.Menu(
+            "Move History", self.SCREEN_WIDTH, self.SCREEN_HEIGHT, theme=self.theme)
+        table = menu.add.table(table_id='records_table',
+                               font_size=20, font_color="Black")
+        table.default_cell_padding = 5
+        table.default_row_background_color = 'white'
+        table.add_row(['Turn #', 'White Moves', 'Black Moves'],
+                      cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+
+        # Hardcoded for now
+        records = ["Example move"]
+
+        # Modify this to match formatting of record history
+        for index, record in enumerate(records, start=1):
+            table.add_row([index - 1, record, record])
+
+        menu.add.button('Back', self.run_game)
         menu.mainloop(self.screen)
