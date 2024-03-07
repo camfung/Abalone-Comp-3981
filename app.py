@@ -17,8 +17,8 @@ class App:
             board = Board()
 
             # add the drawables
-            cls.gui.drawable_elements.append(hud)
             cls.gui.drawable_elements.append(board)
+            cls.gui.drawable_elements.append(hud)
 
             # add the event handlers
             cls.gui.event_handlers.append(hud)

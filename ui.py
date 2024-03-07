@@ -7,7 +7,7 @@ from enums import Formation, UIState
 """
 Essentially what this interface is meant to do is replace the event handling in the pygameUI main game loop. 
 The idea is that in the main game loop the handle event will be called on every event for all the ui components. 
-The behavior for the events will be definied in the concrete class
+The behavior for the events will be defined in the concrete class
 """
 
 
@@ -24,12 +24,46 @@ class Drawable(ABC):
 
 
 class HUD(Drawable, EventHandler):
-    def draw(self, surface, game_manager):
-        # Example for drawing to the screen
-        pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(10, 10, 150, 100))
+    HUD_HEIGHT = 150
+    menu = None
+
+    def __init__(self):
+        self.ui_instance = PygameUI()
+        self.theme = self.ui_instance.theme
+        self.theme.widget_width = 100
+
+    def create_hud(self):
+        menu = pygame_menu.Menu("Abalone", self.ui_instance.SCREEN_WIDTH, self.HUD_HEIGHT,
+                                theme=self.theme, position=(0, 0, True), columns=5, rows=2)
+        # menu.add.button("Start Game", align=pygame_menu.locals.ALIGN_CENTER)
+        menu.add.button("Stop Game", pygame_menu.events.EXIT,
+                        align=pygame_menu.locals.ALIGN_CENTER)
+        # TODO implementation
+        menu.add.button("Pause", align=pygame_menu.locals.ALIGN_CENTER)
+        menu.add.button("Reset", self.ui_instance.play_menu,
+                        align=pygame_menu.locals.ALIGN_CENTER)
+        # TODO implementation
+        menu.add.button("Undo Last Move",
+                        align=pygame_menu.locals.ALIGN_CENTER)
+        menu.add.button("Show Move History", self.ui_instance.display_move_history,
+                        align=pygame_menu.locals.ALIGN_CENTER)
+        # TODO use Player.get_balls_remaining method
+        menu.add.label(f"White Score:    Black Score:    ")
+
+        return menu
+
+    def get_menu(self):
+        if self.menu is None:
+            self.menu = self.create_hud()
+        return self.menu
 
     def handle_event(self, event):
         pass
+
+    def draw(self, surface, game_manager):
+        menu = self.get_menu()
+        menu.draw(surface)
+        menu.update(pygame.event.get())
 
 
 class Board(Drawable, EventHandler):
@@ -38,6 +72,7 @@ class Board(Drawable, EventHandler):
     TOP_MARGIN = 2
     OFFSET = CELL_SIZE / 2 + SIDE_MARGIN - 5
     ALIGNMENT = [0, -2, -1, -1, 0, 0, 1, 1, 2, 2, 0]
+
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Get the mouse position
@@ -51,6 +86,7 @@ class Board(Drawable, EventHandler):
             # right click
             elif event.button == 3:
                 print(f'Right click at {row, col}')
+
     def draw(self, surface, game_manager):
         game_manager = game_manager.get_board()
 
@@ -58,51 +94,62 @@ class Board(Drawable, EventHandler):
         pygame.display.set_caption("Abalone Board")
 
         background_image = pygame.image.load("images/final_board.png", "rb")
-        background_image = pygame.transform.scale(background_image, (1000, 1000))
+        background_image = pygame.transform.scale(
+            background_image, (1000, 1000))
         screen.blit(background_image, (0, 0))
 
         for row in range(len(game_manager)):
-                for col in range(len(game_manager[row])):
-                    if game_manager[row][col] == Marble.BLACK:
-                        ball_image = pygame.image.load("images/black_ball.png")
-                    elif game_manager[row][col] == Marble.WHITE:
-                        ball_image = pygame.image.load("images/white_ball.png")
-                    else:
-                        continue
+            for col in range(len(game_manager[row])):
+                if game_manager[row][col] == Marble.BLACK:
+                    ball_image = pygame.image.load("images/black_ball.png")
+                elif game_manager[row][col] == Marble.WHITE:
+                    ball_image = pygame.image.load("images/white_ball.png")
+                else:
+                    continue
 
-                    # Calculate the offset
-                    offset = self.OFFSET if row % 2 == 0 else 0  # Apply offset to odd rows for Abalone layout
-                    total_grid_width = len(game_manager) * self.CELL_SIZE + (len(game_manager) - 1) * self.SIDE_MARGIN
-                    total_grid_height = len(game_manager) * self.CELL_SIZE + (len(game_manager) - 1) * self.TOP_MARGIN
-                    start_x = (1000 - total_grid_width) // 2
-                    start_y = (1000 - total_grid_height) // 2
+                # Calculate the offset
+                # Apply offset to odd rows for Abalone layout
+                offset = self.OFFSET if row % 2 == 0 else 0
+                total_grid_width = len(
+                    game_manager) * self.CELL_SIZE + (len(game_manager) - 1) * self.SIDE_MARGIN
+                total_grid_height = len(
+                    game_manager) * self.CELL_SIZE + (len(game_manager) - 1) * self.TOP_MARGIN
+                start_x = (1000 - total_grid_width) // 2
+                start_y = (1000 - total_grid_height) // 2
 
-                    cell_x = start_x + (self.ALIGNMENT[row] + col) * (self.CELL_SIZE + self.SIDE_MARGIN) - offset
-                    cell_y = start_y + row * (self.CELL_SIZE + self.TOP_MARGIN)
-                    screen.blit(ball_image, (cell_x, cell_y))
+                cell_x = start_x + \
+                    (self.ALIGNMENT[row] + col) * \
+                    (self.CELL_SIZE + self.SIDE_MARGIN) - offset
+                cell_y = start_y + row * (self.CELL_SIZE + self.TOP_MARGIN)
+                screen.blit(ball_image, (cell_x, cell_y))
 
     @classmethod
     def get_cell(cls, pos):
         board = cls.ALIGNMENT
         for row in range(len(board)):
-                for col in range(len(board)):
-                    # Calculate the offset
-                    offset = cls.OFFSET if row % 2 == 0 else 0  # Apply offset to odd rows for Abalone layout
-                    total_grid_width = len(board) * cls.CELL_SIZE + (len(board) - 1) * cls.SIDE_MARGIN
-                    total_grid_height = len(board) * cls.CELL_SIZE + (len(board) - 1) * cls.TOP_MARGIN
-                    start_x = (1000 - total_grid_width) // 2
-                    start_y = (1000 - total_grid_height) // 2
+            for col in range(len(board)):
+                # Calculate the offset
+                # Apply offset to odd rows for Abalone layout
+                offset = cls.OFFSET if row % 2 == 0 else 0
+                total_grid_width = len(
+                    board) * cls.CELL_SIZE + (len(board) - 1) * cls.SIDE_MARGIN
+                total_grid_height = len(
+                    board) * cls.CELL_SIZE + (len(board) - 1) * cls.TOP_MARGIN
+                start_x = (1000 - total_grid_width) // 2
+                start_y = (1000 - total_grid_height) // 2
 
-                    cell_x = start_x + (cls.ALIGNMENT[row] + col) * (cls.CELL_SIZE + cls.SIDE_MARGIN) - offset
-                    cell_y = start_y + row * (cls.CELL_SIZE + cls.TOP_MARGIN)
-                    rect = pygame.Rect(
-                        cell_x,
-                        cell_y,
-                        cls.CELL_SIZE,
-                        cls.CELL_SIZE
-                    )
-                    if rect.collidepoint(pos):
-                        return row, col
+                cell_x = start_x + \
+                    (cls.ALIGNMENT[row] + col) * \
+                    (cls.CELL_SIZE + cls.SIDE_MARGIN) - offset
+                cell_y = start_y + row * (cls.CELL_SIZE + cls.TOP_MARGIN)
+                rect = pygame.Rect(
+                    cell_x,
+                    cell_y,
+                    cls.CELL_SIZE,
+                    cls.CELL_SIZE
+                )
+                if rect.collidepoint(pos):
+                    return row, col
         return None, None
 
 
@@ -129,7 +176,8 @@ class PygameUI(UI):
     def __init__(self) -> None:
         super().__init__()
         self.theme = pygame_menu.themes.THEME_DARK
-        self.screen = pygame.display.set_mode((1000, 1000))
+        self.screen = pygame.display.set_mode(
+            (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self.state = UIState.MAIN_MENU
         self.state_actions = {
             UIState.GAME_PLAY: self.run_game,
@@ -176,7 +224,7 @@ class PygameUI(UI):
     def update_screen(self, game_manager):
         pass
 
-    def display_score(self, record):
+    def display_score(self, game_manager):
         pass
 
     def display_moves(self, record):
@@ -227,4 +275,24 @@ class PygameUI(UI):
         # Settings options will go here
 
         menu.add.button('Back', self.main_menu)
+        menu.mainloop(self.screen)
+
+    def display_move_history(self):
+        menu = pygame_menu.Menu(
+            "Move History", self.SCREEN_WIDTH, self.SCREEN_HEIGHT, theme=self.theme)
+        table = menu.add.table(table_id='records_table',
+                               font_size=20, font_color="Black")
+        table.default_cell_padding = 5
+        table.default_row_background_color = 'white'
+        table.add_row(['Turn #', 'White Moves', 'Black Moves'],
+                      cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+
+        # Hardcoded for now
+        records = ["Example move"]
+
+        # Modify this to match formatting of record history
+        for index, record in enumerate(records, start=1):
+            table.add_row([index - 1, record, record])
+
+        menu.add.button('Back', self.run_game)
         menu.mainloop(self.screen)
