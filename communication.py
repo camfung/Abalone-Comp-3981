@@ -19,13 +19,23 @@ class GameManager():
                 "Only one instance of GameManager can be created")
 
         self._app = app
+        self._move_history = []
         self._observers = []
         self._game = None
         GameManager.__instance = self
 
-    def undo_last_move(self):
-        self._game.set_move()
+    def commit_move(self, player, move, timestamp):
+        self._move_history.append(copy.deepcopy(self._game.get_current_game_state()))
+        self._game.set_move(player, move, timestamp)
         self.notify()
+
+    def undo_last_move(self):
+        if len(self._move_history) != 0:
+            self._game.set_game_state(self._move_history.pop())
+            self._game.get_current_game_state().remove_last_record()
+            self.notify()
+        else:
+            pass
 
     @property
     def current_player_to_move(self):
@@ -48,10 +58,6 @@ class GameManager():
 
     def join_room(self, player):
         self._observers.append(player)
-
-    def commit_move(self, player, move, timestamp):
-        self._game.set_move(player, move, timestamp)
-        self.notify()
 
     def leave_room(self, player):
         self._observers.remove(player)
