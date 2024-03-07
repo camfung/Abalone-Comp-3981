@@ -67,11 +67,23 @@ namespace Ui {
     }
 
     class HUD {
-
+        - ui_instance: PygameUI
+        - theme: Theme
+        + create_hud(): Menu
+        + get_menu(): Menu
+        + handle_event(): void
+        + draw(surface: UI, game_manager: GameManager): void
     }
 
     class Board {
-
+        + CELL_SIZE: int$
+        + SIDE_MARGIN: int$
+        + TOP_MARGIN: int$
+        + OFFSET: float
+        + ALIGNMENT: int[]$
+        + handle_event(): void
+        + draw(surface: UI, game_manager: GameManager): void
+        + get_cell(pos: Position): tuple(int, int)$
     }
 }
 
@@ -105,7 +117,7 @@ namespace Communication {
         + stop_game() : void
         + pause_game() : void
         + reset_game() : void
-        + commit_move(player: Player, move: Move) : void
+        + commit_move(player: Player, move: Move, timestamp: float) : void
         + undo_last_move() : void
     }
 }
@@ -117,7 +129,7 @@ namespace Gameplay {
         - current_game_state : GameState
         - record_history : RecordHistory
         + initialize_board_layout(formation: Formation) : GameState$
-        + set_move(player: Player, move: Move) : void
+        + set_move(player: Player, move: Move, timestamp: float) : void
         + get_current_game_state() : GameState
         + get_record_history(): RecordHistory
     }
@@ -166,7 +178,7 @@ namespace Gameplay {
 namespace Records {
     class RecordHistory {
         - game_counter: int$
-        - game_id
+        - game_id: int
         - records: Record[]
         + get_game_id(): int
         + get_records(): Record[]
@@ -179,10 +191,13 @@ namespace Records {
         - index: int
         - game_id: int
         - move: Move
-        + __init__(): Record
+        - player_turn: Marble
+        - time_taken: float
+        + __init__(index: int, game_id: int, move: Move, player_turn: Marble, time_taken: float): Record
         + get_index(): int
-        + get_game_id: int
+        + get_game_id(): int
         + get_move(): String
+        + __str__(): String
     }
 }
 
@@ -232,6 +247,13 @@ namespace Enums {
         SINGLE
         INLINE
         SIDE_STEP
+    }
+
+    class UIState {
+        MAIN_MENU
+        SETTINGS_MENU
+        PLAY_MENU
+        GAME_PLAY
     }
 }
 

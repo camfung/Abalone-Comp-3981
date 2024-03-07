@@ -1,17 +1,17 @@
 from abc import ABC, abstractmethod
+import random
+import time
 from typing import Any
 
-
-class GameManager:
-    pass
-
-
-class Move:
-    pass
+from communication import GameManager
+from enums import Marble
+from gameplay import Move
 
 
 class Player(ABC):
-    def __init__(self, time_limit: int, move_limit: int, numBalls: int, color: int):
+    INIT_NUM_BALLS = 14
+
+    def __init__(self, time_limit: int, move_limit: int,  color: Marble, numBalls: int = 14):
         self._time_limit = time_limit
         self._move_limit = move_limit
         self._current_move = 0
@@ -53,13 +53,41 @@ class Player(ABC):
     # wouldnt all the interaction with the game state be in the make move function.
     # if so then the child classes can get the state from the gamemanager since it will be in the scope of the function
     @abstractmethod
-    def get_game_state(self, gameManager: GameManager) -> None:
-        return gameManager.get_game_state()
+    def get_game_state(self, game_manager) -> None:
+        return game_manager.get_game_state()
 
     @abstractmethod
+    def make_move(self, game_manager, player, move) -> None:
+        pass
+
+    @abstractmethod
+    def undo_last_move(self, game_manager, player, move) -> None:
+        pass
+
+    def get_balls_remaining(self):
+        return self.INIT_NUM_BALLS - self.numBalls
+
+
+class HumanPlayer(Player):
+
     def make_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
-        pass
+        gameManager.commit_move(move)
 
-    @abstractmethod
     def undo_last_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
-        pass
+        print("Undoing last move.")
+
+
+class AbaloneAgent(Player):
+
+    def generate_move(self, gameManager: GameManager):
+        # sample for making a random move
+        move = random.choice(
+            gameManager.get_possible_moves())
+        return move
+
+    def make_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
+        time.sleep(1)
+        gameManager.commit_move(player, move)
+
+    def undo_last_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
+        print("Agent undoing last move.")

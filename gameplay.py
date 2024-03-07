@@ -58,8 +58,8 @@ class Game:
     def get_current_game_state(self):
         return self._current_game_state
 
-    def set_move(self, player=None, move=None):
-        if player is None and move is None:
+    def set_move(self, player=None, move=None, timestamp=None):
+        if player is None and move is None and timestamp is None:
             self._current_game_state = self._current_game_state.get_previous_game_state()
             self._record_history.remove_last_record()
             return
@@ -78,7 +78,7 @@ class Game:
                                    next_marble,
                                    copy.deepcopy(self._current_game_state))
         self._current_game_state = new_game_state
-        self._record_history.add_record(move)
+        self._record_history.add_record(move, player.color, timestamp)
 
     def get_record_history(self):
         return self._record_history
@@ -316,7 +316,9 @@ class Move:
         self._pos_f = Move.__calc_pos_f(first_ball_i, last_ball_i, direction)
         self._selection_type = Move.__calc_selection_type(first_ball_i, last_ball_i)
         self._move_type = Move.__calc_move_type(first_ball_i, last_ball_i, direction, self._selection_type)
-
+    @property 
+    def marble(self): 
+        return self._marble
     @staticmethod
     def __calc_pos_f(first_ball_i, last_ball_i, direction):
         if direction == Direction.UP_LEFT:
@@ -397,4 +399,10 @@ class Move:
         return self._move_type
 
     def __str__(self):
-        return f"{self._pos_i} -> {self._pos_f}"
+        if self._selection_type == MoveType.SINGLE:
+            return (f"{chr(self._pos_i[0][0] + 64)}{self._pos_i[0][1]} "
+                    f"-> {chr(self._pos_f[0][0] + 64)}{self._pos_f[0][1]}")
+        return (f"{chr(self._pos_i[0][0] + 64)}{self._pos_i[0][1]},  "
+                f"{chr(self._pos_i[1][0] + 64)}{self._pos_i[1][1]} "
+                f"-> {chr(self._pos_f[0][0] + 64)}{self._pos_f[0][1]},  "
+                f"{chr(self._pos_f[1][0] + 64)}{self._pos_f[1][1]}")

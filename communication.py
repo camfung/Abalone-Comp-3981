@@ -4,31 +4,7 @@ from gameplay import *
 from exceptions import DuplicateSingletons
 
 
-class Observer(abc.ABC):
-    @abc.abstractmethod
-    def update(self):
-        pass
-
-    @abc.abstractmethod
-    def __call__(self, *args, **kwargs):
-        pass
-
-
-class Observable(abc.ABC):
-    @abc.abstractmethod
-    def join_room(self, player):
-        pass
-
-    @abc.abstractmethod
-    def leave_room(self, player):
-        pass
-
-    @abc.abstractmethod
-    def notify(self):
-        pass
-
-
-class GameManager(Observable):
+class GameManager():
     __instance = None
 
     @staticmethod
@@ -37,23 +13,33 @@ class GameManager(Observable):
             GameManager.__instance = GameManager()
         return GameManager.__instance
 
-    def __init__(self):
+    def __init__(self, app):
         if GameManager.__instance is not None:
-            raise DuplicateSingletons("Only one instance of GameManager can be created")
+            raise DuplicateSingletons(
+                "Only one instance of GameManager can be created")
 
+        self._app = app
         self._observers = []
         self._game = None
         GameManager.__instance = self
 
-    def join_room(self, player):
-        self._observers.append(player)
+    def commit_move(self, player, move):
+        self._game.set_move(player, move)
+        self.notify()
 
-    def leave_room(self, player):
-        self._observers.remove(player)
+    def undo_last_move(self):
+        self._game.set_move()
+        self.notify()
 
-    def notify(self):
-        for observer in self._observers:
-            observer.update()
+    @property
+    def current_player_to_move(self):
+        return self._game.get_current_game_state().get_current_move_color()
+
+    def get_possible_moves(self):
+        return self._game.get_current_game_state().get_possible_moves()
+
+    def get_board(self):
+        return self._game.get_current_game_state().get_board()
 
     def start_game(self, formation):
         self._game = Game(formation)
@@ -64,13 +50,16 @@ class GameManager(Observable):
     def pause_game(self):
         self.notify()
 
-    def commit_move(self, player, move):
-        self._game.set_move(player, move)
+    def join_room(self, player):
+        self._observers.append(player)
+
+    def commit_move(self, player, move, timestamp):
+        self._game.set_move(player, move, timestamp)
         self.notify()
 
-    def undo_last_move(self):
-        self._game.set_move()
-        self.notify()
+    def leave_room(self, player):
+        self._observers.remove(player)
 
-    def get_board(self):
-        return self._game.get_current_game_state().get_board()
+    def notify(self):
+        for observer in self._observers:
+            observer.update(self)
