@@ -67,11 +67,23 @@ namespace Ui {
     }
 
     class HUD {
-
+        - ui_instance: PygameUI
+        - theme: Theme
+        + create_hud(): Menu
+        + get_menu(): Menu
+        + handle_event(): void
+        + draw(surface: UI, game_manager: GameManager): void
     }
 
     class Board {
-
+        + CELL_SIZE: int$
+        + SIDE_MARGIN: int$
+        + TOP_MARGIN: int$
+        + OFFSET: float
+        + ALIGNMENT: int[]$
+        + handle_event(): void
+        + draw(surface: UI, game_manager: GameManager): void
+        + get_cell(pos: Position): tuple(int, int)$
     }
 }
 
@@ -166,7 +178,7 @@ namespace Gameplay {
 namespace Records {
     class RecordHistory {
         - game_counter: int$
-        - game_id
+        - game_id: int
         - records: Record[]
         + get_game_id(): int
         + get_records(): Record[]
@@ -235,6 +247,13 @@ namespace Enums {
         SINGLE
         INLINE
         SIDE_STEP
+    }
+
+    class UIState {
+        MAIN_MENU
+        SETTINGS_MENU
+        PLAY_MENU
+        GAME_PLAY
     }
 }
 
