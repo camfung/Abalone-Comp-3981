@@ -4,6 +4,7 @@ import pygame
 from enums import Direction, GameType, Marble, PlayerInputEvents
 import pygame_menu
 from enums import Formation, UIState
+from records import RecordHistory
 from ui_components import Button, Drawable, EventHandler
 
 
@@ -84,7 +85,8 @@ class PlayerGameInputHandler:
                 return
 
     def __str__(
-        self): return f'{self.state}, First: {self.first_marble}, Second: {self.second_marble}'
+            self):
+        return f'{self.state}, First: {self.first_marble}, Second: {self.second_marble}'
 
     # checks if second positoin is within dist of first position
     def is_adjacent(self, first_position, second_position, dist=2):
@@ -245,10 +247,10 @@ class Board(Drawable, EventHandler):
                 start_y = (1000 - total_grid_height) // 2
 
                 cell_x = start_x + \
-                    (self.ALIGNMENT[row] + col) * \
-                    (self.CELL_SIZE + self.SIDE_MARGIN) - offset
+                         (self.ALIGNMENT[row] + col) * \
+                         (self.CELL_SIZE + self.SIDE_MARGIN) - offset
                 cell_y = start_y + row * \
-                    (self.CELL_SIZE + self.TOP_MARGIN) + self.TOP_OFFSET
+                         (self.CELL_SIZE + self.TOP_MARGIN) + self.TOP_OFFSET
                 screen.blit(ball_image, (cell_x, cell_y))
 
     @classmethod
@@ -267,10 +269,10 @@ class Board(Drawable, EventHandler):
                 start_y = (1000 - total_grid_height) // 2
 
                 cell_x = start_x + \
-                    (cls.ALIGNMENT[row] + col) * \
-                    (cls.CELL_SIZE + cls.SIDE_MARGIN) - offset
+                         (cls.ALIGNMENT[row] + col) * \
+                         (cls.CELL_SIZE + cls.SIDE_MARGIN) - offset
                 cell_y = start_y + row * \
-                    (cls.CELL_SIZE + cls.TOP_MARGIN) + cls.TOP_OFFSET
+                         (cls.CELL_SIZE + cls.TOP_MARGIN) + cls.TOP_OFFSET
                 rect = pygame.Rect(
                     cell_x,
                     cell_y,
@@ -306,13 +308,17 @@ class PygameUI(UI):
             (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self._app = app
         self.start_button_clicked = False
+
         def start_game_cb(): return self._app.notify(self, "AiMakeMove")
+
         def undo_move_cb(): return self._app.notify(self, "UndoLastMove")
+
         def pause_game_cb(): return self._app.notify(self, "PauseGame")
+
         callbacks = (
             start_game_cb,
             undo_move_cb,
-            pause_game_cb,
+            pause_game_cb
         )
         hud = HUD(self, callbacks)
 
@@ -322,6 +328,7 @@ class PygameUI(UI):
 
         def marble_player_to_move_cb(marble_pos):
             return self._app.notify(self, "IsMarblePlayerToMove", marble_pos=marble_pos)
+
         callbacks = (
             execute_move_cb,
             marble_player_to_move_cb
@@ -422,7 +429,8 @@ class PygameUI(UI):
         player_color = menu.add.selector(
             'I Play As: ', [('Black', Marble.BLACK), ('White', Marble.WHITE)])  # Adding selector for player color
         cpu_level = menu.add.dropselect('Agent:     ', [(
-            'Random moves', 1), ('Cameron', 2), ('Joey', 3), ('Elsa', 4), ('Callum', 5)], default=0, onchange=self.update_play_button)
+            'Random moves', 1), ('Cameron', 2), ('Joey', 3), ('Elsa', 4), ('Callum', 5)], default=0,
+                                        onchange=self.update_play_button)
         formation = menu.add.dropselect('Formation: ', [(
             f.name, f) for f in Formation], default=0, onchange=self.update_play_button)
 
@@ -451,15 +459,16 @@ class PygameUI(UI):
                                font_size=20, font_color="Black")
         table.default_cell_padding = 5
         table.default_row_background_color = 'white'
-        table.add_row(['Turn #', 'White Moves', 'Black Moves'],
+        table.add_row(['Moves'],
                       cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
 
-        # Hardcoded for now
-        records = ["Example move"]
+        records = self._app.notify(self, "getRecordHistory")
 
         # Modify this to match formatting of record history
         for index, record in enumerate(records, start=1):
-            table.add_row([index - 1, record, record])
+            str_record = str(record)
+            table.add_row([str_record])
+            print(record)
 
         menu.add.button('Back', self.run_game)
         menu.mainloop(self.screen)
