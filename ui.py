@@ -143,20 +143,22 @@ class HUD(Drawable, EventHandler):
         self.theme = self.ui_instance.theme
         self.theme.widget_width = 100
 
-        start_game_cb, undo_move_cb, pause_game_cb = callbacks
+        self.start_game_cb, self.undo_move_cb, self.pause_game_cb = callbacks
 
     def create_hud(self):
         menu = pygame_menu.Menu("Abalone", self.ui_instance.SCREEN_WIDTH, self.HUD_HEIGHT,
                                 theme=self.theme, position=(0, 0, True), columns=5, rows=2)
-        # menu.add.button("Start Game", align=pygame_menu.locals.ALIGN_CENTER)
+        menu.add.button("Start Game", self.start_game_cb,
+                        align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Stop Game", pygame_menu.events.EXIT,
                         align=pygame_menu.locals.ALIGN_CENTER)
         # TODO implementation
-        menu.add.button("Pause", align=pygame_menu.locals.ALIGN_CENTER)
+        menu.add.button("Pause", self.pause_game_cb,
+                        align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Reset", self.ui_instance.play_menu,
                         align=pygame_menu.locals.ALIGN_CENTER)
         # TODO implementation
-        menu.add.button("Undo Last Move",
+        menu.add.button("Undo Last Move", self.undo_move_cb,
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Show Move History", self.ui_instance.display_move_history,
                         align=pygame_menu.locals.ALIGN_CENTER)
@@ -340,12 +342,11 @@ class PygameUI(UI):
         # Placeholder for starting the game with the selected configuration
         # print(f"Starting game with config: {config}")
 
-        def start_button_cb(): return self._app.notify(self, "AiMakeMove")
+        # def start_button_cb(): return self._app.notify(self, "AiMakeMove")
 
-        start_button = Button(1000, 100, 200, 50, PygameUI.button_color,
-                              PygameUI.button_highlight_color, "Start", PygameUI.text_color, 32, start_button_cb)
-        self.drawable_elements.append(start_button)
-        self.event_handlers.append(start_button)
+        # start_button = Button(1000, 100, 200, 50, PygameUI.button_color, PygameUI.button_highlight_color, "Start", PygameUI.text_color, 32, start_button_cb)
+        # self.drawable_elements.append(start_button)
+        # self.event_handlers.append(start_button)
         self._app.notify(self, "StartGame", config=config)
 
     def run_game(self):
