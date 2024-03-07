@@ -414,14 +414,18 @@ class PygameUI(UI):
             'Play', PygameUI.SCREEN_WIDTH, PygameUI.SCREEN_HEIGHT, theme=self.theme)
         opponent_type = menu.add.selector(
             'Opponent: ', [('CPU', GameType.PLAYER_VS_CPU), ('Human', GameType.PLAYER_VS_PLAYER)])
+        player_color = menu.add.selector(
+            'I Play As: ', [('Black', Marble.BLACK), ('White', Marble.WHITE)])  # Adding selector for player color
         cpu_level = menu.add.dropselect('Agent:     ', [(
             'Random moves', 1), ('Cameron', 2), ('Joey', 3), ('Elsa', 4), ('Callum', 5)], default=0, onchange=self.update_play_button)
         formation = menu.add.dropselect('Formation: ', [(
             f.name, f) for f in Formation], default=0, onchange=self.update_play_button)
 
-        menu.add.button('Play', lambda: self.start_the_game({'game_type': opponent_type.get_value(),
-                                                             'cpu_level': cpu_level.get_value(),
-                                                             'formation': formation.get_value()}))
+        menu.add.button('Play', lambda: self.start_the_game({
+            'game_type': opponent_type.get_value(),
+            'player_color': player_color.get_value(),
+            'cpu_level': cpu_level.get_value(),
+            'formation': formation.get_value()}))
 
         menu.add.button('Back', self.main_menu)
         menu.mainloop(self.screen)

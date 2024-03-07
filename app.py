@@ -22,7 +22,8 @@ class App:
             self.game_manager.game_type = game_type
 
             # make the correct players depending on the config
-            self.players = self.initialize_players(game_type)
+            player_color = kwargs["config"]["player_color"]
+            self.players = self.initialize_players(game_type, player_color)
 
             self.game_manager.start_game(formation)
             self.gui.update(self.game_manager)
@@ -55,11 +56,14 @@ class App:
             marble_row, marble_col = kwargs["marble_pos"]
             return self.game_manager.get_board()[marble_row][marble_col] == self.game_manager.current_player_to_move
 
-    def initialize_players(self, game_type: GameType):
+    def initialize_players(self, game_type: GameType, player_color: Marble):
         if game_type == GameType.CPU_VS_CPU:
             return [AbaloneAgent(10, 100, Marble.BLACK), AbaloneAgent(10, 100, Marble.WHITE)]
         elif game_type == GameType.PLAYER_VS_CPU:
-            return [AbaloneAgent(10, 100, Marble.BLACK), HumanPlayer(10, 100, Marble.WHITE)]
+            if player_color == Marble.BLACK:
+                return [HumanPlayer(10, 100, Marble.BLACK), AbaloneAgent(10, 100, Marble.WHITE)]
+            else:
+                return [AbaloneAgent(10, 100, Marble.BLACK), HumanPlayer(10, 100, Marble.WHITE)]
         elif game_type == GameType.PLAYER_VS_PLAYER:
             return [HumanPlayer(10, 100, Marble.BLACK), HumanPlayer(10, 100, Marble.WHITE)]
 
