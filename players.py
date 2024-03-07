@@ -55,16 +55,35 @@ class Player(ABC):
     # wouldnt all the interaction with the game state be in the make move function.
     # if so then the child classes can get the state from the gamemanager since it will be in the scope of the function
     @abstractmethod
-    def get_game_state(self, gameManager: GameManager) -> None:
-        return gameManager.get_game_state()
+    def get_game_state(self, game_manager) -> None:
+        return game_manager.get_game_state()
 
     @abstractmethod
-    def make_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
+    def make_move(self, game_manager, player, move) -> None:
         pass
 
     @abstractmethod
-    def undo_last_move(self, gameManager: GameManager, player: 'Player', move: Move) -> None:
+    def undo_last_move(self, game_manager, player, move) -> None:
         pass
 
     def get_balls_remaining(self):
         return self.INIT_NUM_BALLS - self.numBalls
+
+
+class AbaloneAgent(Player):
+
+    def __init__(self, time_limit: int, move_limit: int, numBalls: int, color: int):
+        super().__init__(time_limit, move_limit, numBalls, color)
+
+    def update(self) -> None:
+        pass
+
+    def get_game_state(self, gameManager) -> None:
+        pass
+
+    def make_move(self, gameManager, player, move) -> None:
+        pass
+
+    def undo_last_move(self, gameManager, player, move) -> None:
+        pass
+
