@@ -53,6 +53,10 @@ class GameManager():
     def join_room(self, player):
         self._observers.append(player)
 
+    def commit_move(self, player, move, timestamp):
+        self._game.set_move(player, move, timestamp)
+        self.notify()
+
     def leave_room(self, player):
         self._observers.remove(player)
 
