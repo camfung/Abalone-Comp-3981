@@ -34,8 +34,9 @@ class App:
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
             if type(player) == AbaloneAgent:
                 # trigger the agent to make a move
-                move = player.generate_move(self.game_manager)
-                player.make_move(self.game_manager, player.color, move)
+                move, time_stamp = player.generate_move(self.game_manager)
+                player.make_move(self.game_manager,
+                                 player.color, move, time_stamp=1)
                 self.gui.start_button_clicked = True
             self.gui.waiting_for_player_input = True
 
