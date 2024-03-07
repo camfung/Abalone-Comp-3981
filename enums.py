@@ -1,4 +1,5 @@
 
+from enum import Enum, auto
 from enum import *
 
 
@@ -60,12 +61,28 @@ class UIState(Enum):
 
 
 class GameType(Enum):
+    """
+    Enum representing the types of games in the Abalone-Comp-3981 project.
+
+    Attributes:
+        PLAYER_VS_PLAYER: Represents a game between two human players.
+        PLAYER_VS_CPU: Represents a game between a human player and a CPU player.
+        CPU_VS_CPU: Represents a game between two CPU players.
+    """
     PLAYER_VS_PLAYER = auto()
     PLAYER_VS_CPU = auto()
     CPU_VS_CPU = auto()
 
 
 class PlayerInputEvents(Enum):
+    """
+    Enum representing the different input events for a player.
+
+    Attributes:
+        AWAITING_FIRST_MARBLE: Represents the state when the player is awaiting the selection of the first marble.
+        AWAITING_SECOND_MARBLE: Represents the state when the player is awaiting the selection of the second marble.
+        AWAITING_DIRECTION: Represents the state when the player is awaiting the selection of the movement direction.
+    """
     AWAITING_FIRST_MARBLE = auto()
     AWAITING_SECOND_MARBLE = auto()
     AWAITING_DIRECTION = auto()
