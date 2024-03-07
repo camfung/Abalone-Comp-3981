@@ -22,7 +22,7 @@ class App:
             self.game_manager.game_type = game_type
 
             # make the correct players depending on the config
-            player_color = kwargs["config"]["player_color"]
+            player_color = kwargs["config"]["player_color"][0][1]
             self.players = self.initialize_players(game_type, player_color)
 
             self.game_manager.start_game(formation)
