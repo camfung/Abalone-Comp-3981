@@ -40,7 +40,7 @@ class GameManager(Observable):
     def __init__(self):
         if GameManager.__instance is not None:
             raise DuplicateSingletons("Only one instance of GameManager can be created")
-
+        self._move_history = []
         self._observers = []
         self._game = None
         GameManager.__instance = self
@@ -67,10 +67,16 @@ class GameManager(Observable):
     def commit_move(self, player, move):
         self._game.set_move(player, move)
         self.notify()
+        self._move_history.append(self._game.get_current_game_state())
 
     def undo_last_move(self):
-        self._game.set_move()
-        self.notify()
+        if len(self._move_history):
+            self._game.set_game_state(self._move_history.pop())
+            self._game.get_current_game_state().remove_last_record()
+            self.notify()
+            return True
+        else:
+            return False
 
     def get_board(self):
         return self._game.get_current_game_state().get_board()

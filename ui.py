@@ -32,7 +32,7 @@ class HUD(Drawable, EventHandler):
         self.theme = self.ui_instance.theme
         self.theme.widget_width = 100
 
-    def create_hud(self):
+    def create_hud(self, game_manager):
         menu = pygame_menu.Menu("Abalone", self.ui_instance.SCREEN_WIDTH, self.HUD_HEIGHT,
                                 theme=self.theme, position=(0, 0, True), columns=5, rows=2)
         # menu.add.button("Start Game", align=pygame_menu.locals.ALIGN_CENTER)
@@ -43,7 +43,7 @@ class HUD(Drawable, EventHandler):
         menu.add.button("Reset", self.ui_instance.play_menu,
                         align=pygame_menu.locals.ALIGN_CENTER)
         # TODO implementation
-        menu.add.button("Undo Last Move",
+        menu.add.button("Undo Last Move", game_manager.undo_last_move,
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Show Move History", self.ui_instance.display_move_history,
                         align=pygame_menu.locals.ALIGN_CENTER)
@@ -52,16 +52,16 @@ class HUD(Drawable, EventHandler):
 
         return menu
 
-    def get_menu(self):
+    def get_menu(self, game_manager):
         if self.menu is None:
-            self.menu = self.create_hud()
+            self.menu = self.create_hud(game_manager)
         return self.menu
 
     def handle_event(self, event):
         pass
 
     def draw(self, surface, game_manager):
-        menu = self.get_menu()
+        menu = self.get_menu(game_manager)
         menu.draw(surface)
         menu.update(pygame.event.get())
 

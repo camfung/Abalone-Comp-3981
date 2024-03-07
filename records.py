@@ -40,7 +40,7 @@ class RecordHistory:
         self._records.append(Record(len(self._records) + 1, self._game_id, move))
 
     def remove_last_record(self):
-        self._records.pop()
+        return self._records.pop()
 
     def export_records(self):
         game_time = datetime.now()
