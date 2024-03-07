@@ -23,10 +23,6 @@ class GameManager():
         self._game = None
         GameManager.__instance = self
 
-    def commit_move(self, player, move):
-        self._game.set_move(player, move)
-        self.notify()
-
     def undo_last_move(self):
         self._game.set_move()
         self.notify()

@@ -34,8 +34,9 @@ class App:
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
             if type(player) == AbaloneAgent:
                 # trigger the agent to make a move
-                move = player.generate_move(self.game_manager)
-                player.make_move(self.game_manager, player.color, move)
+                move, time_stamp = player.generate_move(self.game_manager)
+                player.make_move(self.game_manager,
+                                 player.color, move, time_stamp=1)
                 self.gui.start_button_clicked = True
             self.gui.waiting_for_player_input = True
 
@@ -43,13 +44,15 @@ class App:
             first_marble = kwargs["first_marble"]
             second_marble = kwargs["second_marble"]
             direction = kwargs["direction"]
+            time_stamp = 1
             move = Move(first_marble, second_marble, direction,
                         self.game_manager.current_player_to_move)
             # either here or in commit move we want to do isvalidmove(move)
             # if move not valid then set the state of the player event handler back to waiting for first marble
             # if is valid make move and prompt ai to make move
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
-            self.game_manager.commit_move(move=move, player=move.marble)
+            self.game_manager.commit_move(
+                move=move, player=move.marble, timestamp=time_stamp)
             self.notify(self, "AiMakeMove")
         if event == "IsMarblePlayerToMove":
             # check what marble color is at the marble_pos
