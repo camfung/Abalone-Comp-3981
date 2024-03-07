@@ -144,6 +144,9 @@ class HUD(Drawable, EventHandler):
         self.ui_instance = gui
         self.theme = self.ui_instance.theme
         self.theme.widget_width = 100
+        self.score_label = None
+        self._white_balls = 0
+        self._black_balls = 0
 
         self.start_game_cb, self.undo_move_cb, self.pause_game_cb = callbacks
 
@@ -154,20 +157,40 @@ class HUD(Drawable, EventHandler):
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Stop Game", pygame_menu.events.EXIT,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        # TODO implementation
         menu.add.button("Pause", self.pause_game_cb,
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Reset", self.ui_instance.play_menu,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        # TODO implementation
         menu.add.button("Undo Last Move", self.undo_move_cb,
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Show Move History", self.ui_instance.display_move_history,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        # TODO use Player.get_balls_remaining method
-        menu.add.label(f"White Score:    Black Score:    ")
+        self.score_label = menu.add.label(
+            f"White Score: {self._white_balls}   Black Score:  {self._black_balls}  ")
 
         return menu
+
+    @property
+    def white_balls(self):
+        return self._white_balls
+
+    @white_balls.setter
+    def white_balls(self, value):
+        self._white_balls = value
+        if self.score_label is not None:
+            self.score_label.set_title(
+                f"White Score: {self._white_balls}   Black Score:  {self._black_balls}  ")
+
+    @property
+    def black_balls(self):
+        return self._black_balls
+
+    @black_balls.setter
+    def black_balls(self, value):
+        self._black_balls = value
+        if self.score_label is not None:
+            self.score_label.set_title(
+                f"White Score: {self._white_balls}   Black Score:  {self._black_balls}  ")
 
     def get_menu(self):
         if self.menu is None:
@@ -378,33 +401,22 @@ class PygameUI(UI):
     def update(self, game_manager):
         self.screen.fill((0, 0, 0))
 
+        # update the score in the menu
+        self.hud.white_balls, self.hud.black_balls = self._app.notify(
+            self, "GetScore")
+
         for element in self.drawable_elements:
             element.draw(self.screen, game_manager)
 
         pygame.display.flip()
 
     @property
-    def waiting_for_player_input(self):
-        return self.board.waiting_for_player_input
+    def waiting_for_player_input(
+        self): return self.board.waiting_for_player_input
 
     @waiting_for_player_input.setter
     def waiting_for_player_input(self, value):
         self.board.waiting_for_player_input = value
-
-    def update_screen(self, game_manager):
-        pass
-
-    def display_score(self, game_manager):
-        pass
-
-    def display_moves(self, record):
-        pass
-
-    def display_time_per_move(self, record):
-        pass
-
-    def display_board(self, game_manager):
-        pass
 
     def main_menu(self):
         menu = pygame_menu.Menu('Welcome', PygameUI.SCREEN_WIDTH, PygameUI.SCREEN_HEIGHT,

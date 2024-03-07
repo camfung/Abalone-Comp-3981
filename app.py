@@ -58,10 +58,15 @@ class App:
             # check what marble color is at the marble_pos
             marble_row, marble_col = kwargs["marble_pos"]
             return self.game_manager.get_board()[marble_row][marble_col] == self.game_manager.current_player_to_move
+
         if event == "getRecordHistory":
             return self.game_manager.get_record_history()
+
         if event == "UndoLastMove":
             self.game_manager.undo_last_move()
+
+        if event == "GetScore":
+            return self.game_manager.game_score
 
     def initialize_players(self, game_type: GameType, player_color: Marble):
         if game_type == GameType.CPU_VS_CPU:
