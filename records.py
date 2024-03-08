@@ -88,7 +88,8 @@ class RecordHistory:
         Most likely used in undo move.
         :return:
         """
-        self._records.pop()
+        if len(self._records) != 0:
+            self._records.pop()
 
     def export_records(self):
         """

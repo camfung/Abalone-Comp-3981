@@ -21,7 +21,7 @@ class PlayerGameInputHandler:
         self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
         self.first_marble = None
         self.second_marble = None
-        self.execute_move, self.is_marble_player_to_move = callbacks
+        self.execute_move, self.is_marble_player_to_move, self.update_board = callbacks
 
     def on_marble_click(self, marble_position):
         """
@@ -43,7 +43,7 @@ class PlayerGameInputHandler:
         # direction clicked for more than 1 marble move
         elif self.state == PlayerInputEvents.AWAITING_DIRECTION:
             self.__on_awaiting_direction(marble_position)
-        # print("final state: ", str(self))
+        print("final state: ", str(self))
 
     def __on_awaiting_first_marble(self, marble_position):
         """
@@ -97,6 +97,7 @@ class PlayerGameInputHandler:
         """
         if self.is_marble_player_to_move(marble_position):
             self.first_marble = marble_position
+            self.second_marble = None
             self.state = PlayerInputEvents.AWAITING_SECOND_MARBLE
         else:
             direction = self.calculate_direction(
@@ -198,6 +199,7 @@ class PlayerGameInputHandler:
         self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
         self.first_marble = None
         self.second_marble = None
+
 
 
 class HUD(Drawable, EventHandler):
@@ -378,6 +380,48 @@ class Board(Drawable, EventHandler):
                 # right click
                 elif event.button == 3:
                     self.input_handler.reset_state()
+    def clicked_marbles(self, first_ball, second_ball):
+        row1, col1 = first_ball
+        row2, col2 = second_ball
+
+        returned_array = []
+
+        # Check if positions are in the same row
+        if row1 == row2:
+            new_ball = [(row1, col) for col in range(min(col1, col2) + 1, max(col1, col2))]
+            if len(new_ball) > 0:
+                returned_array.append(new_ball[0])
+            returned_array.append((row2, col2))
+            returned_array.append((row1, col1))
+            return returned_array
+
+        # Check if positions are in the same column
+        if col1 == col2:
+            new_ball = [(row, col1) for row in range(min(row1, row2) + 1, max(row1, row2))]
+            if len(new_ball) > 0:
+                returned_array.append(new_ball[0])
+            returned_array.append((row2, col2))
+            returned_array.append((row1, col1))
+            return returned_array
+
+        # Check if positions are in the same diagonal
+        if abs(row1 - row2) == abs(col1 - col2):
+            # Determine the direction of the diagonal
+            row_step = 1 if row1 < row2 else -1
+            col_step = 1 if col1 < col2 else -1
+
+            # Collect locations in the diagonal
+            new_ball = [(row, col) for row, col in zip(range(row1 + row_step, row2, row_step),
+                                                   range(col1 + col_step, col2, col_step))]
+            if len(new_ball) > 0:
+                returned_array.append(new_ball[0])
+            returned_array.append((row2, col2))
+            returned_array.append((row1, col1))
+            return returned_array
+
+        # No straight line found
+        return []
+
 
     def draw(self, surface, game_manager):
         """
@@ -388,9 +432,18 @@ class Board(Drawable, EventHandler):
         - game_manager: An instance of the GameManager class, used to access the current state of the game board.
         """
         game_manager = game_manager.get_board()
+        clicks = []
 
         screen = surface
         pygame.display.set_caption("Abalone Board")
+
+        if self.input_handler.first_marble != None:
+            if self.input_handler.second_marble != None:
+                clicks = self.clicked_marbles(self.input_handler.first_marble, self.input_handler.second_marble)
+            else:
+                clicks.append(self.input_handler.first_marble)
+        else:
+            clicks = []
 
         background_image = pygame.image.load("images/final_board.png", "rb")
         background_image = pygame.transform.scale(
@@ -402,9 +455,15 @@ class Board(Drawable, EventHandler):
         for row in range(len(game_manager)):
             for col in range(len(game_manager[row])):
                 if game_manager[row][col] == Marble.BLACK:
-                    ball_image = pygame.image.load("images/black_ball.png")
+                    if (row, col) in clicks:
+                        ball_image = pygame.image.load("images/dark_black_ball.png")
+                    else:
+                        ball_image = pygame.image.load("images/black_ball.png")
                 elif game_manager[row][col] == Marble.WHITE:
-                    ball_image = pygame.image.load("images/white_ball.png")
+                    if (row, col) in clicks:
+                        ball_image = pygame.image.load("images/dark_white_ball.png")
+                    else:
+                        ball_image = pygame.image.load("images/white_ball.png")
                 else:
                     continue
 
@@ -536,9 +595,13 @@ class PygameUI(UI):
         def marble_player_to_move_cb(marble_pos):
             return self._app.notify(self, "IsMarblePlayerToMove", marble_pos=marble_pos)
 
+        def update_board_cb():
+            return self.update(self._app.game_manager)
+
         callbacks = (
             execute_move_cb,
-            marble_player_to_move_cb
+            marble_player_to_move_cb,
+            update_board_cb
         )
         board = Board(callbacks)
         self.board = board
