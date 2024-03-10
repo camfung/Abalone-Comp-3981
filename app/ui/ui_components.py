@@ -29,7 +29,7 @@ class Button(Drawable, EventHandler):
         self.font = pygame.font.Font(None, font_size)
         self.clicked_callback = clicked_callback
 
-    def draw(self, screen, gamemanager):
+    def draw(self, screen, game_manager):
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
             pygame.draw.rect(screen, self.highlight_color, self.rect)

@@ -1,0 +1,154 @@
+
+from app.enums import *
+from app.exceptions import InvalidDirection
+
+
+class Move:
+    """
+    Represents a move in the game, including its start and end positions, direction, marble involved, and move type.
+    """
+
+    def __init__(self, first_ball_i, last_ball_i, direction, marble):
+        """
+        Initializes a new move with specified parameters.
+
+        Parameters:
+        - first_ball_i: The initial position of the first ball in the move (row, column).
+        - last_ball_i: The initial position of the last ball in the move (row, column),
+        for moves involving multiple balls.
+        - direction: The direction of the move, defined in the Direction enum.
+        - marble: The type of marble being moved, defined in the Marble enum.
+        """
+        self._direction = direction
+        self._marble = marble
+        self._pos_i = (first_ball_i, last_ball_i)
+        self._pos_f = Move.__calc_pos_f(first_ball_i, last_ball_i, direction)
+        self._selection_type = Move.__calc_selection_type(
+            first_ball_i, last_ball_i)
+        self._move_type = Move.__calc_move_type(
+            first_ball_i, last_ball_i, direction, self._selection_type)
+
+    @property
+    def marble(self):
+        return self._marble
+
+    @staticmethod
+    def __calc_pos_f(first_ball_i, last_ball_i, direction):
+        """
+        Calculates the final positions of the balls after the move.
+
+        Parameters:
+        - first_ball_i: Initial position of the first ball.
+        - last_ball_i: Initial position of the last ball.
+        - direction: The direction of the move.
+
+        Returns:
+        Tuple containing the final positions of the first and last balls.
+        """
+        if direction == Direction.UP_LEFT:
+            position = ((first_ball_i[0] - 1, first_ball_i[1]),
+                        (last_ball_i[0] - 1, last_ball_i[1]))
+        elif direction == Direction.UP_RIGHT:
+            position = ((first_ball_i[0] - 1, first_ball_i[1] + 1),
+                        (last_ball_i[0] - 1, last_ball_i[1] + 1))
+        elif direction == Direction.RIGHT:
+            position = ((first_ball_i[0], first_ball_i[1] + 1),
+                        (last_ball_i[0], last_ball_i[1] + 1))
+        elif direction == Direction.DOWN_RIGHT:
+            position = ((first_ball_i[0] + 1, first_ball_i[1]),
+                        (last_ball_i[0] + 1, last_ball_i[1]))
+        elif direction == Direction.DOWN_LEFT:
+            position = ((first_ball_i[0] + 1, first_ball_i[1] - 1),
+                        (last_ball_i[0] + 1, last_ball_i[1] - 1))
+        elif direction == Direction.LEFT:
+            position = ((first_ball_i[0], first_ball_i[1] - 1),
+                        (last_ball_i[0], last_ball_i[1] - 1))
+        else:
+            raise InvalidDirection("Invalid direction passed to Move")
+
+        return position
+
+    @staticmethod
+    def __calc_selection_type(first_ball_i, last_ball_i):
+        """
+        Determines the selection type of the move based on the initial positions of the balls.
+
+        Parameters:
+        - first_ball_i: Initial position of the first ball.
+        - last_ball_i: Initial position of the last ball.
+
+        Returns:
+        MarbleSelection: The selection type (horizontal, backward slash, forward slash).
+        """
+        # Return Horizontal if Rows are Same
+        if first_ball_i[0] == last_ball_i[0]:
+            return MarbleSelection.HORIZONTAL
+
+        # Return Back-slash if Columns are Same
+        if first_ball_i[1] == last_ball_i[1]:
+            return MarbleSelection.BACKWARD_SLASH
+
+        # Return Forward-slash if Rows and Columns are different
+        return MarbleSelection.FORWARD_SLASH
+
+    @staticmethod
+    def __calc_move_type(first_ball_i, last_ball_i, direction, selection):
+        """
+        Determines the type of move based on the initial positions of the balls, their selection type, and direction.
+
+        Parameters:
+        - first_ball_i: Initial position of the first ball.
+        - last_ball_i: Initial position of the last ball.
+        - direction: The direction of the move.
+        - selection: The selection type of the move.
+
+        Returns:
+        MoveType: The type of the move (single, inline, side step).
+        """
+        # Return Single if First and Last Ball are the same
+        if first_ball_i == last_ball_i:
+            return MoveType.SINGLE
+
+        # Return Inline if Horizontal Selection and Directions is Left or Right
+        if (selection == MarbleSelection.HORIZONTAL
+                and (Direction.LEFT == direction or Direction.RIGHT == direction)):
+            return MoveType.INLINE
+
+        # Return Inline if Selection is Backward Slash and Directions is UpLeft or DownRight
+        if (selection == MarbleSelection.BACKWARD_SLASH
+                and (Direction.UP_LEFT == direction or Direction.DOWN_RIGHT == direction)):
+            return MoveType.INLINE
+
+        # Return Inline if Selection is Forward Slash and Directions is UpRight or DownLeft
+        if (selection == MarbleSelection.FORWARD_SLASH
+                and (Direction.UP_RIGHT == direction or Direction.DOWN_LEFT == direction)):
+            return MoveType.INLINE
+
+        return MoveType.SIDE_STEP
+
+    def get_pos_i(self):
+        return self._pos_i
+
+    def get_pos_f(self):
+        return self._pos_f
+
+    def get_direction(self):
+        return self._direction
+
+    def get_marble(self):
+        return self._marble
+
+    def get_selection_type(self):
+        return self._selection_type
+
+    def get_move_type(self):
+        return self._move_type
+
+    def __str__(self):
+        if self._selection_type == MoveType.SINGLE:
+            return (f"{chr(self._pos_i[0][0] + 64)}{self._pos_i[0][1]} "
+                    f"-> {chr(self._pos_f[0][0] + 64)}{self._pos_f[0][1]}")
+        return (f"{chr(self._pos_i[0][0] + 64)}{self._pos_i[0][1]},  "
+                f"{chr(self._pos_i[1][0] + 64)}{self._pos_i[1][1]} "
+                f"-> {chr(self._pos_f[0][0] + 64)}{self._pos_f[0][1]},  "
+                f"{chr(self._pos_f[1][0] + 64)}{self._pos_f[1][1]}")
