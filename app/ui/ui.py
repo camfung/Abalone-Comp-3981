@@ -2,9 +2,9 @@
 from abc import ABC, abstractmethod
 import sys
 import pygame
-from app.enums import GameType, Marble
+from app.api.enums import GameType, Marble
 import pygame_menu
-from app.enums import Formation
+from app.api.enums import Formation
 from app.ui.board import Board
 from app.ui.hud import HUD
 

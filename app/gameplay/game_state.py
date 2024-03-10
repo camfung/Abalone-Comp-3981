@@ -2,7 +2,7 @@
 import copy
 
 from app.gameplay.move import Move
-from app.enums import *
+from app.api.enums import *
 
 
 class GameState:

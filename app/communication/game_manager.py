@@ -2,7 +2,7 @@
 import copy
 
 from app.gameplay.game import Game
-from app.exceptions import DuplicateSingletons
+from app.api.exceptions import DuplicateSingletons
 
 
 class GameManager:

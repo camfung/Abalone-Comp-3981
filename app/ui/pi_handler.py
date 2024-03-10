@@ -1,5 +1,5 @@
 
-from app.enums import *
+from app.api.enums import *
 
 
 class PlayerInputHandler:

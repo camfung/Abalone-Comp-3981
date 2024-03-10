@@ -1,16 +1,13 @@
 
-from enums import *
-from gameplay.game import Game
-from gameplay.move import Move
+from app.api.enums import GameType, Marble
+from app.gameplay.move import Move
 
-from communication.game_manager import GameManager
+from app.communication.game_manager import GameManager
 
-from players.agent import AbaloneAgent
-from players.human import HumanPlayer
+from app.players.agent import AbaloneAgent
+from app.players.human import HumanPlayer
 
-from ui.hud import HUD
-from ui.board import Board
-from ui.ui import PygameUI
+from app.ui.ui import PygameUI
 
 
 class App:
@@ -73,7 +70,7 @@ class App:
             """
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else \
                 self.players[1]
-            if type(player) == AbaloneAgent:
+            if isinstance(player, AbaloneAgent):
                 # trigger the agent to make a move
                 move, time_stamp = player.generate_move(self.game_manager)
                 player.make_move(self.game_manager,
@@ -97,7 +94,7 @@ class App:
             time_stamp = 1
             move = Move(first_marble, second_marble, direction,
                         self.game_manager.current_player_to_move)
-            # either here or in commit move we want to do isvalidmove(move)
+            # either here or in commit move we want to do is_valid_move(move)
             # if move not valid then set the state of the player event handler back to waiting for first marble
             # if is valid make move and prompt AI to make move
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else \

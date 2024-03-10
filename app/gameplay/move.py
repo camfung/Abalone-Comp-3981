@@ -1,6 +1,6 @@
 
-from app.enums import *
-from app.exceptions import InvalidDirection
+from app.api.enums import *
+from app.api.exceptions import InvalidDirection
 
 
 class Move:

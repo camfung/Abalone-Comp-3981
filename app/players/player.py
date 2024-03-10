@@ -1,7 +1,7 @@
 
 from abc import ABC, abstractmethod
 
-from app.enums import Marble
+from app.api.enums import Marble
 
 
 class Player(ABC):
@@ -11,7 +11,7 @@ class Player(ABC):
 
     INIT_NUM_BALLS = 14
 
-    def __init__(self, time_limit: int, move_limit: int,  color: Marble, numBalls: int = 14):
+    def __init__(self, time_limit: int, move_limit: int,  color: Marble, num_balls: int = 14):
         """
         Initializes a Player with time and move limits, a color, and the initial number of balls.
 
@@ -24,7 +24,7 @@ class Player(ABC):
         self._time_limit = time_limit
         self._move_limit = move_limit
         self._current_move = 0
-        self._numBalls = numBalls
+        self._num_balls = num_balls
         self._color = color
 
     @property
@@ -43,12 +43,12 @@ class Player(ABC):
         self._current_move = value
 
     @property
-    def numBalls(self) -> int:
-        return self._numBalls
+    def num_balls(self) -> int:
+        return self._num_balls
 
-    @numBalls.setter
-    def numBalls(self, value: int) -> None:
-        self._numBalls = value
+    @num_balls.setter
+    def num_balls(self, value: int) -> None:
+        self._num_balls = value
 
     @property
     def color(self) -> Marble:
@@ -59,4 +59,4 @@ class Player(ABC):
         pass
 
     def get_balls_remaining(self):
-        return self.INIT_NUM_BALLS - self.numBalls
+        return self.INIT_NUM_BALLS - self.num_balls

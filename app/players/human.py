@@ -1,6 +1,6 @@
 
 from app.communication.game_manager import GameManager
-from app.enums import Marble
+from app.api.enums import Marble
 from app.gameplay.move import Move
 from app.players.player import Player
 

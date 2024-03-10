@@ -1,5 +1,5 @@
 import pygame
-from app.enums import Marble
+from app.api.enums import Marble
 from app.ui.pi_handler import PlayerInputHandler
 
 from app.ui.ui_components import Drawable, EventHandler

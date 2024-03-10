@@ -1,10 +1,10 @@
 
 import copy
-from app.enums import *
-from app.records import RecordHistory
-from app.exceptions import InvalidMarbleValue
+from app.api.enums import *
+from app.api.records import RecordHistory
+from app.api.exceptions import InvalidMarbleValue
 import csv
-from game_state import GameState
+from app.gameplay.game_state import GameState
 
 
 class Game:

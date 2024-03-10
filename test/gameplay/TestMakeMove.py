@@ -1,7 +1,7 @@
 
 from app.gameplay.game import Game
 from app.gameplay.move import Move
-from app.enums import *
+from app.api.enums import *
 
 
 game = Game(Formation.DEFAULT)
