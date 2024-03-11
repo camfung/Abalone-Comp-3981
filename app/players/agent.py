@@ -10,7 +10,6 @@ from app.players.player import Player
 
 
 class AbaloneAgent(Player):
-
     """
     A concrete implementation of the Player class representing an AI agent player.
     """

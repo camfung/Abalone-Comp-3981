@@ -1,4 +1,3 @@
-
 import copy
 
 from app.gameplay.move import Move
@@ -81,7 +80,6 @@ class GameState:
                                                         direction=direction)
                                 if move is not None:
                                     moves.append(move)
-
         return moves
 
     def convert_moves_to_game_states(self):
@@ -230,8 +228,7 @@ class GameState:
             return move
         return None
 
-    @staticmethod
-    def __check_move(move):
+    def __check_move(self, move):
         """
         Checks the validity of a move. This method is a placeholder and currently always returns True,
         indicating all moves are considered valid.
@@ -242,7 +239,72 @@ class GameState:
         Returns:
         bool: True if the move is valid, False otherwise.
         """
-        return True
+
+        # Fetch Initial Ball Positions
+        first_ball_i_x = move.get_pos_i()[0][0]
+        first_ball_i_y = move.get_pos_i()[0][1]
+        last_ball_i_x = move.get_pos_i()[1][0]
+        last_ball_i_y = move.get_pos_i()[1][1]
+
+        # Fetch Final Ball Positions
+        first_ball_f_x = move.get_pos_f()[0][0]
+        first_ball_f_y = move.get_pos_f()[0][1]
+        last_ball_f_x = move.get_pos_f()[1][0]
+        last_ball_f_y = move.get_pos_f()[1][1]
+
+        # Fetch Middle Ball Positions
+        remain_ball_f_x = (first_ball_f_x + last_ball_f_x) // 2
+        remain_ball_f_y = (first_ball_f_y + last_ball_f_y) // 2
+
+        if abs(first_ball_f_y - last_ball_f_y) > 1:
+            remain_ball_f_y = (first_ball_f_y + last_ball_f_y) // 2
+
+        # Declare Multipliers to Search for Subsequent Balls
+        move_x = 1 if first_ball_f_x > first_ball_i_x else (
+            -1 if first_ball_f_x < first_ball_i_x else 0)
+        move_y = 1 if first_ball_f_y > first_ball_i_y else (
+            -1 if first_ball_f_y < first_ball_i_y else 0)
+
+        for _ in range(1, 4):
+            # Check if the next space is an empty space
+            if (self._board[first_ball_f_x][first_ball_f_y] == Marble.NONE
+                    and self._board[remain_ball_f_x][remain_ball_f_y] == Marble.NONE
+                    and self._board[last_ball_f_x][last_ball_f_y] == Marble.NONE):
+                return True
+
+            # Check if the next space is edge of board and not directly next to original position.
+            if (self._board[first_ball_f_x][first_ball_f_y] is None
+                    and (abs(first_ball_f_x - first_ball_i_x) <= 1)
+                    and (abs(first_ball_f_y - first_ball_i_y) <= 1)):
+                break
+            elif self._board[first_ball_f_x][first_ball_f_y] is None:
+                return True
+
+            if (self._board[last_ball_f_x][last_ball_f_y] is None
+                    and (abs(last_ball_f_x - last_ball_i_x) <= 1)
+                    and (abs(last_ball_f_y - last_ball_i_y) <= 1)):
+                break
+            elif self._board[last_ball_f_x][last_ball_f_y] is None:
+                return True
+
+            # Check if next space is your own piece
+            if self._board[first_ball_f_x][first_ball_f_y] == self._current_move_color:
+                break
+
+            if self._board[remain_ball_f_x][remain_ball_f_y] == self._current_move_color:
+                break
+
+            if self._board[last_ball_f_x][last_ball_f_y] == self._current_move_color:
+                break
+
+            first_ball_f_x += move_x
+            first_ball_f_y += move_y
+            remain_ball_f_x += move_x
+            remain_ball_f_y += move_y
+            last_ball_f_x += move_x
+            last_ball_f_y += move_y
+
+        return False
 
     def __check_inbounds(self, first_ball_i, last_ball_i, row):
         """
