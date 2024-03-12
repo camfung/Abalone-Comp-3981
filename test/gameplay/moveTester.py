@@ -1,6 +1,7 @@
 import json
-from gameplay import Game, GameState, Move
-from enums import *
+from app.gameplay.game import Game
+from app.gameplay.move import Move
+from app.api.enums import *
 
 # Function to convert direction text to Direction enum
 
