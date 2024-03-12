@@ -133,27 +133,18 @@ class GameState:
         if abs(first_ball_i_y - last_ball_i_y) > 1:
             remain_ball_i_y = (first_ball_i_y + last_ball_i_y) // 2
 
-        remain_ball_f_x = copy.deepcopy(first_ball_f_x)
-        remain_ball_f_y = copy.deepcopy(first_ball_f_y)
-        if abs(first_ball_f_x - last_ball_f_x) > 1:
-            remain_ball_f_x = (first_ball_f_x + last_ball_f_x) // 2
-
-        if abs(first_ball_f_y - last_ball_f_y) > 1:
-            remain_ball_f_y = (first_ball_f_y + last_ball_f_y) // 2
+        remain_ball_f_x = (first_ball_f_x + last_ball_f_x) // 2
+        remain_ball_f_y = (first_ball_f_y + last_ball_f_y) // 2
 
         # Move Subsequent Pieces in Same Direction
         if move.get_move_type() == MoveType.INLINE:
             # Declare Multipliers to Search for Subsequent Balls
-            move_x = 1 if first_ball_f_x > first_ball_i_x else (
-                -1 if first_ball_f_x < first_ball_i_x else 0)
-            move_y = 1 if first_ball_f_y > first_ball_i_y else (
-                -1 if first_ball_f_y < first_ball_i_y else 0)
+            move_x = 1 if first_ball_f_x > first_ball_i_x else (-1 if first_ball_f_x < first_ball_i_x else 0)
+            move_y = 1 if first_ball_f_y > first_ball_i_y else (-1 if first_ball_f_y < first_ball_i_y else 0)
 
             # Declare Variables for Initial and Final Ball Positions
-            sub_ball_i_x = copy.deepcopy(
-                last_ball_i_x) if move_x > 0 else copy.deepcopy(first_ball_i_x)
-            sub_ball_i_y = copy.deepcopy(
-                last_ball_i_y) if move_y > 0 else copy.deepcopy(first_ball_i_y)
+            sub_ball_i_x = copy.deepcopy(last_ball_i_x) if move_x > 0 else copy.deepcopy(first_ball_i_x)
+            sub_ball_i_y = copy.deepcopy(last_ball_i_y) if move_y > 0 else copy.deepcopy(first_ball_i_y)
             sub_ball_f_x = copy.deepcopy(sub_ball_i_x)
             sub_ball_f_y = copy.deepcopy(sub_ball_i_y)
 
@@ -180,16 +171,13 @@ class GameState:
                 sub_ball_f_y += move_y
 
             # Move Marbles to New Locations
-            while ((sub_ball_i_x > org_ball_x and move_x > 0
-                    or sub_ball_i_x < org_ball_x and move_x < 0
+            while ((abs(sub_ball_i_x - org_ball_x) > 0 and move_x != 0
                     or sub_ball_i_x == org_ball_x and move_x == 0)
                    and
-                   (sub_ball_i_y > org_ball_y and move_y > 0
-                    or sub_ball_i_y < org_ball_y and move_y < 0
+                   (abs(sub_ball_i_y - org_ball_y) > 0 and move_y != 0
                     or sub_ball_i_y == org_ball_y and move_y == 0)
                    and not safety_lock):
-                marble_color = copy.deepcopy(
-                    new_board[sub_ball_i_x][sub_ball_i_y])
+                marble_color = copy.deepcopy(new_board[sub_ball_i_x][sub_ball_i_y])
                 new_board[sub_ball_i_x][sub_ball_i_y] = Marble.NONE
 
                 # If the Marble is Off the Board, Delete it. Otherwise, Move Marble to Space
@@ -202,14 +190,14 @@ class GameState:
                 sub_ball_f_y -= move_y
 
         # Remove the all the Mover's marbles in the move
+        new_board[remain_ball_i_x][remain_ball_i_y] = Marble.NONE
         new_board[first_ball_i_x][first_ball_i_y] = Marble.NONE
         new_board[last_ball_i_x][last_ball_i_y] = Marble.NONE
-        new_board[remain_ball_i_x][remain_ball_i_y] = Marble.NONE
 
         # Place the Mover's marbles back on the board
+        new_board[remain_ball_f_x][remain_ball_f_y] = move.get_marble()
         new_board[first_ball_f_x][first_ball_f_y] = move.get_marble()
         new_board[last_ball_f_x][last_ball_f_y] = move.get_marble()
-        new_board[remain_ball_f_x][remain_ball_f_y] = move.get_marble()
 
         return new_board
 
