@@ -2,7 +2,7 @@
 import datetime
 import sys
 import time
-from random import random
+import random
 
 from app.communication.game_manager import GameManager
 from app.api.enums import Marble
