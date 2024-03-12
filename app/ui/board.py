@@ -117,7 +117,7 @@ class Board(Drawable, EventHandler):
         else:
             clicks = []
 
-        background_image = pygame.image.load("images/final_board.png", "rb")
+        background_image = pygame.image.load("./app/images/final_board.png", "rb")
         background_image = pygame.transform.scale(
             background_image, (1000, 1000))
         background_image = pygame.transform.scale(
@@ -128,14 +128,14 @@ class Board(Drawable, EventHandler):
             for col in range(len(game_manager[row])):
                 if game_manager[row][col] == Marble.BLACK:
                     if (row, col) in clicks:
-                        ball_image = pygame.image.load("images/dark_black_ball.png")
+                        ball_image = pygame.image.load("./app/images/dark_black_ball.png")
                     else:
-                        ball_image = pygame.image.load("images/black_ball.png")
+                        ball_image = pygame.image.load("./app/images/black_ball.png")
                 elif game_manager[row][col] == Marble.WHITE:
                     if (row, col) in clicks:
-                        ball_image = pygame.image.load("images/dark_white_ball.png")
+                        ball_image = pygame.image.load("./app/images/dark_white_ball.png")
                     else:
-                        ball_image = pygame.image.load("images/white_ball.png")
+                        ball_image = pygame.image.load("./app/images/white_ball.png")
                 else:
                     continue
 

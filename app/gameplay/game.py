@@ -45,15 +45,15 @@ class Game:
         csv_reader = None
 
         if formation == Formation.DEFAULT:
-            file = open('./formations/default.csv', 'r')
+            file = open('./app/formations/default.csv', 'r')
             csv_reader = csv.reader(file, delimiter=',')
 
         elif formation == Formation.BELGIAN_DAISY:
-            file = open('./formations/belgian_daisy.csv', 'r')
+            file = open('./app/formations/belgian_daisy.csv', 'r')
             csv_reader = csv.reader(file, delimiter=',')
 
         elif formation == Formation.GERMAN_DAISY:
-            file = open('./formations/german_daisy.csv', 'r')
+            file = open('./app/formations/german_daisy.csv', 'r')
             csv_reader = csv.reader(file, delimiter=',')
 
         for row in csv_reader:
@@ -107,7 +107,7 @@ class Game:
             move)
         new_game_state = GameState(new_board_state,
                                    next_marble,
-                                   copy.deepcopy(self._current_game_state))
+                                   self._current_game_state)
         self._current_game_state = new_game_state
         self.update_ball_count()
         self._record_history.add_record(move, player, timestamp)
