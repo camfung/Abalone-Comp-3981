@@ -1,12 +1,14 @@
 
-import abc
-from gameplay import *
-from exceptions import DuplicateSingletons
+import copy
+
+from app.gameplay.game import Game
+from app.api.exceptions import DuplicateSingletons
 
 
-class GameManager():
+class GameManager:
     """
-    Manages the overall game logic, state, and notifications to observers. It implements the Singleton design pattern to ensure a single instance manages the game state.
+    Manages the overall game logic, state, and notifications to observers.
+    It implements the Singleton design pattern to ensure a single instance manages the game state.
     """
 
     __instance = None
@@ -14,7 +16,8 @@ class GameManager():
     @staticmethod
     def get_instance():
         """
-        Static method to get the instance of the GameManager. If no instance exists, it creates one; otherwise, it returns the existing instance.
+        Static method to get the instance of the GameManager.
+        If no instance exists, it creates one; otherwise, it returns the existing instance.
 
         Returns:
             GameManager: The singleton instance of the GameManager.
@@ -31,7 +34,8 @@ class GameManager():
         - app: A reference to the application that is using this game manager.
 
         Raises:
-        - DuplicateSingletons: If an instance already exists, this exception is raised to prevent creating a new instance.
+        - DuplicateSingletons: If an instance already exists,
+        this exception is raised to prevent creating a new instance.
         """
         if GameManager.__instance is not None:
             raise DuplicateSingletons(
@@ -82,7 +86,7 @@ class GameManager():
             tuple: A tuple where the first element is the count of white balls and
                 the second element is the count of black balls in the game.
         """
-        return (self._game._white_balls, self._game._black_balls)
+        return self._game._white_balls, self._game._black_balls
 
     @property
     def current_player_to_move(self):

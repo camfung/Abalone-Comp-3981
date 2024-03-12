@@ -1,14 +1,20 @@
-from enums import Formation, GameType, Marble
-from gameplay import Game, Move
-from communication import GameManager
-from players import AbaloneAgent, HumanPlayer
-from ui import HUD, Board, PygameUI
+
+from app.api.enums import GameType, Marble
+from app.gameplay.move import Move
+
+from app.communication.game_manager import GameManager
+
+from app.players.agent import AbaloneAgent
+from app.players.human import HumanPlayer
+
+from app.ui.ui import PygameUI
 
 
 class App:
     """
-    The main application class that orchestrates the game by integrating the game manager, user interface (UI),
-    and players. It handles events and notifications across these components to manage game flow and state.
+    The main application class that orchestrates the game by
+    integrating the game manager, user interface (UI), and players.
+    It handles events and notifications across these components to manage game flow and state.
     """
 
     def __init__(self):
@@ -34,7 +40,8 @@ class App:
         """
         if event == "StartGame":
             """
-            Starts a new game with the specified configuration. This event initializes players, sets up the game board, and starts the game loop.
+            Starts a new game with the specified configuration. 
+            This event initializes players, sets up the game board, and starts the game loop.
 
             Parameters:
             - config: A dictionary containing the game configuration such as formation, game type, and player color.
@@ -58,10 +65,12 @@ class App:
             """
             Triggers the AI agent to calculate and make a move. This event is called when it's the AI's turn to play.
 
-            No specific parameters are required for this event as the AI's decision-making process is internal and based on the current game state.
+            No specific parameters are required for this event 
+            as the AI's decision-making process is internal and based on the current game state.
             """
-            player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
-            if type(player) == AbaloneAgent:
+            player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else \
+                self.players[1]
+            if isinstance(player, AbaloneAgent):
                 # trigger the agent to make a move
                 move, time_stamp = player.generate_move(self.game_manager)
                 player.make_move(self.game_manager,
@@ -71,7 +80,8 @@ class App:
 
         if event == "PlayerMakeMove":
             """
-            Processes a move made by a player. This includes validating the move, updating the game state, and possibly triggering the AI to make its move.
+            Processes a move made by a player. This includes validating the move, updating the game state, 
+            and possibly triggering the AI to make its move.
 
             Parameters:
             - first_marble: The position of the first marble selected by the player.
@@ -84,10 +94,11 @@ class App:
             time_stamp = 1
             move = Move(first_marble, second_marble, direction,
                         self.game_manager.current_player_to_move)
-            # either here or in commit move we want to do isvalidmove(move)
+            # either here or in commit move we want to do is_valid_move(move)
             # if move not valid then set the state of the player event handler back to waiting for first marble
-            # if is valid make move and prompt ai to make move
-            player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
+            # if is valid make move and prompt AI to make move
+            player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else \
+                self.players[1]
             self.game_manager.commit_move(
                 move=move, player=move.marble, timestamp=time_stamp)
             self.notify(self, "AiMakeMove")
@@ -119,8 +130,8 @@ class App:
         Initializes players based on the selected game type and player colors.
 
         Parameters:
-        - game_type: An enumeration value of GameType indicating whether it's player vs. CPU, CPU vs. CPU,
-        or player vs. player.
+        - game_type: An enumeration value of GameType
+        indicating whether it's player vs. CPU, CPU vs. CPU, or player vs. player.
         - player_color: An enumeration value of Marble indicating the color chosen by the player.
 
         Returns:
