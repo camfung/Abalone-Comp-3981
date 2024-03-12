@@ -2,6 +2,7 @@
 import datetime
 import sys
 import time
+from random import random
 
 from app.communication.game_manager import GameManager
 from app.api.enums import Marble
@@ -41,7 +42,8 @@ class AbaloneAgent(Player):
         """
         initial_time = datetime.datetime.now()
         # sample for making a random move
-        move = self.calc_move(game_manager)
+        move = random.choice(game_manager.get_possible_moves())
+        # move = self.calc_move(game_manager)
         final_time = datetime.datetime.now()
         time_delta = final_time - initial_time
         return move, time_delta.total_seconds()
