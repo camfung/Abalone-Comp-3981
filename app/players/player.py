@@ -55,7 +55,7 @@ class Player(ABC):
         return self._color
 
     @abstractmethod
-    def make_move(self, game_manager, player, move) -> None:
+    def make_move(self, game_manager, player, move, timestamp) -> None:
         pass
 
     def get_balls_remaining(self):
