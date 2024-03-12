@@ -1,3 +1,4 @@
+
 import copy
 
 from app.gameplay.move import Move
@@ -124,16 +125,16 @@ class GameState:
         last_ball_f_y = move.get_pos_f()[1][1]
 
         # Fetch Middle Ball Positions
-        remain_ball_i_x = first_ball_i_x
-        remain_ball_i_y = first_ball_i_y
+        remain_ball_i_x = copy.deepcopy(first_ball_i_x)
+        remain_ball_i_y = copy.deepcopy(first_ball_i_y)
         if abs(first_ball_i_x - last_ball_i_x) > 1:
             remain_ball_i_x = (first_ball_i_x + last_ball_i_x) // 2
 
         if abs(first_ball_i_y - last_ball_i_y) > 1:
             remain_ball_i_y = (first_ball_i_y + last_ball_i_y) // 2
 
-        remain_ball_f_x = first_ball_f_x
-        remain_ball_f_y = first_ball_f_y
+        remain_ball_f_x = copy.deepcopy(first_ball_f_x)
+        remain_ball_f_y = copy.deepcopy(first_ball_f_y)
         if abs(first_ball_f_x - last_ball_f_x) > 1:
             remain_ball_f_x = (first_ball_f_x + last_ball_f_x) // 2
 
@@ -149,16 +150,16 @@ class GameState:
                 -1 if first_ball_f_y < first_ball_i_y else 0)
 
             # Declare Variables for Initial and Final Ball Positions
-            sub_ball_i_x = copy.copy(
-                last_ball_i_x) if move_x > 0 else copy.copy(first_ball_i_x)
-            sub_ball_i_y = copy.copy(
-                last_ball_i_y) if move_y > 0 else copy.copy(first_ball_i_y)
-            sub_ball_f_x = copy.copy(sub_ball_i_x)
-            sub_ball_f_y = copy.copy(sub_ball_i_y)
+            sub_ball_i_x = copy.deepcopy(
+                last_ball_i_x) if move_x > 0 else copy.deepcopy(first_ball_i_x)
+            sub_ball_i_y = copy.deepcopy(
+                last_ball_i_y) if move_y > 0 else copy.deepcopy(first_ball_i_y)
+            sub_ball_f_x = copy.deepcopy(sub_ball_i_x)
+            sub_ball_f_y = copy.deepcopy(sub_ball_i_y)
 
             # Save Original Ball Positions to keep track when Tracing Backwards
-            org_ball_x = copy.copy(sub_ball_i_x)
-            org_ball_y = copy.copy(sub_ball_i_y)
+            org_ball_x = copy.deepcopy(sub_ball_i_x)
+            org_ball_y = copy.deepcopy(sub_ball_i_y)
 
             # Adjust Final Positions to Start Loop
             sub_ball_f_x += move_x

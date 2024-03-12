@@ -141,6 +141,9 @@ class Game:
     def set_game_state(self, new_game_state):
         self._current_game_state = new_game_state
 
+    def get_possible_moves(self):
+        return self._current_game_state.get_possible_moves()
+
     def __str__(self):
         game_state_str = str(self._current_game_state)
         return f"Game ID: {self._game_id}\n{game_state_str}"

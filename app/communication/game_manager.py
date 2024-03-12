@@ -73,6 +73,23 @@ class GameManager:
         else:
             pass
 
+    def is_valid_move(self, move):
+        """
+        Checks if the input move is valid in current game state.
+        :param move: Move to be validated
+        :return: boolean indicating if the move is valid
+        """
+        if move in self._game.get_possible_moves():
+            return True
+        return False
+
+    def get_valid_moves(self):
+        """
+        Returns a list of valid moves in the game state.
+        :return: List of valid moves in the game
+        """
+        return self._game.get_possible_moves()
+
     @property
     def game_score(self):
         """
