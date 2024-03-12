@@ -87,7 +87,6 @@ class App:
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else self.players[1]
             self.game_manager.commit_move(
                 move=move, player=move.marble, timestamp=time_stamp)
-            self.notify(self, "AiMakeMove")
         if event == "IsMarblePlayerToMove":
             """
             Checks if the marble at a given position belongs to the current player to move.

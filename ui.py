@@ -21,7 +21,7 @@ class PlayerGameInputHandler:
         self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
         self.first_marble = None
         self.second_marble = None
-        self.execute_move, self.is_marble_player_to_move, self.update_board = callbacks
+        self.execute_move, self.is_marble_player_to_move, self.update_board, self.ai_turn = callbacks
 
     def on_marble_click(self, marble_position):
         """
@@ -106,6 +106,7 @@ class PlayerGameInputHandler:
                 self.execute_move(self.first_marble,
                                   self.second_marble, direction)
                 self.reset_state()
+                self.ai_turn()
             else:
                 # not a valid direction
                 return
@@ -199,6 +200,7 @@ class PlayerGameInputHandler:
         self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
         self.first_marble = None
         self.second_marble = None
+        self.update_board()
 
 
 
@@ -597,10 +599,14 @@ class PygameUI(UI):
         def update_board_cb():
             return self.update(self._app.game_manager)
 
+        def ai_turn_cb():
+            return self._app.notify(self, "AiMakeMove")
+
         callbacks = (
             execute_move_cb,
             marble_player_to_move_cb,
-            update_board_cb
+            update_board_cb,
+            ai_turn_cb
         )
         board = Board(callbacks)
         self.board = board
