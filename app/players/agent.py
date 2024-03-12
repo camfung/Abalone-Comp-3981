@@ -84,6 +84,13 @@ class AbaloneAgent(Player):
 
     @classmethod
     def evaluation(cls, state):
+        """
+        Evaluate the current state based on heuristics.
+
+        Heuristics will be implemented in Part 3.
+        :param state: GameState
+        :return: Evaluation Value as an integer.
+        """
         return 0
 
     @classmethod
@@ -92,14 +99,15 @@ class AbaloneAgent(Player):
         if cls.terminal_test(state):
             return cls.evaluation(state)
 
+        # Assign Lowest Value
         v = sys.maxsize * -1
 
-        # Check each possible move in actions (state)
+        # Check each possible state from current game state
         for child_states in state.convert_moves_to_game_states():
             v = max(v, cls.min_move(child_states, alpha, beta))
-            if v < alpha:
+            if v > beta:
                 return v
-            beta = max(alpha, v)
+            alpha = max(alpha, v)
 
         return v
 
@@ -108,9 +116,11 @@ class AbaloneAgent(Player):
         # if Terminal Test state return Utility
         if cls.terminal_test(state):
             return cls.evaluation(state)
+
+        # Assign Highest Value
         v = sys.maxsize
 
-        # Check each possible move in actions (state)
+        # Check each possible state from current game state
         for child_states in state.convert_moves_to_game_states():
             v = min(v, cls.max_move(child_states, alpha, beta))
             if v < alpha:
