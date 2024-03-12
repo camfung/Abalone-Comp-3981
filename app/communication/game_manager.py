@@ -103,7 +103,7 @@ class GameManager:
             tuple: A tuple where the first element is the count of white balls and
                 the second element is the count of black balls in the game.
         """
-        return self._game._white_balls, self._game._black_balls
+        return self._game.get_ball_count()[0], self._game.get_ball_count()[1]
 
     @property
     def current_player_to_move(self):

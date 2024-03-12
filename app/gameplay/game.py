@@ -144,6 +144,9 @@ class Game:
     def get_possible_moves(self):
         return self._current_game_state.get_possible_moves()
 
+    def get_ball_count(self):
+        return self._white_balls, self._black_balls
+
     def __str__(self):
         game_state_str = str(self._current_game_state)
         return f"Game ID: {self._game_id}\n{game_state_str}"
