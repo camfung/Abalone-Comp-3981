@@ -65,12 +65,12 @@ class GameType(Enum):
 
     Attributes:
         PLAYER_VS_PLAYER: Represents a game between two human players.
-        PLAYER_VS_CPU: Represents a game between a human player and a CPU player.
-        CPU_VS_CPU: Represents a game between two CPU players.
+        PLAYER_VS_AGENT: Represents a game between a human player and an agent.
+        AGENT_VS_AGENT: Represents a game between two agents.
     """
     PLAYER_VS_PLAYER = auto()
-    PLAYER_VS_CPU = auto()
-    CPU_VS_CPU = auto()
+    PLAYER_VS_AGENT = auto()
+    AGENT_VS_AGENT = auto()
 
 
 class PlayerInputEvents(Enum):
