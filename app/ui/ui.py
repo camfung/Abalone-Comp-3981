@@ -200,13 +200,12 @@ class PygameUI(UI):
         # Adding time limit and move limit selectors for both Black and White players
         black_time_limit = menu.add.dropselect('Black Time Limit: ', [
             ('1 min', 60), ('2 mins', 120), ('5 mins', 300), ('10 mins', 600)], default=0)
-        black_move_limit = menu.add.dropselect('Black Move Limit: ', [
-            ('10 moves', 10), ('20 moves', 20), ('50 moves', 50), ('Unlimited', None)], default=3)
 
         white_time_limit = menu.add.dropselect('White Time Limit: ', [
             ('1 min', 60), ('2 mins', 120), ('5 mins', 300), ('10 mins', 600)], default=0)
-        white_move_limit = menu.add.dropselect('White Move Limit: ', [
-            ('10 moves', 10), ('20 moves', 20), ('50 moves', 50), ('Unlimited', None)], default=3)
+
+        move_limit = menu.add.dropselect('Move Limit: ', [
+            (f'{x} moves', x) for x in range(5, 100, 5)], default=3)
 
         menu.add.button('Play', lambda: self.start_the_game({
             'game_type': opponent_type.get_value(),
@@ -214,9 +213,8 @@ class PygameUI(UI):
             'cpu_level': cpu_level.get_value(),
             'formation': formation.get_value(),
             'black_time_limit': black_time_limit.get_value(),
-            'black_move_limit': black_move_limit.get_value(),
-            'white_time_limit': white_time_limit.get_value(),
-            'white_move_limit': white_move_limit.get_value()}))
+            'move_limit': move_limit.get_value(),
+            'white_time_limit': white_time_limit.get_value()}))
 
         menu.add.button('Back', self.main_menu)
         menu.mainloop(self.screen)
