@@ -54,8 +54,11 @@ class App:
 
             # make the correct players depending on the config
             player_color = kwargs["config"]["player_color"][0][1]
-            move_limit = kwargs["config"]["move_limit"][0][1]
-            self.players = self.initialize_players(game_type, player_color, move_limit)
+            move_limit = kwargs["config"]["move_limit"]
+
+            black_time_limit = kwargs["config"]["black_time_limit"]
+            white_time_limit = kwargs["config"]["white_time_limit"]
+            self.players = self.initialize_players(game_type, player_color, move_limit, black_time_limit, white_time_limit)
 
             self.game_manager.start_game(formation)
             self.gui.update(self.game_manager)
@@ -126,7 +129,7 @@ class App:
         if event == "GetScore":
             return self.game_manager.game_score
 
-    def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int):
+    def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit : int, white_time_limit: int):
         """
         Initializes players based on the selected game type and player colors.
 
@@ -139,14 +142,14 @@ class App:
         A list of initialized player objects for the game.
         """
         if game_type == GameType.AGENT_VS_AGENT:
-            return [AbaloneAgent(10, move_limit, Marble.BLACK), AbaloneAgent(10, move_limit, Marble.WHITE)]
+            return [AbaloneAgent(black_time_limit, move_limit, Marble.BLACK), AbaloneAgent(white_time_limit, move_limit, Marble.WHITE)]
         elif game_type == GameType.PLAYER_VS_AGENT:
             if player_color == Marble.BLACK:
-                return [HumanPlayer(10, move_limit, Marble.BLACK), AbaloneAgent(10, move_limit, Marble.WHITE)]
+                return [HumanPlayer(black_time_limit, move_limit, Marble.BLACK), AbaloneAgent(white_time_limit, move_limit, Marble.WHITE)]
             else:
-                return [AbaloneAgent(10, move_limit, Marble.BLACK), HumanPlayer(10, move_limit, Marble.WHITE)]
+                return [AbaloneAgent(black_time_limit, move_limit, Marble.BLACK), HumanPlayer(white_time_limit, move_limit, Marble.WHITE)]
         elif game_type == GameType.PLAYER_VS_PLAYER:
-            return [HumanPlayer(10, move_limit, Marble.BLACK), HumanPlayer(10, move_limit, Marble.WHITE)]
+            return [HumanPlayer(black_time_limit, move_limit, Marble.BLACK), HumanPlayer(white_time_limit, move_limit, Marble.WHITE)]
 
     def run(self):
         """
