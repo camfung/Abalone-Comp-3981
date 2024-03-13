@@ -60,7 +60,7 @@ class App:
             self.game_manager.start_game(formation)
             self.gui.update(self.game_manager)
 
-            # if the first player to move is a cpu make the move
+            # if the first player to move is an agent make the move
             self.gui.run_game()
         if event == "AiMakeMove":
             """
@@ -132,15 +132,15 @@ class App:
 
         Parameters:
         - game_type: An enumeration value of GameType
-        indicating whether it's player vs. CPU, CPU vs. CPU, or player vs. player.
+        indicating whether it's player vs. agent, agent vs. agent, or player vs. player.
         - player_color: An enumeration value of Marble indicating the color chosen by the player.
 
         Returns:
         A list of initialized player objects for the game.
         """
-        if game_type == GameType.CPU_VS_CPU:
+        if game_type == GameType.AGENT_VS_AGENT:
             return [AbaloneAgent(10, move_limit, Marble.BLACK), AbaloneAgent(10, move_limit, Marble.WHITE)]
-        elif game_type == GameType.PLAYER_VS_CPU:
+        elif game_type == GameType.PLAYER_VS_AGENT:
             if player_color == Marble.BLACK:
                 return [HumanPlayer(10, move_limit, Marble.BLACK), AbaloneAgent(10, move_limit, Marble.WHITE)]
             else:
