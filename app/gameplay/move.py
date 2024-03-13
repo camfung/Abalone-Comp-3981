@@ -150,5 +150,5 @@ class Move:
                     f"-> {chr(self._pos_f[0][0] + 64)}{self._pos_f[0][1]}")
         return (f"{chr(self._pos_i[0][0] + 64)}{self._pos_i[0][1]},  "
                 f"{chr(self._pos_i[1][0] + 64)}{self._pos_i[1][1]} "
-                f"-> {chr(self._pos_f[0][0] + 64)}{self._pos_f[0][1]},  "
+                f"-> {chr(self._pos_f[0][0] + 64)}{self._pos_f[0][1]}, "
                 f"{chr(self._pos_f[1][0] + 64)}{self._pos_f[1][1]}")
