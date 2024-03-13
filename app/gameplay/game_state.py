@@ -1,6 +1,7 @@
 
 import copy
 
+from app.api.exceptions import InvalidMarbleValue
 from app.gameplay.move import Move
 from app.api.enums import *
 
@@ -24,6 +25,7 @@ class GameState:
         self._current_move_color = marble
         self._prev_game_state = prev_game_state
         self._moves = self.__generate_possible_moves()
+        self._white_balls, self._black_balls = self.get_ball_count()
 
     def get_board(self):
         return self._board
@@ -36,6 +38,17 @@ class GameState:
 
     def get_possible_moves(self):
         return self._moves
+
+    def get_ball_count(self):
+        white_count = 0
+        black_count = 0
+        for row in self._board():
+            for col in row:
+                if col == Marble.BLACK:
+                    black_count += 1
+                elif col == Marble.WHITE:
+                    white_count += 1
+        return white_count, black_count
 
     def __generate_possible_moves(self):
         """
@@ -97,8 +110,17 @@ class GameState:
         """
         game_states = []
 
+        next_marble = self._current_move_color
+        if next_marble is Marble.BLACK:
+            next_marble = Marble.WHITE
+        elif next_marble is Marble.WHITE:
+            next_marble = Marble.BLACK
+        else:
+            raise InvalidMarbleValue("No Marble Value provided in Set Move.")
+
         for move in self._moves:
-            new_game_state = self.generate_new_board_state(move)
+            new_board_state = self.generate_new_board_state(move)
+            new_game_state = GameState(new_board_state, next_marble, self)
             game_states.append(new_game_state)
 
         return game_states

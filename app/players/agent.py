@@ -1,12 +1,15 @@
 
 import datetime
-import random
+import sys
 import time
+import random
 
 from app.communication.game_manager import GameManager
 from app.api.enums import Marble
+from app.gameplay.game_state import GameState
 from app.gameplay.move import Move
 from app.players.player import Player
+from app.api.exceptions import InvalidMarbleValue
 
 
 class AbaloneAgent(Player):
@@ -14,6 +17,18 @@ class AbaloneAgent(Player):
     """
     A concrete implementation of the Player class representing an AI agent player.
     """
+
+    def __init__(self, time_limit: int, move_limit: int, color: Marble):
+        """
+        Initializes a Player with time and move limits, a color, and the initial number of balls.
+
+        Parameters:
+        - time_limit: The maximum amount of time (in seconds) the player is allowed to take for their moves.
+        - move_limit: The maximum number of moves the player is allowed to make.
+        - color: The color of the player's marbles, defined in the Marble enum.
+        - numBalls: The initial number of balls (marbles) the player has at the start of the game.
+        """
+        super().__init__(time_limit, move_limit, color)
 
     def generate_move(self, game_manager: GameManager):
         """
@@ -27,9 +42,8 @@ class AbaloneAgent(Player):
         """
         initial_time = datetime.datetime.now()
         # sample for making a random move
-        move = random.choice(
-            game_manager.get_possible_moves())
-        time.sleep(random.uniform(1, 3))
+        move = random.choice(game_manager.get_possible_moves())
+        # move = self.calc_move(game_manager)
         final_time = datetime.datetime.now()
         time_delta = final_time - initial_time
         return move, time_delta.total_seconds()
@@ -45,3 +59,73 @@ class AbaloneAgent(Player):
         - time_stamp: The timestamp when the move was generated.
         """
         game_manager.commit_move(player, move, time_stamp)
+
+    def calc_move(self, game_manager: GameManager):
+        if self._color == Marble.WHITE:
+            v = self.min_move(game_manager.get_current_game_state(), sys.maxsize * -1, sys.maxsize)
+        elif self._color == Marble.BLACK:
+            v = self.max_move(game_manager.get_current_game_state(), sys.maxsize * -1, sys.maxsize)
+        else:
+            raise InvalidMarbleValue("Calculate Move can only be White or Black.")
+
+        for state in game_manager.get_possible_game_states():
+            if self.evaluation(state) == v:
+                return state
+        return None
+
+    @staticmethod
+    def terminal_test(state: GameState) -> bool:
+        white_balls, black_balls = state.get_ball_count()
+
+        if white_balls <= 8:
+            return True
+        if black_balls <= 8:
+            return True
+
+        return False
+
+    @classmethod
+    def evaluation(cls, state):
+        """
+        Evaluate the current state based on heuristics.
+
+        Heuristics will be implemented in Part 3.
+        :param state: GameState
+        :return: Evaluation Value as an integer.
+        """
+        return 0
+
+    @classmethod
+    def max_move(cls, state: GameState, alpha, beta):
+        # if Terminal Test state return Utility
+        if cls.terminal_test(state):
+            return cls.evaluation(state)
+
+        # Assign Lowest Value
+        v = sys.maxsize * -1
+
+        # Check each possible state from current game state
+        for child_states in state.convert_moves_to_game_states():
+            v = max(v, cls.min_move(child_states, alpha, beta))
+            if v > beta:
+                return v
+            alpha = max(alpha, v)
+
+        return v
+
+    @classmethod
+    def min_move(cls, state: GameState, alpha, beta):
+        # if Terminal Test state return Utility
+        if cls.terminal_test(state):
+            return cls.evaluation(state)
+
+        # Assign Highest Value
+        v = sys.maxsize
+
+        # Check each possible state from current game state
+        for child_states in state.convert_moves_to_game_states():
+            v = min(v, cls.max_move(child_states, alpha, beta))
+            if v < alpha:
+                return v
+            beta = max(alpha, v)
+        return v
