@@ -42,7 +42,7 @@ class GameState:
     def get_ball_count(self):
         white_count = 0
         black_count = 0
-        for row in self._board():
+        for row in self._board:
             for col in row:
                 if col == Marble.BLACK:
                     black_count += 1
