@@ -54,7 +54,7 @@ class App:
 
             # make the correct players depending on the config
             player_color = kwargs["config"]["player_color"][0][1]
-            move_limit = kwargs["config"]["move_limit"][0][1]
+            move_limit = kwargs["config"]["move_limit"]
 
             black_time_limit = kwargs["config"]["black_time_limit"]
             white_time_limit = kwargs["config"]["white_time_limit"]
