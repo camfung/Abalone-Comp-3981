@@ -50,25 +50,28 @@ class FileScriber:
         # Step 7: Export List of Boards to Output Board File
         with open(output_board_file, "w") as output_f:
             for board in all_boards:
-                spaces = []
+                spaces = ""
                 for rIndex, row in enumerate(board):
                     for cIndex, col in enumerate(row):
-                        str_row = f"{chr(rIndex)}"
+                        str_row = f"{chr(rIndex + 74 - 2 * rIndex)}"
 
                         if col is None or col == Marble.NONE:
                             continue
                         elif col == Marble.BLACK:
-
-                            formatted_space = f"{cIndex}b"
-                            spaces.append(formatted_space)
+                            formatted_space = f"{str_row}{cIndex}b"
+                            spaces += f"{formatted_space},"
                         elif col == Marble.BLACK:
-                            formatted_space = f"{cIndex}w"
-                            spaces.append(formatted_space)
+                            formatted_space = f"{str_row}{cIndex}w"
+                            spaces += f"{formatted_space},"
+                spaces = spaces[:-1]
+                output_f.write(spaces)
 
     @staticmethod
     def import_board_from_text_files(input_file):
         # Read Board File
+        with open(input_file, "r") as input_f:
+            lines = input_f.readlines()
 
         # Return Results
-        pass
+        return lines
 
