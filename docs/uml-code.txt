@@ -25,9 +25,10 @@ namespace Players {
 
     class AbaloneAgent {
         - generate_move() : Move
-		+ calc_move() : Action
-		+ max_move(): Utility
-		+ min_move(): Utility
+		+ calc_move() : Move
+		+ evaluation(): Bool
+		+ max_move(): int
+		+ min_move(): int
     }
 } 
 

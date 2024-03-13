@@ -11,7 +11,7 @@ class HumanPlayer(Player):
     A concrete implementation of the Player class representing a human player.
     """
 
-    def make_move(self, game_manager: GameManager, player: Marble, move: Move) -> None:
+    def make_move(self, game_manager: GameManager, player: Marble, move: Move, timestamp=1) -> None:
         """
         Commits a move made by the human player to the game manager.
 
@@ -20,4 +20,4 @@ class HumanPlayer(Player):
         - player: The color of the player making the move.
         - move: The Move object representing the move to be made.
         """
-        game_manager.commit_move(move=move, player=player, timestamp=1)
+        game_manager.commit_move(move=move, player=player, timestamp=timestamp)
