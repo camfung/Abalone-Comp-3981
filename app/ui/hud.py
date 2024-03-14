@@ -1,3 +1,4 @@
+import time
 
 import pygame_menu
 from app.ui.ui_components import Drawable, EventHandler
@@ -23,10 +24,17 @@ class HUD(Drawable, EventHandler):
         self.theme = self.ui_instance.theme
         self.theme.widget_width = 100
         self.score_label = None
+        self.timer = None
         self._white_balls = 0
         self._black_balls = 0
+        self._start_time = time.time()
+        self._elapsed_time = 0
 
         self.start_game_cb, self.undo_move_cb, self.pause_game_cb = callbacks
+
+    def update_timer(self):
+        self._elapsed_time = time.time() - self._start_time
+        self.timer.set_title(f"Time: {self._elapsed_time:.2f}     Time: {self._elapsed_time:.2f}")
 
     def create_hud(self):
         """
@@ -54,7 +62,7 @@ class HUD(Drawable, EventHandler):
         self.score_label = menu.add.label(
             f"White Score: {self._white_balls}   Black Score:  {self._black_balls}  ")
 
-        button = menu.add.label("Time: 100     Time:100", selectable = False)
+        self.timer = menu.add.label(f"Time: {self._elapsed_time:.2f}     Time: {self._elapsed_time:.2f}", selectable = False)
 
         return menu
 
