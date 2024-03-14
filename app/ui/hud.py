@@ -50,8 +50,11 @@ class HUD(Drawable, EventHandler):
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Show Move History", self.ui_instance.display_move_history,
                         align=pygame_menu.locals.ALIGN_CENTER)
+
         self.score_label = menu.add.label(
             f"White Score: {self._white_balls}   Black Score:  {self._black_balls}  ")
+
+        button = menu.add.label("Time: 100     Time:100", selectable = False)
 
         return menu
 
