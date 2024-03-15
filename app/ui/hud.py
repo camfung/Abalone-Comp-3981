@@ -1,4 +1,8 @@
+import time
+
 import pygame_menu
+
+from app.api.enums import Marble
 from app.ui.ui_components import Drawable, EventHandler
 
 
@@ -23,10 +27,61 @@ class HUD(Drawable, EventHandler):
         self.theme = self.ui_instance.theme
         self.theme.widget_width = 100
         self.score_label = None
+        self.timer = None
         self._white_balls = 0
         self._black_balls = 0
 
+        self._start_time_black = time.time()
+        self._start_time_white = time.time()
+
+        self._elapsed_time_black = 0
+        self._elapsed_time_white = 0
+        self._game_started = False
+
+        self._black_check_time = True
+        self._white_check_time = True
+
+        self._turn_end = Marble.BLACK
+
         self.start_game_cb, self.undo_move_cb, self.pause_game_cb = callbacks
+
+    def update_timer(self, game_manager):
+        if self._game_started:
+            if game_manager.current_player_to_move == Marble.BLACK:
+                if self._black_check_time:
+                    self._start_time_black = time.time() - self._elapsed_time_black
+                    self._black_check_time = False
+                    self._white_check_time = True
+                self._elapsed_time_black = time.time() - self._start_time_black
+                self._turn_end = Marble.BLACK
+            elif game_manager.current_player_to_move == Marble.WHITE:
+                if self._white_check_time:
+                    self._start_time_white = time.time() - self._elapsed_time_white
+                    self._white_check_time = False
+                    self._black_check_time = True
+                self._elapsed_time_white = time.time() - self._start_time_white
+                self._turn_end = Marble.WHITE
+            self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
+
+    def start_game(self):
+        self._game_started = True
+        self._black_check_time = True
+        self._white_check_time = True
+        self.start_game_cb()
+
+    def restart_game(self):
+        self._elapsed_time_black = 0
+        self._elapsed_time_white = 0
+        self._game_started = False
+
+        self._black_check_time = True
+        self._white_check_time = True
+        self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
+        self.ui_instance.play_menu()
+
+    def pause_game(self):
+        self._game_started = False
+        self.pause_game_cb()
 
     def create_hud(self):
         """
@@ -38,20 +93,23 @@ class HUD(Drawable, EventHandler):
         """
         menu = pygame_menu.Menu("Abalone", self.ui_instance.SCREEN_WIDTH, self.HUD_HEIGHT,
                                 theme=self.theme, position=(0, 0, True), columns=5, rows=2)
-        menu.add.button("Start Game", self.start_game_cb,
+        menu.add.button("Start Game", self.start_game,
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Stop Game", pygame_menu.events.EXIT,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Pause", self.pause_game_cb,
+        menu.add.button("Pause", self.pause_game,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Reset", self.ui_instance.play_menu,
+        menu.add.button("Reset", self.restart_game,
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Undo Last Move", self.undo_move_cb,
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Show Move History", self.ui_instance.display_move_history,
                         align=pygame_menu.locals.ALIGN_CENTER)
+
         self.score_label = menu.add.label(
             f"White Score: {self._white_balls}   Black Score:  {self._black_balls}  ")
+
+        self.timer = menu.add.label(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}", selectable = False)
 
         return menu
 
@@ -110,7 +168,6 @@ class HUD(Drawable, EventHandler):
         """
         if self.menu is None:
             self.menu = self.create_hud()
-
         return self.menu
 
     def handle_event(self, event):

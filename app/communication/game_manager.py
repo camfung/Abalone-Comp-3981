@@ -67,7 +67,6 @@ class GameManager:
         if len(self._move_history) != 0:
             self._game.set_game_state(self._move_history.pop())
             self._game.get_record_history().remove_last_record()
-            self._game.update_ball_count()
             self.notify()
         else:
             pass
