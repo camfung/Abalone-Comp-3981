@@ -122,6 +122,7 @@ class PygameUI(UI):
         The main game loop. Handles events, updates the game state, and redraws the screen.
         """
         while True:
+            self.drawable_elements[1].update_timer(self._app.game_manager)
             for event in pygame.event.get():
                 if event == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
