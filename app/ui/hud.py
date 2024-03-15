@@ -35,51 +35,51 @@ class HUD(Drawable, EventHandler):
 
         self._elapsed_time_black = 0
         self._elapsed_time_white = 0
-        self.game_started = False
+        self._game_started = False
 
-        self.black_check_time = True
-        self.white_check_time = True
+        self._black_check_time = True
+        self._white_check_time = True
 
-        self.turn_end = Marble.BLACK
+        self._turn_end = Marble.BLACK
 
         self.start_game_cb, self.undo_move_cb, self.pause_game_cb = callbacks
 
     def update_timer(self, game_manager):
-        if self.game_started:
+        if self._game_started:
             if game_manager.current_player_to_move == Marble.BLACK:
-                if self.black_check_time:
+                if self._black_check_time:
                     self._start_time_black = time.time() - self._elapsed_time_black
-                    self.black_check_time = False
-                    self.white_check_time = True
+                    self._black_check_time = False
+                    self._white_check_time = True
                 self._elapsed_time_black = time.time() - self._start_time_black
-                self.turn_end = Marble.BLACK
+                self._turn_end = Marble.BLACK
             elif game_manager.current_player_to_move == Marble.WHITE:
-                if self.white_check_time:
+                if self._white_check_time:
                     self._start_time_white = time.time() - self._elapsed_time_white
-                    self.white_check_time = False
-                    self.black_check_time = True
+                    self._white_check_time = False
+                    self._black_check_time = True
                 self._elapsed_time_white = time.time() - self._start_time_white
-                self.turn_end = Marble.WHITE
+                self._turn_end = Marble.WHITE
             self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
 
     def start_game(self):
-        self.game_started = True
-        self.black_check_time = True
-        self.white_check_time = True
+        self._game_started = True
+        self._black_check_time = True
+        self._white_check_time = True
         self.start_game_cb()
 
     def restart_game(self):
         self._elapsed_time_black = 0
         self._elapsed_time_white = 0
-        self.game_started = False
+        self._game_started = False
 
-        self.black_check_time = True
-        self.white_check_time = True
+        self._black_check_time = True
+        self._white_check_time = True
         self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
         self.ui_instance.play_menu()
 
     def pause_game(self):
-        self.game_started = False
+        self._game_started = False
         self.pause_game_cb()
 
     def create_hud(self):
