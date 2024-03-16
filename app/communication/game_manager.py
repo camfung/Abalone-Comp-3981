@@ -96,6 +96,9 @@ class GameManager:
     def current_player_to_move(self):
         return self._game.get_current_game_state().get_current_move_color()
 
+    def get_current_game_state(self):
+        return self._game.get_current_game_state()
+
     def get_possible_moves(self):
         return self._game.get_current_game_state().get_possible_moves()
 
