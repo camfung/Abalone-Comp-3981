@@ -6,7 +6,7 @@ from app.api.enums import GameType, Marble
 import pygame_menu
 from app.api.enums import Formation
 from app.ui.board import Board
-from app.ui.hud import HUD
+from app.ui.hud import HUD, RecordMenu
 
 
 class UI(ABC):
@@ -80,6 +80,7 @@ class PygameUI(UI):
             pause_game_cb
         )
         hud = HUD(self, callbacks)
+        record_menu = RecordMenu(self)
 
         def execute_move_cb(first_marble, second_marble, direction):
             return self._app.notify(self, "PlayerMakeMove", first_marble=first_marble,
@@ -99,14 +100,17 @@ class PygameUI(UI):
         board = Board(callbacks)
         self.board = board
         self.hud = hud
+        self.record_menu = record_menu
 
         # add the drawables
         self.drawable_elements.append(board)
         self.drawable_elements.append(hud)
+        self.drawable_elements.append(record_menu)
 
         # add the event handlers
         self.event_handlers.append(board)
         self.event_handlers.append(hud)
+        self.event_handlers.append(record_menu)
 
     def start_the_game(self, config):
         """

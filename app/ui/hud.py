@@ -13,7 +13,6 @@ class HUD(Drawable, EventHandler):
     """
     HUD_HEIGHT = 150
     menu = None
-    record_menu = None
 
     def __init__(self, gui, callbacks):
         """
@@ -89,7 +88,6 @@ class HUD(Drawable, EventHandler):
         self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
         self.ui_instance.reset_board()
 
-
     def pause_game(self):
         self._game_started = False
         self.pause_game_cb()
@@ -120,7 +118,8 @@ class HUD(Drawable, EventHandler):
         self.score_label = menu.add.label(
             f"White Score: {self._white_balls}   Black Score:  {self._black_balls}  ")
 
-        self.timer = menu.add.label(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}", selectable = False)
+        self.timer = menu.add.label(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}",
+                                    selectable=False)
 
         return menu
 
@@ -202,7 +201,45 @@ class HUD(Drawable, EventHandler):
         menu = self.get_menu()
         menu.draw(surface)
 
-        # Record Menu
+
+class RecordMenu(Drawable, EventHandler):
+    record_menu = None
+
+    def __init__(self, gui):
+        self.ui_instance = gui
+        self.theme = self.ui_instance.theme
+
+    # def create_record_menu(self):
+    #     record_menu = pygame_menu.Menu(
+    #         "Move History", 300, 850, theme=self.theme, position=(100, 100, True))
+    #     table = record_menu.add.table(table_id='records_table',
+    #                                   font_size=12, font_color="Black")
+    #     table.default_cell_padding = 5
+    #     table.default_row_background_color = 'white'
+    #     table.add_row(['Moves'],
+    #                   cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+    #
+    #     records = self.ui_instance._app.notify(self, "getRecordHistory")
+    #
+    #     for index, record in enumerate(records, start=1):
+    #         str_record = str(record)
+    #         table.add_row([str_record])
+    #         print(record)
+    #
+    #     record_menu.add.button('Back', self.ui_instance.display_move_history)  # for testing purposes
+    #
+    #     return record_menu
+    #
+    # def get_record_menu(self):
+    #     if self.record_menu is None:
+    #         self.record_menu = self.create_record_menu()
+    #     return self.record_menu
+
+    def handle_event(self, event):
+        if self.record_menu is not None:
+            self.record_menu.update([event])
+
+    def draw(self, surface, game_manager):
         record_menu = pygame_menu.Menu(
             "Move History", 300, 850, theme=self.theme, position=(100, 100, True))
         table = record_menu.add.table(table_id='records_table',
@@ -219,5 +256,9 @@ class HUD(Drawable, EventHandler):
             table.add_row([str_record])
             print(record)
 
-        record_menu.add.button('Back', self.ui_instance.run_game)  # for testing purposes
+        record_menu.add.button('Back', self.ui_instance.display_move_history)  # for testing purposes
+
+        self.record_menu = record_menu
         record_menu.draw(surface)
+
+
