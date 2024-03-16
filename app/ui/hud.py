@@ -68,7 +68,7 @@ class HUD(Drawable, EventHandler):
         self._white_check_time = True
         self.start_game_cb()
 
-    def restart_game(self):
+    def stop_game(self):
         self._elapsed_time_black = 0
         self._elapsed_time_white = 0
         self._game_started = False
@@ -77,6 +77,17 @@ class HUD(Drawable, EventHandler):
         self._white_check_time = True
         self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
         self.ui_instance.play_menu()
+
+    def restart_game(self):
+        self._elapsed_time_black = 0
+        self._elapsed_time_white = 0
+        self._game_started = False
+
+        self._black_check_time = True
+        self._white_check_time = True
+        self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
+        self.ui_instance.reset_board()
+
 
     def pause_game(self):
         self._game_started = False
@@ -94,7 +105,7 @@ class HUD(Drawable, EventHandler):
                                 theme=self.theme, position=(0, 0, True), columns=5, rows=2)
         menu.add.button("Start Game", self.start_game,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Stop Game", pygame_menu.events.EXIT,
+        menu.add.button("Stop Game", self.stop_game,
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Pause", self.pause_game,
                         align=pygame_menu.locals.ALIGN_CENTER)
