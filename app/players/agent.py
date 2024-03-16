@@ -27,8 +27,7 @@ class AbaloneAgent(Player):
         """
         initial_time = datetime.datetime.now()
         # sample for making a random move
-        move = random.choice(
-            game_manager.get_possible_moves())
+        move = random.choice(game_manager.get_possible_moves())
         time.sleep(random.uniform(1, 3))
         final_time = datetime.datetime.now()
         time_delta = final_time - initial_time
