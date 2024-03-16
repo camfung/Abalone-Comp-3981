@@ -117,7 +117,7 @@ class Board(Drawable, EventHandler):
         else:
             clicks = []
 
-        background_image = pygame.image.load("./app/images/final_board.png", "rb")
+        background_image = pygame.image.load("./app/images/Numbered_Board.png", "rb")
         background_image = pygame.transform.scale(
             background_image, (1000, 1000))
         background_image = pygame.transform.scale(
