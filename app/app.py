@@ -156,3 +156,6 @@ class App:
         Starts the application by displaying the main menu and initializing the game loop.
         """
         self.gui.run()
+
+    def reset_board(self):
+        self.game_manager.reset_board()
