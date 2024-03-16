@@ -150,7 +150,7 @@ class PlayerInputHandler:
 
         # check if occupied by your own
         if self.is_marble_player_to_move(to_position):
-            return
+            return False
 
         # Reuse is_adjacent logic for direction validity
         return self.is_adjacent(from_position, to_position, 1)

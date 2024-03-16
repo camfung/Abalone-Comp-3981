@@ -56,7 +56,8 @@ class GameManager:
         - move: The move being made.
         - timestamp: The time at which the move was made.
         """
-        self._move_history.append(copy.deepcopy(self._game.get_current_game_state()))
+        self._move_history.append(copy.deepcopy(
+            self._game.get_current_game_state()))
         self._game.set_move(player, move, timestamp)
         self.notify()
 
@@ -89,20 +90,14 @@ class GameManager:
             tuple: A tuple where the first element is the count of white balls and
                 the second element is the count of black balls in the game.
         """
-        return self._game.get_ball_count()
+        return self._game.get_ball_count()[0], self._game.get_ball_count()[1]
 
     @property
     def current_player_to_move(self):
         return self._game.get_current_game_state().get_current_move_color()
 
-    def get_current_game_state(self):
-        return self._game.get_current_game_state()
-
     def get_possible_moves(self):
         return self._game.get_current_game_state().get_possible_moves()
-
-    def get_possible_game_states(self):
-        return self._game.get_possible_game_states()
 
     def get_board(self):
         return self._game.get_current_game_state().get_board()
