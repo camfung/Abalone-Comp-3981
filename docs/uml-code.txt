@@ -38,6 +38,7 @@ namespace Driver {
        - game : GameManager 
        - gui : PygameUI
        + run() 
+       + reset_board()
     }
 
 }
@@ -60,7 +61,7 @@ namespace Ui {
         + display_score(record: Record)
         + display_moves(record: Record)
         + display_time_per_move(record : Record)
-
+	+ reset_board()
     }
     class Drawable {
         <<interface>>
@@ -85,6 +86,7 @@ namespace Ui {
 	+ update_timer(game_manager: GameManager): void
 	+ start_game()
 	+ restart_game()
+	+ stop_game()
 	+ pause_game()
     }
 
@@ -132,6 +134,7 @@ namespace Communication {
         + reset_game() : void
         + commit_move(player: Player, move: Move, timestamp: float) : void
         + undo_last_move() : void
+	+ reset_board() : void
     }
 }
 

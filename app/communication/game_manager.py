@@ -71,6 +71,11 @@ class GameManager:
         else:
             pass
 
+    def reset_board(self):
+        runs = len(self._move_history)
+        for _ in range(0, runs):
+            self.undo_last_move()
+
     @property
     def game_score(self):
         """
