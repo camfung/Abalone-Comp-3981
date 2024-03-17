@@ -112,7 +112,7 @@ class HUD(Drawable, EventHandler):
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Undo Last Move", self.undo_move_cb,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Show Move History", self.ui_instance.display_move_history,
+        menu.add.button("Show Move History", self.ui_instance.display_move_history, #Remove once refactoring is complete
                         align=pygame_menu.locals.ALIGN_CENTER)
 
         self.score_label = menu.add.label(
@@ -240,25 +240,34 @@ class RecordMenu(Drawable, EventHandler):
             self.record_menu.update([event])
 
     def draw(self, surface, game_manager):
+        # Created here so that it updates
         record_menu = pygame_menu.Menu(
             "Move History", 300, 850, theme=self.theme, position=(100, 100, True))
-        table = record_menu.add.table(table_id='records_table',
-                                      font_size=12, font_color="Black")
-        table.default_cell_padding = 5
-        table.default_row_background_color = 'white'
-        table.add_row(['Moves'],
-                      cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+        black_table = record_menu.add.table(table_id='black_records_table',
+                                            font_size=12, font_color="Black")
+        black_table.default_cell_padding = 5
+        black_table.default_row_background_color = 'white'
+        black_table.add_row(['Black Moves'],
+                            cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+
+        white_table = record_menu.add.table(table_id='white_records_table',
+                                            font_size=12, font_color="Black")
+        white_table.default_cell_padding = 5
+        white_table.default_row_background_color = 'white'
+        white_table.add_row(['White Moves'],
+                            cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
 
         records = self.ui_instance._app.notify(self, "getRecordHistory")
 
         for index, record in enumerate(records, start=1):
             str_record = str(record)
-            table.add_row([str_record])
+            if index % 2 == 0:
+                black_table.add_row([str_record])
+            else:
+                white_table.add_row([str_record])
             print(record)
 
         record_menu.add.button('Back', self.ui_instance.display_move_history)  # for testing purposes
 
         self.record_menu = record_menu
         record_menu.draw(surface)
-
-
