@@ -262,9 +262,9 @@ class RecordMenu(Drawable, EventHandler):
         for index, record in enumerate(records, start=1):
             str_record = str(record)
             if index % 2 == 0:
-                black_table.add_row([str_record])
-            else:
                 white_table.add_row([str_record])
+            else:
+                black_table.add_row([str_record])
             print(record)
 
         record_menu.add.button('Back', self.ui_instance.display_move_history)  # for testing purposes
