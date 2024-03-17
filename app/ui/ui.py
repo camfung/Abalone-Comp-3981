@@ -233,7 +233,7 @@ class PygameUI(UI):
         menu.add.button('Back', self.main_menu)
         menu.mainloop(self.screen)
 
-    def display_move_history(self):
+    def display_move_history(self): #Note, delete after refactoring
         menu = pygame_menu.Menu(
             "Move History", self.SCREEN_WIDTH, self.SCREEN_HEIGHT, theme=self.theme)
         table = menu.add.table(table_id='records_table',

@@ -3,6 +3,7 @@ import time
 import pygame_menu
 
 from app.api.enums import Marble
+from app.players.agent import AbaloneAgent
 from app.ui.ui_components import Drawable, EventHandler
 
 
@@ -112,7 +113,8 @@ class HUD(Drawable, EventHandler):
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Undo Last Move", self.undo_move_cb,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Show Move History", self.ui_instance.display_move_history, #Remove once refactoring is complete
+        menu.add.button("Show Move History", self.ui_instance.display_move_history,
+                        # Remove once refactoring is complete
                         align=pygame_menu.locals.ALIGN_CENTER)
 
         self.score_label = menu.add.label(
@@ -239,10 +241,25 @@ class RecordMenu(Drawable, EventHandler):
         if self.record_menu is not None:
             self.record_menu.update([event])
 
+    def get_agent_player(self):
+        """
+        Returns true if a given player is agent, for the purposes of displaying next agent move.
+        If true, the agent player is black.
+        :return: Boolean
+        """
+        return isinstance(self.ui_instance._app.players[0], AbaloneAgent)
+
     def draw(self, surface, game_manager):
         # Created here so that it updates
         record_menu = pygame_menu.Menu(
             "Move History", 300, 850, theme=self.theme, position=(100, 100, True))
+        next_agent_move = record_menu.add.table(table_id='next_agent_move',
+                                                font_size=12, font_color="Black")
+        next_agent_move.default_cell_padding = 5
+        next_agent_move.default_row_background_color = 'white'
+        next_agent_move.add_row(['Next Agent Move'],
+                                cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+
         black_table = record_menu.add.table(table_id='black_records_table',
                                             font_size=12, font_color="Black")
         black_table.default_cell_padding = 5
@@ -265,9 +282,12 @@ class RecordMenu(Drawable, EventHandler):
                 white_table.add_row([str_record])
             else:
                 black_table.add_row([str_record])
-            print(record)
 
-        record_menu.add.button('Back', self.ui_instance.display_move_history)  # for testing purposes
+            if index == records.get_records_length() or index == records.get_records_length() - 1:
+                if self.get_agent_player() and index % 2 != 0:
+                    next_agent_move.add_row([str_record])
+                elif not self.get_agent_player() and index % 2 == 0:
+                    next_agent_move.add_row([str_record])
 
         self.record_menu = record_menu
         record_menu.draw(surface)
