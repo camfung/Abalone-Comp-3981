@@ -1,4 +1,4 @@
-
+import threading
 from abc import ABC, abstractmethod
 import sys
 import pygame
@@ -62,6 +62,7 @@ class PygameUI(UI):
         - app: A reference to the main application object, used for callback notifications.
         """
         super().__init__()
+        self.lock = threading.Lock()
         self.theme = pygame_menu.themes.THEME_DARK
         self.screen = pygame.display.set_mode(
             (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
@@ -149,16 +150,17 @@ class PygameUI(UI):
         Parameters:
         - game_manager: An instance of the game manager class that holds the current state of the game.
         """
-        self.screen.fill((0, 0, 0))
+        with self.lock:
+            self.screen.fill((0, 0, 0))
 
-        # update the score in the menu
-        self.hud.white_balls, self.hud.black_balls = self._app.notify(
-            self, "GetScore")
+            # update the score in the menu
+            self.hud.white_balls, self.hud.black_balls = self._app.notify(
+                self, "GetScore")
 
-        for element in self.drawable_elements:
-            element.draw(self.screen, game_manager)
+            for element in self.drawable_elements:
+                element.draw(self.screen, game_manager)
 
-        pygame.display.flip()
+            pygame.display.flip()
 
     def reset_board(self):
         self._app.reset_board()

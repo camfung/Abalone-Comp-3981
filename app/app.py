@@ -1,3 +1,5 @@
+import threading
+import time
 
 from app.api.enums import GameType, Marble
 from app.gameplay.move import Move
@@ -29,6 +31,7 @@ class App:
         self.game_manager.join_room(self.gui)
 
     def notify(self, sender, event, **kwargs):
+        thread = threading.Thread(target=self.notify, args=(self, "AiMakeMove"))
         """
         Handles notifications sent from different parts of the application,
         acting upon various events like starting the game, making moves, undoing moves, and querying game state.
@@ -79,8 +82,12 @@ class App:
                 move, time_stamp = player.generate_move(self.game_manager)
                 player.make_move(self.game_manager,
                                  player.color, move, time_stamp=time_stamp)
+                if thread.is_alive():
+                    thread.join()
+                print("Also Here")
                 self.gui.start_button_clicked = True
             self.gui.waiting_for_player_input = True
+
 
         if event == "PlayerMakeMove":
             """
@@ -105,7 +112,7 @@ class App:
                 self.players[1]
             self.game_manager.commit_move(
                 move=move, player=move.marble, timestamp=time_stamp)
-            self.notify(self, "AiMakeMove")
+            thread.start()
         if event == "IsMarblePlayerToMove":
             """
             Checks if the marble at a given position belongs to the current player to move.
