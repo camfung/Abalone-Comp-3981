@@ -236,20 +236,28 @@ class PygameUI(UI):
     def display_move_history(self): #Note, delete after refactoring
         menu = pygame_menu.Menu(
             "Move History", self.SCREEN_WIDTH, self.SCREEN_HEIGHT, theme=self.theme)
-        table = menu.add.table(table_id='records_table',
-                               font_size=20, font_color="Black")
-        table.default_cell_padding = 5
-        table.default_row_background_color = 'white'
-        table.add_row(['Moves'],
-                      cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+        black_table = menu.add.table(table_id='black_records_table',
+                                            font_size=12, font_color="Black")
+        black_table.default_cell_padding = 5
+        black_table.default_row_background_color = 'white'
+        black_table.add_row(['Black Moves'],
+                            cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+
+        white_table = menu.add.table(table_id='white_records_table',
+                                            font_size=12, font_color="Black")
+        white_table.default_cell_padding = 5
+        white_table.default_row_background_color = 'white'
+        white_table.add_row(['White Moves'],
+                            cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
 
         records = self._app.notify(self, "getRecordHistory")
 
-        # Modify this to match formatting of record history
         for index, record in enumerate(records, start=1):
             str_record = str(record)
-            table.add_row([str_record])
-            print(record)
+            if index % 2 == 0:
+                white_table.add_row([str_record])
+            else:
+                black_table.add_row([str_record])
 
         menu.add.button('Back', self.run_game)
         menu.mainloop(self.screen)

@@ -1,3 +1,4 @@
+import math
 import time
 
 import pygame_menu
@@ -114,7 +115,6 @@ class HUD(Drawable, EventHandler):
         menu.add.button("Undo Last Move", self.undo_move_cb,
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Show Move History", self.ui_instance.display_move_history,
-                        # Remove once refactoring is complete
                         align=pygame_menu.locals.ALIGN_CENTER)
 
         self.score_label = menu.add.label(
@@ -276,18 +276,26 @@ class RecordMenu(Drawable, EventHandler):
 
         records = self.ui_instance._app.notify(self, "getRecordHistory")
 
+        start_index = 1
+
+        if records.get_records_length() > 15:
+            record_menu.add.button('Show Full History', self.ui_instance.display_move_history)
+
+            start_index = records.get_records_length() - math.ceil(records.get_records_length() / 2)
+
         for index, record in enumerate(records, start=1):
             str_record = str(record)
-            if index % 2 == 0:
-                white_table.add_row([str_record])
-            else:
-                black_table.add_row([str_record])
+            if index >= start_index:
+                if index % 2 == 0:
+                    white_table.add_row([str_record])
+                else:
+                    black_table.add_row([str_record])
 
-            if index == records.get_records_length() or index == records.get_records_length() - 1:
-                if self.get_agent_player() and index % 2 != 0:
-                    next_agent_move.add_row([str_record])
-                elif not self.get_agent_player() and index % 2 == 0:
-                    next_agent_move.add_row([str_record])
+                if index == records.get_records_length() or index == records.get_records_length() - 1:
+                    if self.get_agent_player() and index % 2 != 0:
+                        next_agent_move.add_row([str_record])
+                    elif not self.get_agent_player() and index % 2 == 0:
+                        next_agent_move.add_row([str_record])
 
         self.record_menu = record_menu
         record_menu.draw(surface)
