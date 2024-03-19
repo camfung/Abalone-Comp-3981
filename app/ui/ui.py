@@ -6,7 +6,7 @@ from app.api.enums import GameType, Marble
 import pygame_menu
 from app.api.enums import Formation
 from app.ui.board import Board
-from app.ui.hud import HUD
+from app.ui.hud import HUD, RecordMenu
 
 
 class UI(ABC):
@@ -80,6 +80,7 @@ class PygameUI(UI):
             pause_game_cb
         )
         hud = HUD(self, callbacks)
+        record_menu = RecordMenu(self)
 
         def execute_move_cb(first_marble, second_marble, direction):
             return self._app.notify(self, "PlayerMakeMove", first_marble=first_marble,
@@ -99,14 +100,17 @@ class PygameUI(UI):
         board = Board(callbacks)
         self.board = board
         self.hud = hud
+        self.record_menu = record_menu
 
         # add the drawables
         self.drawable_elements.append(board)
         self.drawable_elements.append(hud)
+        self.drawable_elements.append(record_menu)
 
         # add the event handlers
         self.event_handlers.append(board)
         self.event_handlers.append(hud)
+        self.event_handlers.append(record_menu)
 
     def start_the_game(self, config):
         """
@@ -229,23 +233,31 @@ class PygameUI(UI):
         menu.add.button('Back', self.main_menu)
         menu.mainloop(self.screen)
 
-    def display_move_history(self):
+    def display_move_history(self): #Note, delete after refactoring
         menu = pygame_menu.Menu(
             "Move History", self.SCREEN_WIDTH, self.SCREEN_HEIGHT, theme=self.theme)
-        table = menu.add.table(table_id='records_table',
-                               font_size=20, font_color="Black")
-        table.default_cell_padding = 5
-        table.default_row_background_color = 'white'
-        table.add_row(['Moves'],
-                      cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+        black_table = menu.add.table(table_id='black_records_table',
+                                            font_size=12, font_color="Black")
+        black_table.default_cell_padding = 5
+        black_table.default_row_background_color = 'white'
+        black_table.add_row(['Black Moves'],
+                            cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+
+        white_table = menu.add.table(table_id='white_records_table',
+                                            font_size=12, font_color="Black")
+        white_table.default_cell_padding = 5
+        white_table.default_row_background_color = 'white'
+        white_table.add_row(['White Moves'],
+                            cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
 
         records = self._app.notify(self, "getRecordHistory")
 
-        # Modify this to match formatting of record history
         for index, record in enumerate(records, start=1):
             str_record = str(record)
-            table.add_row([str_record])
-            print(record)
+            if index % 2 == 0:
+                white_table.add_row([str_record])
+            else:
+                black_table.add_row([str_record])
 
         menu.add.button('Back', self.run_game)
         menu.mainloop(self.screen)

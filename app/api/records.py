@@ -118,3 +118,6 @@ class RecordHistory:
             return current_record
         else:
             raise StopIteration
+
+    def get_records_length(self):
+        return len(self._records)
