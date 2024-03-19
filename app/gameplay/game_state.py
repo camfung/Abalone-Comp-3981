@@ -93,6 +93,9 @@ class GameState:
                                                         last_ball_i=last_ball_i,
                                                         direction=direction)
                                 if move is not None:
+                                    if move.get_pos_i == move.get_pos_f:
+                                        continue
+
                                     moves.append(move)
         return moves
 
