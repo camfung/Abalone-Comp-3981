@@ -82,10 +82,9 @@ class App:
                 move, time_stamp = player.generate_move(self.game_manager)
                 player.make_move(self.game_manager,
                                  player.color, move, time_stamp=time_stamp)
-                if thread.is_alive():
-                    thread.join()
-                print("Also Here")
                 self.gui.start_button_clicked = True
+            if thread.is_alive():
+                thread.join()
             self.gui.waiting_for_player_input = True
 
 
