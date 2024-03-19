@@ -124,8 +124,8 @@ class GameManager:
         """
         Notifies all observers about a change in the game state.
         """
-        for observer in self._observers:
-            observer.update(self)
+        ##for observer in self._observers:
+            ##observer.update(self)
 
     def get_record_history(self):
         return self._game.get_record_history()
