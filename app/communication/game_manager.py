@@ -1,5 +1,6 @@
 
 import copy
+import time
 
 from app.gameplay.game import Game
 from app.api.exceptions import DuplicateSingletons
@@ -75,6 +76,7 @@ class GameManager:
     def reset_board(self):
         runs = len(self._move_history)
         for _ in range(0, runs):
+            time.sleep(0.1)
             self.undo_last_move()
 
     @property
