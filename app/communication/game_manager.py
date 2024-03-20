@@ -1,5 +1,6 @@
 
 import copy
+import time
 
 from app.gameplay.game import Game
 from app.api.exceptions import DuplicateSingletons
@@ -56,7 +57,8 @@ class GameManager:
         - move: The move being made.
         - timestamp: The time at which the move was made.
         """
-        self._move_history.append(copy.deepcopy(self._game.get_current_game_state()))
+        self._move_history.append(copy.deepcopy(
+            self._game.get_current_game_state()))
         self._game.set_move(player, move, timestamp)
         self.notify()
 
@@ -67,10 +69,15 @@ class GameManager:
         if len(self._move_history) != 0:
             self._game.set_game_state(self._move_history.pop())
             self._game.get_record_history().remove_last_record()
-            self._game.update_ball_count()
             self.notify()
         else:
             pass
+
+    def reset_board(self):
+        runs = len(self._move_history)
+        for _ in range(0, runs):
+            time.sleep(0.1)
+            self.undo_last_move()
 
     @property
     def game_score(self):
@@ -85,7 +92,7 @@ class GameManager:
             tuple: A tuple where the first element is the count of white balls and
                 the second element is the count of black balls in the game.
         """
-        return self._game.get_ball_count()
+        return self._game.get_ball_count()[0], self._game.get_ball_count()[1]
 
     @property
     def current_player_to_move(self):
@@ -96,9 +103,6 @@ class GameManager:
 
     def get_possible_moves(self):
         return self._game.get_current_game_state().get_possible_moves()
-
-    def get_possible_game_states(self):
-        return self._game.get_possible_game_states()
 
     def get_board(self):
         return self._game.get_current_game_state().get_board()
@@ -122,8 +126,8 @@ class GameManager:
         """
         Notifies all observers about a change in the game state.
         """
-        for observer in self._observers:
-            observer.update(self)
+        ##for observer in self._observers:
+            ##observer.update(self)
 
     def get_record_history(self):
         return self._game.get_record_history()

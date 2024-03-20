@@ -1,5 +1,11 @@
+import math
+import threading
+import time
 
 import pygame_menu
+
+from app.api.enums import Marble
+from app.players.agent import AbaloneAgent
 from app.ui.ui_components import Drawable, EventHandler
 
 
@@ -23,10 +29,72 @@ class HUD(Drawable, EventHandler):
         self.theme = self.ui_instance.theme
         self.theme.widget_width = 100
         self.score_label = None
+        self.timer = None
         self._white_balls = 0
         self._black_balls = 0
 
+        self._start_time_black = time.time()
+        self._start_time_white = time.time()
+
+        self._elapsed_time_black = 0
+        self._elapsed_time_white = 0
+        self._game_started = False
+
+        self._black_check_time = True
+        self._white_check_time = True
+
+        self._turn_end = Marble.BLACK
+
         self.start_game_cb, self.undo_move_cb, self.pause_game_cb = callbacks
+
+    def update_timer(self, game_manager):
+        if self._game_started:
+            if game_manager.current_player_to_move == Marble.BLACK:
+                if self._black_check_time:
+                    self._start_time_black = time.time() - self._elapsed_time_black
+                    self._black_check_time = False
+                    self._white_check_time = True
+                self._elapsed_time_black = time.time() - self._start_time_black
+                self._turn_end = Marble.BLACK
+            elif game_manager.current_player_to_move == Marble.WHITE:
+                if self._white_check_time:
+                    self._start_time_white = time.time() - self._elapsed_time_white
+                    self._white_check_time = False
+                    self._black_check_time = True
+                self._elapsed_time_white = time.time() - self._start_time_white
+                self._turn_end = Marble.WHITE
+            self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
+
+    def start_game(self):
+        self._game_started = True
+        self._black_check_time = True
+        self._white_check_time = True
+        self.start_game_cb()
+
+    def stop_game(self):
+        self._elapsed_time_black = 0
+        self._elapsed_time_white = 0
+        self._game_started = False
+
+        self._black_check_time = True
+        self._white_check_time = True
+        self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
+        self.ui_instance.play_menu()
+
+    def restart_game(self):
+        self._elapsed_time_black = 0
+        self._elapsed_time_white = 0
+        self._game_started = False
+
+        self._black_check_time = True
+        self._white_check_time = True
+        self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
+        thread = threading.Thread(target=self.ui_instance.reset_board, args=(threading.current_thread(), ))
+        thread.start()
+
+    def pause_game(self):
+        self._game_started = False
+        self.pause_game_cb()
 
     def create_hud(self):
         """
@@ -38,20 +106,24 @@ class HUD(Drawable, EventHandler):
         """
         menu = pygame_menu.Menu("Abalone", self.ui_instance.SCREEN_WIDTH, self.HUD_HEIGHT,
                                 theme=self.theme, position=(0, 0, True), columns=5, rows=2)
-        menu.add.button("Start Game", self.start_game_cb,
+        menu.add.button("Start Game", self.start_game,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Stop Game", pygame_menu.events.EXIT,
+        menu.add.button("Stop Game", self.stop_game,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Pause", self.pause_game_cb,
+        menu.add.button("Pause", self.pause_game,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Reset", self.ui_instance.play_menu,
+        menu.add.button("Reset", self.restart_game,
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Undo Last Move", self.undo_move_cb,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Show Move History", self.ui_instance.display_move_history,
+        menu.add.button("Show Full Move History", self.ui_instance.display_move_history,
                         align=pygame_menu.locals.ALIGN_CENTER)
+
         self.score_label = menu.add.label(
             f"White Score: {self._white_balls}   Black Score:  {self._black_balls}  ")
+
+        self.timer = menu.add.label(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}",
+                                    selectable=False)
 
         return menu
 
@@ -76,7 +148,7 @@ class HUD(Drawable, EventHandler):
         self._white_balls = value
         if self.score_label is not None:
             self.score_label.set_title(
-                f"White Score: {self._white_balls}   Black Score:  {self._black_balls}  ")
+                f"White Score: {self._white_balls}   Black Score: {self._black_balls}  ")
 
     @property
     def black_balls(self):
@@ -132,3 +204,88 @@ class HUD(Drawable, EventHandler):
         """
         menu = self.get_menu()
         menu.draw(surface)
+
+
+class RecordMenu(Drawable, EventHandler):
+    record_menu = None
+
+    def __init__(self, gui):
+        self.ui_instance = gui
+        self.theme = self.ui_instance.theme
+
+    def handle_event(self, event):
+        if self.record_menu is not None:
+            self.record_menu.update([event])
+
+    def get_agent_player(self):
+        """
+        Returns true if a given player is agent, for the purposes of displaying next agent move.
+        If true, the agent player is black.
+        :return: Boolean
+        """
+        return isinstance(self.ui_instance._app.players[0], AbaloneAgent)
+
+    def draw(self, surface, game_manager):
+        # Created here so that it updates
+        record_menu = pygame_menu.Menu(
+            "Move History", 400, 850, theme=self.theme, position=(100, 100, True))
+        next_agent_move = record_menu.add.table(table_id='next_agent_move',
+                                                font_size=12, font_color="Black")
+        next_agent_move.default_cell_padding = 5
+        next_agent_move.default_row_background_color = 'white'
+        next_agent_move.add_row(['Next Agent Move'],
+                                cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+
+        table = record_menu.add.table(table_id='black_records_table',
+                                            font_size=12, font_color="Black")
+        table.default_cell_padding = 5
+        table.default_row_background_color = 'white'
+        table.add_row(['Black Moves', 'White Moves'],
+                            cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+
+        # black_table = record_menu.add.table(table_id='black_records_table',
+        #                                     font_size=12, font_color="Black")
+        # black_table.default_cell_padding = 5
+        # black_table.default_row_background_color = 'white'
+        # black_table.add_row(['Black Moves'],
+        #                     cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+        #
+        # white_table = record_menu.add.table(table_id='white_records_table',
+        #                                     font_size=12, font_color="Black")
+        # white_table.default_cell_padding = 5
+        # white_table.default_row_background_color = 'white'
+        # white_table.add_row(['White Moves'],
+        #                     cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+
+        records = self.ui_instance._app.notify(self, "getRecordHistory")
+
+        start_index = 1
+
+        record_len = records.get_records_length()
+
+        if record_len > 15:
+            record_menu.add.button('Show Full History', self.ui_instance.display_move_history)
+            start_index = record_len - math.ceil(record_len / 2)
+
+        for i in range(start_index - 1, record_len, 2):
+            black_move = str(records.get_record(i).condensed_str()) if i < record_len else ''
+            white_move = str(records.get_record(i + 1).condensed_str()) if i + 1 < record_len else ''
+            table.add_row([black_move, white_move])
+
+        for index, record in enumerate(records, start=1):
+            str_record = str(record)
+
+            if index >= start_index:
+                # if index % 2 == 0:
+                #     white_table.add_row([str_record])
+                # else:
+                #     black_table.add_row([str_record])
+
+                if index == records.get_records_length() or index == records.get_records_length() - 1:
+                    if self.get_agent_player() and index % 2 != 0:
+                        next_agent_move.add_row([str_record])
+                    elif not self.get_agent_player() and index % 2 == 0:
+                        next_agent_move.add_row([str_record])
+
+        self.record_menu = record_menu
+        record_menu.draw(surface)

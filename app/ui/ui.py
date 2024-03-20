@@ -6,7 +6,7 @@ from app.api.enums import GameType, Marble
 import pygame_menu
 from app.api.enums import Formation
 from app.ui.board import Board
-from app.ui.hud import HUD
+from app.ui.hud import HUD, RecordMenu
 
 
 class UI(ABC):
@@ -48,7 +48,7 @@ class PygameUI(UI):
     """
 
     SCREEN_HEIGHT = 1000
-    SCREEN_WIDTH = 1300
+    SCREEN_WIDTH = 1400
     button_color = (0, 128, 255)
     button_highlight_color = (255, 255, 0)
     text_color = (255, 255, 255)
@@ -80,6 +80,7 @@ class PygameUI(UI):
             pause_game_cb
         )
         hud = HUD(self, callbacks)
+        record_menu = RecordMenu(self)
 
         def execute_move_cb(first_marble, second_marble, direction):
             return self._app.notify(self, "PlayerMakeMove", first_marble=first_marble,
@@ -99,14 +100,17 @@ class PygameUI(UI):
         board = Board(callbacks)
         self.board = board
         self.hud = hud
+        self.record_menu = record_menu
 
         # add the drawables
         self.drawable_elements.append(board)
         self.drawable_elements.append(hud)
+        self.drawable_elements.append(record_menu)
 
         # add the event handlers
         self.event_handlers.append(board)
         self.event_handlers.append(hud)
+        self.event_handlers.append(record_menu)
 
     def start_the_game(self, config):
         """
@@ -122,6 +126,7 @@ class PygameUI(UI):
         The main game loop. Handles events, updates the game state, and redraws the screen.
         """
         while True:
+            self.drawable_elements[1].update_timer(self._app.game_manager)
             for event in pygame.event.get():
                 if event == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
@@ -159,6 +164,10 @@ class PygameUI(UI):
 
         pygame.display.flip()
 
+    def reset_board(self, thread):
+        self._app.reset_board()
+        thread.join()
+
     @property
     def waiting_for_player_input(
         self): return self.board.waiting_for_player_input
@@ -187,30 +196,27 @@ class PygameUI(UI):
             'Play', PygameUI.SCREEN_WIDTH, PygameUI.SCREEN_HEIGHT, theme=self.theme)
 
         opponent_type = menu.add.selector(
-            'Opponent: ', [('CPU', GameType.PLAYER_VS_CPU), ('Human', GameType.PLAYER_VS_PLAYER)])
+            'Opponent: ', [('Agent', GameType.PLAYER_VS_AGENT), ('Human', GameType.PLAYER_VS_PLAYER)])
         player_color = menu.add.selector(
             'I Play As: ', [('Black', Marble.BLACK), ('White', Marble.WHITE)])  # Adding selector for player color
 
-        cpu_level = menu.add.dropselect('Agent:     ', [
+        agent_level = menu.add.dropselect('Agent:     ', [
             ('Random moves', 1), ('Cameron', 2), ('Joey', 3), ('Elsa', 4), ('Callum', 5)], default=0,
             onchange=self.update_play_button)
         formation = menu.add.dropselect('Formation: ', [
             (f.name, f) for f in Formation], default=0, onchange=self.update_play_button)
 
         # Adding time limit and move limit selectors for both Black and White players
-        black_time_limit = menu.add.dropselect('Black Time Limit: ', [
-            ('1 min', 60), ('2 mins', 120), ('5 mins', 300), ('10 mins', 600)], default=0)
+        black_time_limit = menu.add.text_input('Black Time Limit (Seconds): ', default = 30, input_type=pygame_menu.locals.INPUT_INT, maxchar=4)
 
-        white_time_limit = menu.add.dropselect('White Time Limit: ', [
-            ('1 min', 60), ('2 mins', 120), ('5 mins', 300), ('10 mins', 600)], default=0)
+        white_time_limit = menu.add.text_input('White Time Limit (Seconds): ', default = 30, input_type=pygame_menu.locals.INPUT_INT, maxchar=4)
 
-        move_limit = menu.add.dropselect('Move Limit: ', [
-            (f'{x} moves', x) for x in range(5, 100, 5)], default=3)
+        move_limit = menu.add.text_input('Move Limit: ', default = 20, input_type=pygame_menu.locals.INPUT_INT, maxchar = 3)
 
         menu.add.button('Play', lambda: self.start_the_game({
             'game_type': opponent_type.get_value(),
             'player_color': player_color.get_value(),
-            'cpu_level': cpu_level.get_value(),
+            'agent_level': agent_level.get_value(),
             'formation': formation.get_value(),
             'black_time_limit': black_time_limit.get_value(),
             'move_limit': move_limit.get_value(),
@@ -232,19 +238,18 @@ class PygameUI(UI):
         menu = pygame_menu.Menu(
             "Move History", self.SCREEN_WIDTH, self.SCREEN_HEIGHT, theme=self.theme)
         table = menu.add.table(table_id='records_table',
-                               font_size=20, font_color="Black")
+                                            font_size=18, font_color="Black")
         table.default_cell_padding = 5
         table.default_row_background_color = 'white'
-        table.add_row(['Moves'],
-                      cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+        table.add_row(['Black Moves', 'White Moves'], cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
 
         records = self._app.notify(self, "getRecordHistory")
+        record_len = records.get_records_length()
 
-        # Modify this to match formatting of record history
-        for index, record in enumerate(records, start=1):
-            str_record = str(record)
-            table.add_row([str_record])
-            print(record)
+        for i in range(0, record_len, 2):
+            black_move = str(records.get_record(i)) if i < record_len else ''
+            white_move = str(records.get_record(i + 1)) if i + 1 < record_len else ''
+            table.add_row([black_move, white_move])
 
         menu.add.button('Back', self.run_game)
         menu.mainloop(self.screen)

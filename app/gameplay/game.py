@@ -102,6 +102,7 @@ class Game:
             next_marble = Marble.BLACK
         else:
             raise InvalidMarbleValue("No Marble Value provided in Set Move.")
+        print(f"{self._current_game_state.get_current_move_color()}: {move}")
 
         new_board_state = self._current_game_state.generate_new_board_state(
             move)
@@ -125,6 +126,9 @@ class Game:
 
     def set_game_state(self, new_game_state):
         self._current_game_state = new_game_state
+
+    def get_possible_moves(self):
+        return self._current_game_state.get_possible_moves()
 
     def __str__(self):
         game_state_str = str(self._current_game_state)

@@ -1,3 +1,5 @@
+import threading
+import time
 
 from app.api.enums import GameType, Marble
 from app.gameplay.move import Move
@@ -29,6 +31,7 @@ class App:
         self.game_manager.join_room(self.gui)
 
     def notify(self, sender, event, **kwargs):
+        thread = threading.Thread(target=self.notify, args=(self, "AiMakeMove"))
         """
         Handles notifications sent from different parts of the application,
         acting upon various events like starting the game, making moves, undoing moves, and querying game state.
@@ -54,13 +57,16 @@ class App:
 
             # make the correct players depending on the config
             player_color = kwargs["config"]["player_color"][0][1]
-            move_limit = kwargs["config"]["move_limit"][0][1]
-            self.players = self.initialize_players(game_type, player_color, move_limit)
+            move_limit = kwargs["config"]["move_limit"]
+
+            black_time_limit = kwargs["config"]["black_time_limit"]
+            white_time_limit = kwargs["config"]["white_time_limit"]
+            self.players = self.initialize_players(game_type, player_color, move_limit, black_time_limit, white_time_limit)
 
             self.game_manager.start_game(formation)
             self.gui.update(self.game_manager)
 
-            # if the first player to move is a cpu make the move
+            # if the first player to move is an agent make the move
             self.gui.run_game()
         if event == "AiMakeMove":
             """
@@ -77,7 +83,10 @@ class App:
                 player.make_move(self.game_manager,
                                  player.color, move, time_stamp=time_stamp)
                 self.gui.start_button_clicked = True
+            if thread.is_alive():
+                thread.join()
             self.gui.waiting_for_player_input = True
+
 
         if event == "PlayerMakeMove":
             """
@@ -102,7 +111,7 @@ class App:
                 self.players[1]
             self.game_manager.commit_move(
                 move=move, player=move.marble, timestamp=time_stamp)
-            self.notify(self, "AiMakeMove")
+            thread.start()
         if event == "IsMarblePlayerToMove":
             """
             Checks if the marble at a given position belongs to the current player to move.
@@ -126,30 +135,33 @@ class App:
         if event == "GetScore":
             return self.game_manager.game_score
 
-    def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int):
+    def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit : int, white_time_limit: int):
         """
         Initializes players based on the selected game type and player colors.
 
         Parameters:
         - game_type: An enumeration value of GameType
-        indicating whether it's player vs. CPU, CPU vs. CPU, or player vs. player.
+        indicating whether it's player vs. agent, agent vs. agent, or player vs. player.
         - player_color: An enumeration value of Marble indicating the color chosen by the player.
 
         Returns:
         A list of initialized player objects for the game.
         """
-        if game_type == GameType.CPU_VS_CPU:
-            return [AbaloneAgent(10, move_limit, Marble.BLACK), AbaloneAgent(10, move_limit, Marble.WHITE)]
-        elif game_type == GameType.PLAYER_VS_CPU:
+        if game_type == GameType.AGENT_VS_AGENT:
+            return [AbaloneAgent(black_time_limit, move_limit, Marble.BLACK), AbaloneAgent(white_time_limit, move_limit, Marble.WHITE)]
+        elif game_type == GameType.PLAYER_VS_AGENT:
             if player_color == Marble.BLACK:
-                return [HumanPlayer(10, move_limit, Marble.BLACK), AbaloneAgent(10, move_limit, Marble.WHITE)]
+                return [HumanPlayer(black_time_limit, move_limit, Marble.BLACK), AbaloneAgent(white_time_limit, move_limit, Marble.WHITE)]
             else:
-                return [AbaloneAgent(10, move_limit, Marble.BLACK), HumanPlayer(10, move_limit, Marble.WHITE)]
+                return [AbaloneAgent(black_time_limit, move_limit, Marble.BLACK), HumanPlayer(white_time_limit, move_limit, Marble.WHITE)]
         elif game_type == GameType.PLAYER_VS_PLAYER:
-            return [HumanPlayer(10, move_limit, Marble.BLACK), HumanPlayer(10, move_limit, Marble.WHITE)]
+            return [HumanPlayer(black_time_limit, move_limit, Marble.BLACK), HumanPlayer(white_time_limit, move_limit, Marble.WHITE)]
 
     def run(self):
         """
         Starts the application by displaying the main menu and initializing the game loop.
         """
         self.gui.run()
+
+    def reset_board(self):
+        self.game_manager.reset_board()

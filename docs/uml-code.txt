@@ -38,6 +38,7 @@ namespace Driver {
        - game : GameManager 
        - gui : PygameUI
        + run() 
+       + reset_board()
     }
 
 }
@@ -60,7 +61,7 @@ namespace Ui {
         + display_score(record: Record)
         + display_moves(record: Record)
         + display_time_per_move(record : Record)
-
+	+ reset_board()
     }
     class Drawable {
         <<interface>>
@@ -70,10 +71,23 @@ namespace Ui {
     class HUD {
         - ui_instance: PygameUI
         - theme: Theme
+	- _start_time_black: time
+	- _start_time_white: time
+	- _elapsed_time_black: int
+	- _elapsed_time_white: int
+	- _game_started: boolean
+	- _black_check_time: boolean
+	- _white_check_time: boolean
+	- _turn_end: Marble
         + create_hud(): Menu
         + get_menu(): Menu
         + handle_event(): void
         + draw(surface: UI, game_manager: GameManager): void
+	+ update_timer(game_manager: GameManager): void
+	+ start_game()
+	+ restart_game()
+	+ stop_game()
+	+ pause_game()
     }
 
     class Board {
@@ -120,6 +134,7 @@ namespace Communication {
         + reset_game() : void
         + commit_move(player: Player, move: Move, timestamp: float) : void
         + undo_last_move() : void
+	+ reset_board() : void
     }
 }
 
