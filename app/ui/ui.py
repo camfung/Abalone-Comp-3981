@@ -48,7 +48,7 @@ class PygameUI(UI):
     """
 
     SCREEN_HEIGHT = 1000
-    SCREEN_WIDTH = 1300
+    SCREEN_WIDTH = 1400
     button_color = (0, 128, 255)
     button_highlight_color = (255, 255, 0)
     text_color = (255, 255, 255)
@@ -234,31 +234,22 @@ class PygameUI(UI):
         menu.add.button('Back', self.main_menu)
         menu.mainloop(self.screen)
 
-    def display_move_history(self): #Note, delete after refactoring
+    def display_move_history(self):
         menu = pygame_menu.Menu(
             "Move History", self.SCREEN_WIDTH, self.SCREEN_HEIGHT, theme=self.theme)
-        black_table = menu.add.table(table_id='black_records_table',
-                                            font_size=12, font_color="Black")
-        black_table.default_cell_padding = 5
-        black_table.default_row_background_color = 'white'
-        black_table.add_row(['Black Moves'],
-                            cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
-
-        white_table = menu.add.table(table_id='white_records_table',
-                                            font_size=12, font_color="Black")
-        white_table.default_cell_padding = 5
-        white_table.default_row_background_color = 'white'
-        white_table.add_row(['White Moves'],
-                            cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+        table = menu.add.table(table_id='records_table',
+                                            font_size=18, font_color="Black")
+        table.default_cell_padding = 5
+        table.default_row_background_color = 'white'
+        table.add_row(['Black Moves', 'White Moves'], cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
 
         records = self._app.notify(self, "getRecordHistory")
+        record_len = records.get_records_length()
 
-        for index, record in enumerate(records, start=1):
-            str_record = str(record)
-            if index % 2 == 0:
-                white_table.add_row([str_record])
-            else:
-                black_table.add_row([str_record])
+        for i in range(0, record_len, 2):
+            black_move = str(records.get_record(i)) if i < record_len else ''
+            white_move = str(records.get_record(i + 1)) if i + 1 < record_len else ''
+            table.add_row([black_move, white_move])
 
         menu.add.button('Back', self.run_game)
         menu.mainloop(self.screen)

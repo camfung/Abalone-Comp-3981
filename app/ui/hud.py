@@ -116,7 +116,7 @@ class HUD(Drawable, EventHandler):
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Undo Last Move", self.undo_move_cb,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Show Move History", self.ui_instance.display_move_history,
+        menu.add.button("Show Full Move History", self.ui_instance.display_move_history,
                         align=pygame_menu.locals.ALIGN_CENTER)
 
         self.score_label = menu.add.label(
@@ -213,32 +213,6 @@ class RecordMenu(Drawable, EventHandler):
         self.ui_instance = gui
         self.theme = self.ui_instance.theme
 
-    # def create_record_menu(self):
-    #     record_menu = pygame_menu.Menu(
-    #         "Move History", 300, 850, theme=self.theme, position=(100, 100, True))
-    #     table = record_menu.add.table(table_id='records_table',
-    #                                   font_size=12, font_color="Black")
-    #     table.default_cell_padding = 5
-    #     table.default_row_background_color = 'white'
-    #     table.add_row(['Moves'],
-    #                   cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
-    #
-    #     records = self.ui_instance._app.notify(self, "getRecordHistory")
-    #
-    #     for index, record in enumerate(records, start=1):
-    #         str_record = str(record)
-    #         table.add_row([str_record])
-    #         print(record)
-    #
-    #     record_menu.add.button('Back', self.ui_instance.display_move_history)  # for testing purposes
-    #
-    #     return record_menu
-    #
-    # def get_record_menu(self):
-    #     if self.record_menu is None:
-    #         self.record_menu = self.create_record_menu()
-    #     return self.record_menu
-
     def handle_event(self, event):
         if self.record_menu is not None:
             self.record_menu.update([event])
@@ -254,7 +228,7 @@ class RecordMenu(Drawable, EventHandler):
     def draw(self, surface, game_manager):
         # Created here so that it updates
         record_menu = pygame_menu.Menu(
-            "Move History", 300, 850, theme=self.theme, position=(100, 100, True))
+            "Move History", 400, 850, theme=self.theme, position=(100, 100, True))
         next_agent_move = record_menu.add.table(table_id='next_agent_move',
                                                 font_size=12, font_color="Black")
         next_agent_move.default_cell_padding = 5
@@ -262,36 +236,50 @@ class RecordMenu(Drawable, EventHandler):
         next_agent_move.add_row(['Next Agent Move'],
                                 cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
 
-        black_table = record_menu.add.table(table_id='black_records_table',
+        table = record_menu.add.table(table_id='black_records_table',
                                             font_size=12, font_color="Black")
-        black_table.default_cell_padding = 5
-        black_table.default_row_background_color = 'white'
-        black_table.add_row(['Black Moves'],
+        table.default_cell_padding = 5
+        table.default_row_background_color = 'white'
+        table.add_row(['Black Moves', 'White Moves'],
                             cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
 
-        white_table = record_menu.add.table(table_id='white_records_table',
-                                            font_size=12, font_color="Black")
-        white_table.default_cell_padding = 5
-        white_table.default_row_background_color = 'white'
-        white_table.add_row(['White Moves'],
-                            cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+        # black_table = record_menu.add.table(table_id='black_records_table',
+        #                                     font_size=12, font_color="Black")
+        # black_table.default_cell_padding = 5
+        # black_table.default_row_background_color = 'white'
+        # black_table.add_row(['Black Moves'],
+        #                     cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+        #
+        # white_table = record_menu.add.table(table_id='white_records_table',
+        #                                     font_size=12, font_color="Black")
+        # white_table.default_cell_padding = 5
+        # white_table.default_row_background_color = 'white'
+        # white_table.add_row(['White Moves'],
+        #                     cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
 
         records = self.ui_instance._app.notify(self, "getRecordHistory")
 
         start_index = 1
 
-        if records.get_records_length() > 15:
-            record_menu.add.button('Show Full History', self.ui_instance.display_move_history)
+        record_len = records.get_records_length()
 
-            start_index = records.get_records_length() - math.ceil(records.get_records_length() / 2)
+        if record_len > 15:
+            record_menu.add.button('Show Full History', self.ui_instance.display_move_history)
+            start_index = record_len - math.ceil(record_len / 2)
+
+        for i in range(start_index - 1, record_len, 2):
+            black_move = str(records.get_record(i).condensed_str()) if i < record_len else ''
+            white_move = str(records.get_record(i + 1).condensed_str()) if i + 1 < record_len else ''
+            table.add_row([black_move, white_move])
 
         for index, record in enumerate(records, start=1):
             str_record = str(record)
+
             if index >= start_index:
-                if index % 2 == 0:
-                    white_table.add_row([str_record])
-                else:
-                    black_table.add_row([str_record])
+                # if index % 2 == 0:
+                #     white_table.add_row([str_record])
+                # else:
+                #     black_table.add_row([str_record])
 
                 if index == records.get_records_length() or index == records.get_records_length() - 1:
                     if self.get_agent_player() and index % 2 != 0:
