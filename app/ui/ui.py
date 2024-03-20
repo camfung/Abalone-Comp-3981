@@ -164,8 +164,9 @@ class PygameUI(UI):
 
         pygame.display.flip()
 
-    def reset_board(self):
+    def reset_board(self, thread):
         self._app.reset_board()
+        thread.join()
 
     @property
     def waiting_for_player_input(

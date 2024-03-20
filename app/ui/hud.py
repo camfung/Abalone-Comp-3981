@@ -1,4 +1,5 @@
 import math
+import threading
 import time
 
 import pygame_menu
@@ -88,7 +89,8 @@ class HUD(Drawable, EventHandler):
         self._black_check_time = True
         self._white_check_time = True
         self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
-        self.ui_instance.reset_board()
+        thread = threading.Thread(target=self.ui_instance.reset_board, args=(threading.current_thread(), ))
+        thread.start()
 
     def pause_game(self):
         self._game_started = False
