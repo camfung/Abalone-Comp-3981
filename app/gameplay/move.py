@@ -1,3 +1,4 @@
+import copy
 
 from app.api.enums import *
 from app.api.exceptions import InvalidDirection
@@ -33,7 +34,7 @@ class Move:
         return self._marble
 
     @staticmethod
-    def __calc_pos_f(first_ball_i, last_ball_i, direction):
+    def __calc_pos_f(f_ball_i, l_ball_i, direction):
         """
         Calculates the final positions of the balls after the move.
 
@@ -45,6 +46,8 @@ class Move:
         Returns:
         Tuple containing the final positions of the first and last balls.
         """
+        first_ball_i = copy.deepcopy(f_ball_i)
+        last_ball_i = copy.deepcopy(l_ball_i)
         if direction == Direction.UP_LEFT:
             position = ((first_ball_i[0] - 1, first_ball_i[1]),
                         (last_ball_i[0] - 1, last_ball_i[1]))
@@ -152,10 +155,10 @@ class Move:
         char_last_i_x = chr(self._pos_i[1][0] + 74 - 2 * (self._pos_i[1][0]))
         char_last_f_x = chr(self._pos_f[1][0] + 74 - 2 * (self._pos_f[1][0]))
 
-        if self._selection_type == MoveType.SINGLE:
+        if self._move_type == MoveType.SINGLE:
             return (f"{char_first_i_x}{self._pos_i[0][1]} "
                     f"-> {char_first_f_x}{self._pos_f[0][1]}")
         return (f"{char_first_i_x}{self._pos_i[0][1]}, "
-                f"{char_first_f_x}{self._pos_i[1][1]} "
-                f"-> {char_last_i_x}{self._pos_f[0][1]}, "
+                f"{char_last_i_x}{self._pos_i[1][1]} "
+                f"-> {char_first_f_x}{self._pos_f[0][1]}, "
                 f"{char_last_f_x}{self._pos_f[1][1]}")

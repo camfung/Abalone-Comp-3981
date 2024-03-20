@@ -38,7 +38,15 @@ class Record:
         """
         # return f"{self._index}: {self._player_turn} {self._move} - {int(self._time_taken)} seconds"
         return (f"{self._index}: {self._player_turn.name} {self._move} "
-                f"{self._move.get_move_type().name}  {format(self._time_taken, '.2f')} seconds")
+                f"{self._move.get_move_type().name} {format(self._time_taken, '.2f')}s")
+
+    def condensed_str(self):
+        """
+        A condensed string representation of the record
+        :return: String with condensed record information
+        """
+        return (f"{self._index}: {self._move} "
+                f"{self._move.get_move_type().name} {format(self._time_taken, '.2f')}s")
 
 
 class RecordHistory:
