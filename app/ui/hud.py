@@ -116,7 +116,7 @@ class HUD(Drawable, EventHandler):
                         align=pygame_menu.locals.ALIGN_CENTER)
         menu.add.button("Undo Last Move", self.undo_move_cb,
                         align=pygame_menu.locals.ALIGN_CENTER)
-        menu.add.button("Show Move History", self.ui_instance.display_move_history,
+        menu.add.button("Show Full Move History", self.ui_instance.display_move_history,
                         align=pygame_menu.locals.ALIGN_CENTER)
 
         self.score_label = menu.add.label(
@@ -212,32 +212,6 @@ class RecordMenu(Drawable, EventHandler):
     def __init__(self, gui):
         self.ui_instance = gui
         self.theme = self.ui_instance.theme
-
-    # def create_record_menu(self):
-    #     record_menu = pygame_menu.Menu(
-    #         "Move History", 300, 850, theme=self.theme, position=(100, 100, True))
-    #     table = record_menu.add.table(table_id='records_table',
-    #                                   font_size=12, font_color="Black")
-    #     table.default_cell_padding = 5
-    #     table.default_row_background_color = 'white'
-    #     table.add_row(['Moves'],
-    #                   cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
-    #
-    #     records = self.ui_instance._app.notify(self, "getRecordHistory")
-    #
-    #     for index, record in enumerate(records, start=1):
-    #         str_record = str(record)
-    #         table.add_row([str_record])
-    #         print(record)
-    #
-    #     record_menu.add.button('Back', self.ui_instance.display_move_history)  # for testing purposes
-    #
-    #     return record_menu
-    #
-    # def get_record_menu(self):
-    #     if self.record_menu is None:
-    #         self.record_menu = self.create_record_menu()
-    #     return self.record_menu
 
     def handle_event(self, event):
         if self.record_menu is not None:
