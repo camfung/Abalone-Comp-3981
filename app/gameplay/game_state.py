@@ -208,20 +208,18 @@ class GameState:
         return new_board
 
     def __move_subsequent_pieces(self, **kwargs):
-        remain_ball_i_x = kwargs['remain_ball_i_x']
-        remain_ball_i_y = kwargs['remain_ball_i_y']
+        """
+        Moves the subsequent pieces if in the way of the pushers balls (Sumito).
+        :param kwargs: first and last balls
+        :return:
+        """
         first_ball_i_x = kwargs['first_ball_i_x']
         first_ball_i_y = kwargs['first_ball_i_y']
         last_ball_i_x = kwargs['last_ball_i_x']
         last_ball_i_y = kwargs['last_ball_i_y']
 
-        remain_ball_f_x = kwargs['remain_ball_f_x']
-        remain_ball_f_y = kwargs['remain_ball_f_y']
         first_ball_f_x = kwargs['first_ball_f_x']
         first_ball_f_y = kwargs['first_ball_f_y']
-        last_ball_f_x = kwargs['last_ball_f_x']
-        last_ball_f_y = kwargs['last_ball_f_y']
-
         move = kwargs['move']
         new_board = kwargs['new_board']
 
@@ -265,6 +263,7 @@ class GameState:
                 or sub_ball_i_y == org_ball_y and move_y == 0)
                and not safety_lock):
             marble_color = copy.deepcopy(new_board[sub_ball_i_x][sub_ball_i_y])
+            print(marble_color)
             new_board[sub_ball_i_x][sub_ball_i_y] = Marble.NONE
 
             # If the Marble is Off the Board, Delete it. Otherwise, Move Marble to Space
@@ -280,6 +279,13 @@ class GameState:
 
     @staticmethod
     def __move_pushers_pieces(**kwargs):
+        """
+        Move the Pushers pieces by removing them from the original positions
+        and reassigning them to the new positions.
+        :param kwargs: ball positions
+        :precondition: the final ball positions are empty
+        :return:
+        """
         remain_ball_i_x = kwargs['remain_ball_i_x']
         remain_ball_i_y = kwargs['remain_ball_i_y']
         first_ball_i_x = kwargs['first_ball_i_x']
