@@ -228,7 +228,7 @@ class RecordMenu(Drawable, EventHandler):
     def draw(self, surface, game_manager):
         # Created here so that it updates
         record_menu = pygame_menu.Menu(
-            "Move History", 400, 850, theme=self.theme, position=(100, 100, True))
+            "Move History", 450, 850, theme=self.theme, position=(100, 100, True))
         next_agent_move = record_menu.add.table(table_id='next_agent_move',
                                                 font_size=12, font_color="Black")
         next_agent_move.default_cell_padding = 5
