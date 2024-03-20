@@ -180,58 +180,122 @@ class GameState:
         remain_ball_f_x = (first_ball_f_x + last_ball_f_x) // 2
         remain_ball_f_y = (first_ball_f_y + last_ball_f_y) // 2
 
+        kwargs = {
+            "remain_ball_i_x": remain_ball_i_x,
+            "remain_ball_i_y": remain_ball_i_y,
+            "first_ball_i_x": first_ball_i_x,
+            "first_ball_i_y": first_ball_i_y,
+            "last_ball_i_x": last_ball_i_x,
+            "last_ball_i_y": last_ball_i_y,
+            "remain_ball_f_x": remain_ball_f_x,
+            "remain_ball_f_y": remain_ball_f_y,
+            "first_ball_f_x": first_ball_f_x,
+            "first_ball_f_y": first_ball_f_y,
+            "last_ball_f_x": last_ball_f_x,
+            "last_ball_f_y": last_ball_f_y,
+            "move": move,
+            "new_board": new_board,
+        }
+
         # Move Subsequent Pieces in Same Direction
         if move.get_move_type() == MoveType.INLINE:
-            # Declare Multipliers to Search for Subsequent Balls
-            move_x = 1 if first_ball_f_x > first_ball_i_x else (-1 if first_ball_f_x < first_ball_i_x else 0)
-            move_y = 1 if first_ball_f_y > first_ball_i_y else (-1 if first_ball_f_y < first_ball_i_y else 0)
+            new_board = self.__move_subsequent_pieces(**kwargs)
 
-            # Declare Variables for Initial and Final Ball Positions
-            sub_ball_i_x = copy.deepcopy(last_ball_i_x) if move_x > 0 else copy.deepcopy(first_ball_i_x)
-            sub_ball_i_y = copy.deepcopy(last_ball_i_y) if move_y > 0 else copy.deepcopy(first_ball_i_y)
-            sub_ball_f_x = copy.deepcopy(sub_ball_i_x)
-            sub_ball_f_y = copy.deepcopy(sub_ball_i_y)
+        # Move the Pushers Pieces
+        kwargs["new_board"] = new_board
+        new_board = self.__move_pushers_pieces(**kwargs)
 
-            # Save Original Ball Positions to keep track when Tracing Backwards
-            org_ball_x = copy.deepcopy(sub_ball_i_x)
-            org_ball_y = copy.deepcopy(sub_ball_i_y)
+        return new_board
 
-            # Adjust Final Positions to Start Loop
+    def __move_subsequent_pieces(self, **kwargs):
+        remain_ball_i_x = kwargs['remain_ball_i_x']
+        remain_ball_i_y = kwargs['remain_ball_i_y']
+        first_ball_i_x = kwargs['first_ball_i_x']
+        first_ball_i_y = kwargs['first_ball_i_y']
+        last_ball_i_x = kwargs['last_ball_i_x']
+        last_ball_i_y = kwargs['last_ball_i_y']
+
+        remain_ball_f_x = kwargs['remain_ball_f_x']
+        remain_ball_f_y = kwargs['remain_ball_f_y']
+        first_ball_f_x = kwargs['first_ball_f_x']
+        first_ball_f_y = kwargs['first_ball_f_y']
+        last_ball_f_x = kwargs['last_ball_f_x']
+        last_ball_f_y = kwargs['last_ball_f_y']
+
+        move = kwargs['move']
+        new_board = kwargs['new_board']
+
+        # Declare Multipliers to Search for Subsequent Balls
+        move_x = 1 if first_ball_f_x > first_ball_i_x else (-1 if first_ball_f_x < first_ball_i_x else 0)
+        move_y = 1 if first_ball_f_y > first_ball_i_y else (-1 if first_ball_f_y < first_ball_i_y else 0)
+
+        # Declare Variables for Initial and Final Ball Positions
+        sub_ball_i_x = copy.deepcopy(last_ball_i_x) if move_x > 0 else copy.deepcopy(first_ball_i_x)
+        sub_ball_i_y = copy.deepcopy(last_ball_i_y) if move_y > 0 else copy.deepcopy(first_ball_i_y)
+        sub_ball_f_x = copy.deepcopy(sub_ball_i_x)
+        sub_ball_f_y = copy.deepcopy(sub_ball_i_y)
+
+        # Save Original Ball Positions to keep track when Tracing Backwards
+        org_ball_x = copy.deepcopy(sub_ball_i_x)
+        org_ball_y = copy.deepcopy(sub_ball_i_y)
+
+        # Adjust Final Positions to Start Loop
+        sub_ball_f_x += move_x
+        sub_ball_f_y += move_y
+
+        # Safety Lock Prevents Spaces from being shifted if there are no opposing pieces being pushed
+        safety_lock = False
+        if (new_board[sub_ball_f_x][sub_ball_f_y] is Marble.NONE
+                or new_board[sub_ball_f_x][sub_ball_f_y] is None):
+            safety_lock = True
+
+        # Search for the End of the Line
+        while (new_board[sub_ball_f_x][sub_ball_f_y] is not Marble.NONE
+               and new_board[sub_ball_f_x][sub_ball_f_y] is not None):
+            sub_ball_i_x += move_x
             sub_ball_f_x += move_x
+            sub_ball_i_y += move_y
             sub_ball_f_y += move_y
 
-            # Safety Lock Prevents Spaces from being shifted if there are no opposing pieces being pushed
-            safety_lock = False
-            if (new_board[sub_ball_f_x][sub_ball_f_y] is Marble.NONE
-                    or new_board[sub_ball_f_x][sub_ball_f_y] is None):
-                safety_lock = True
+        # Move Marbles to New Locations
+        while ((abs(sub_ball_i_x - org_ball_x) > 0 and move_x != 0
+                or sub_ball_i_x == org_ball_x and move_x == 0)
+               and
+               (abs(sub_ball_i_y - org_ball_y) > 0 and move_y != 0
+                or sub_ball_i_y == org_ball_y and move_y == 0)
+               and not safety_lock):
+            marble_color = copy.deepcopy(new_board[sub_ball_i_x][sub_ball_i_y])
+            new_board[sub_ball_i_x][sub_ball_i_y] = Marble.NONE
 
-            # Search for the End of the Line
-            while (new_board[sub_ball_f_x][sub_ball_f_y] is not Marble.NONE
-                   and new_board[sub_ball_f_x][sub_ball_f_y] is not None):
-                sub_ball_i_x += move_x
-                sub_ball_f_x += move_x
-                sub_ball_i_y += move_y
-                sub_ball_f_y += move_y
+            # If the Marble is Off the Board, Delete it. Otherwise, Move Marble to Space
+            if self._board[sub_ball_f_x][sub_ball_f_y] is not None:
+                new_board[sub_ball_f_x][sub_ball_f_y] = marble_color
 
-            # Move Marbles to New Locations
-            while ((abs(sub_ball_i_x - org_ball_x) > 0 and move_x != 0
-                    or sub_ball_i_x == org_ball_x and move_x == 0)
-                   and
-                   (abs(sub_ball_i_y - org_ball_y) > 0 and move_y != 0
-                    or sub_ball_i_y == org_ball_y and move_y == 0)
-                   and not safety_lock):
-                marble_color = copy.deepcopy(new_board[sub_ball_i_x][sub_ball_i_y])
-                new_board[sub_ball_i_x][sub_ball_i_y] = Marble.NONE
+            sub_ball_i_x -= move_x
+            sub_ball_f_x -= move_x
+            sub_ball_i_y -= move_y
+            sub_ball_f_y -= move_y
 
-                # If the Marble is Off the Board, Delete it. Otherwise, Move Marble to Space
-                if self._board[sub_ball_f_x][sub_ball_f_y] is not None:
-                    new_board[sub_ball_f_x][sub_ball_f_y] = marble_color
+        return new_board
 
-                sub_ball_i_x -= move_x
-                sub_ball_f_x -= move_x
-                sub_ball_i_y -= move_y
-                sub_ball_f_y -= move_y
+    @staticmethod
+    def __move_pushers_pieces(**kwargs):
+        remain_ball_i_x = kwargs['remain_ball_i_x']
+        remain_ball_i_y = kwargs['remain_ball_i_y']
+        first_ball_i_x = kwargs['first_ball_i_x']
+        first_ball_i_y = kwargs['first_ball_i_y']
+        last_ball_i_x = kwargs['last_ball_i_x']
+        last_ball_i_y = kwargs['last_ball_i_y']
+
+        remain_ball_f_x = kwargs['remain_ball_f_x']
+        remain_ball_f_y = kwargs['remain_ball_f_y']
+        first_ball_f_x = kwargs['first_ball_f_x']
+        first_ball_f_y = kwargs['first_ball_f_y']
+        last_ball_f_x = kwargs['last_ball_f_x']
+        last_ball_f_y = kwargs['last_ball_f_y']
+
+        move = kwargs['move']
+        new_board = kwargs['new_board']
 
         # Remove the all the Mover's marbles in the move
         new_board[remain_ball_i_x][remain_ball_i_y] = Marble.NONE
