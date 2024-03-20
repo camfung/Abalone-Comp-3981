@@ -228,18 +228,14 @@ class GameState:
         move_y = 1 if first_ball_f_y > first_ball_i_y else (-1 if first_ball_f_y < first_ball_i_y else 0)
 
         # Declare Variables for Initial and Final Ball Positions
-        sub_ball_i_x = copy.deepcopy(last_ball_i_x) if move_x > 0 else copy.deepcopy(first_ball_i_x)
+        sub_ball_i_x = copy.deepcopy(last_ball_i_x) if move_x < 0 else copy.deepcopy(first_ball_i_x)
         sub_ball_i_y = copy.deepcopy(last_ball_i_y) if move_y > 0 else copy.deepcopy(first_ball_i_y)
-        sub_ball_f_x = copy.deepcopy(sub_ball_i_x)
-        sub_ball_f_y = copy.deepcopy(sub_ball_i_y)
+        sub_ball_f_x = copy.deepcopy(sub_ball_i_x) + move_x
+        sub_ball_f_y = copy.deepcopy(sub_ball_i_y) + move_y
 
         # Save Original Ball Positions to keep track when Tracing Backwards
         org_ball_x = copy.deepcopy(sub_ball_i_x)
         org_ball_y = copy.deepcopy(sub_ball_i_y)
-
-        # Adjust Final Positions to Start Loop
-        sub_ball_f_x += move_x
-        sub_ball_f_y += move_y
 
         # Safety Lock Prevents Spaces from being shifted if there are no opposing pieces being pushed
         safety_lock = False
@@ -263,7 +259,6 @@ class GameState:
                 or sub_ball_i_y == org_ball_y and move_y == 0)
                and not safety_lock):
             marble_color = copy.deepcopy(new_board[sub_ball_i_x][sub_ball_i_y])
-            print(marble_color)
             new_board[sub_ball_i_x][sub_ball_i_y] = Marble.NONE
 
             # If the Marble is Off the Board, Delete it. Otherwise, Move Marble to Space
