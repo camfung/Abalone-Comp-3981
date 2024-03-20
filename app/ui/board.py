@@ -1,3 +1,5 @@
+import time
+
 import pygame
 from app.api.enums import Marble
 from app.ui.pi_handler import PlayerInputHandler
@@ -27,6 +29,7 @@ class Board(Drawable, EventHandler):
         """
         super().__init__()
         self.waiting_for_player_input = False
+        self.time_taken = False
         self.input_handler = PlayerInputHandler(callbacks)
 
     def handle_event(self, event):
@@ -103,6 +106,12 @@ class Board(Drawable, EventHandler):
         - surface: The pygame Surface object where the board should be drawn.
         - game_manager: An instance of the GameManager class, used to access the current state of the game board.
         """
+        if self.waiting_for_player_input and not self.time_taken:
+            self.input_handler.start_time = time.time()
+            self.time_taken = True
+        elif not self.waiting_for_player_input:
+            self.time_taken = False
+
         game_manager = game_manager.get_board()
         clicks = []
 

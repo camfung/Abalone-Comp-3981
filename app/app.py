@@ -101,7 +101,7 @@ class App:
             first_marble = kwargs["first_marble"]
             second_marble = kwargs["second_marble"]
             direction = kwargs["direction"]
-            time_stamp = 1
+            time_stamp = kwargs["time_stamp"]
             move = Move(first_marble, second_marble, direction,
                         self.game_manager.current_player_to_move)
             # either here or in commit move we want to do is_valid_move(move)
@@ -109,6 +109,7 @@ class App:
             # if is valid make move and prompt AI to make move
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else \
                 self.players[1]
+            self.gui.waiting_for_player_input = False
             self.game_manager.commit_move(
                 move=move, player=move.marble, timestamp=time_stamp)
             thread.start()

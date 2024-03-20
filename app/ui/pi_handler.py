@@ -1,3 +1,4 @@
+import time
 
 from app.api.enums import *
 
@@ -15,6 +16,7 @@ class PlayerInputHandler:
         self.state = PlayerInputEvents.AWAITING_FIRST_MARBLE
         self.first_marble = None
         self.second_marble = None
+        self.start_time = 0
         self.execute_move, self.is_marble_player_to_move, self.update_board = callbacks
 
     def on_marble_click(self, marble_position):
@@ -75,7 +77,7 @@ class PlayerInputHandler:
                 direction = self.calculate_direction(
                     self.first_marble, marble_position)
                 self.execute_move(self.first_marble,
-                                  self.second_marble, direction)
+                                  self.second_marble, direction, (time.time() - self.start_time))
                 self.reset_state()
 
             # handle second marble selected
@@ -98,7 +100,7 @@ class PlayerInputHandler:
                 self.second_marble, marble_position)
             if self.is_valid_direction(self.second_marble, marble_position):
                 self.execute_move(self.first_marble,
-                                  self.second_marble, direction)
+                                  self.second_marble, direction, (time.time() - self.start_time))
                 self.reset_state()
             else:
                 # not a valid direction
