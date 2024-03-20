@@ -153,7 +153,7 @@ class Move:
         char_last_i_x = chr(self._pos_i[1][0] + 74 - 2 * (self._pos_i[1][0]))
         char_last_f_x = chr(self._pos_f[1][0] + 74 - 2 * (self._pos_f[1][0]))
 
-        if self._selection_type == MoveType.SINGLE:
+        if self._move_type == MoveType.SINGLE:
             return (f"{char_first_i_x}{self._pos_i[0][1]} "
                     f"-> {char_first_f_x}{self._pos_f[0][1]}")
         return (f"{char_first_i_x}{self._pos_i[0][1]}, "
