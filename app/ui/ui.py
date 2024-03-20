@@ -48,7 +48,7 @@ class PygameUI(UI):
     """
 
     SCREEN_HEIGHT = 1000
-    SCREEN_WIDTH = 1300
+    SCREEN_WIDTH = 1400
     button_color = (0, 128, 255)
     button_highlight_color = (255, 255, 0)
     text_color = (255, 255, 255)
