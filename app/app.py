@@ -31,7 +31,8 @@ class App:
         self.game_manager.join_room(self.gui)
 
     def notify(self, sender, event, **kwargs):
-        thread = threading.Thread(target=self.notify, args=(self, "AiMakeMove"))
+        thread = threading.Thread(
+            target=self.notify, args=(self, "AiMakeMove"))
         """
         Handles notifications sent from different parts of the application,
         acting upon various events like starting the game, making moves, undoing moves, and querying game state.
@@ -61,7 +62,8 @@ class App:
 
             black_time_limit = kwargs["config"]["black_time_limit"]
             white_time_limit = kwargs["config"]["white_time_limit"]
-            self.players = self.initialize_players(game_type, player_color, move_limit, black_time_limit, white_time_limit)
+            self.players = self.initialize_players(
+                game_type, player_color, move_limit, black_time_limit, white_time_limit)
 
             self.game_manager.start_game(formation)
             self.gui.update(self.game_manager)
@@ -86,7 +88,6 @@ class App:
             if thread.is_alive():
                 thread.join()
             self.gui.waiting_for_player_input = True
-
 
         if event == "PlayerMakeMove":
             """
@@ -135,7 +136,7 @@ class App:
         if event == "GetScore":
             return self.game_manager.game_score
 
-    def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit : int, white_time_limit: int):
+    def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit: int, white_time_limit: int):
         """
         Initializes players based on the selected game type and player colors.
 
