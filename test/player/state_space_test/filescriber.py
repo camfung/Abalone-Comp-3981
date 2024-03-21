@@ -1,7 +1,9 @@
+
 from app.api.exceptions import InvalidMarbleValue
 from app.gameplay.game_state import GameState
 from app.api.enums import Marble
 import csv
+from pathlib import Path
 
 
 class FileScriber:
@@ -20,7 +22,9 @@ class FileScriber:
             r_board_config = input_f.readline().strip()
             board_spots = r_board_config.split(",")
 
-            file = open('../../../app/formations/blank_board.csv', 'r')
+            blank_board_path = Path('../../../app/formations/blank_board.csv').resolve()
+
+            file = open(blank_board_path, 'r')
             csv_reader = csv.reader(file, delimiter=',')
 
             starting_board = [[None, None, None, None,
