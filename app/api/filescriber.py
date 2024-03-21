@@ -82,7 +82,6 @@ class FileScriber:
                             formatted_space = f"{str_row}{cIndex}w"
                             spaces += f"{formatted_space},"
                 spaces = FileScriber.sort_line(spaces)
-                spaces = spaces[1:]
                 spaces += "\n"
                 output_f.writelines(spaces)
 
@@ -96,8 +95,22 @@ class FileScriber:
         # Return Results
         return lines
 
+    # Define the custom sorting key function
+    @staticmethod
+    def custom_key(item):
+        marble_order = {'b': 0, 'w': 1}  # Define the order of marble colors
+
+        # Extract information from the item
+        row = ord(item[0]) - ord('A')  # Convert row letter to index (assuming A=0, B=1, ...)
+        col = int(item[1])  # Extract column number
+        color = item[-1]  # Extract marble color
+
+        # Return a tuple with the sorting criteria
+        return marble_order[color], row, col
+
     @staticmethod
     def sort_line(line):
-        sorted_line = ",".join(sorted(line.split(','), key=str.lower))
+        line = line[:-1]
+        sorted_line = ",".join(sorted(line.split(','), key=FileScriber.custom_key))
         return sorted_line
 
