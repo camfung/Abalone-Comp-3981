@@ -1,7 +1,9 @@
+
 from app.api.exceptions import InvalidMarbleValue
 from app.gameplay.game_state import GameState
 from app.api.enums import Marble
 import csv
+from pathlib import Path
 
 
 class FileScriber:
@@ -20,7 +22,9 @@ class FileScriber:
             r_board_config = input_f.readline().strip()
             board_spots = r_board_config.split(",")
 
-            file = open('../../../app/formations/blank_board.csv', 'r')
+            blank_board_path = Path('../../../app/formations/blank_board.csv').resolve()
+
+            file = open(blank_board_path, 'r')
             csv_reader = csv.reader(file, delimiter=',')
 
             starting_board = [[None, None, None, None,
@@ -61,13 +65,6 @@ class FileScriber:
         all_moves = start_state.get_possible_moves()
         all_boards = start_state.convert_moves_to_board_states()
 
-        for index, board in enumerate(all_boards):
-            game_state = GameState(board, Marble.WHITE)
-            print("--------------------------------------")
-            print("Start State:\n", str(start_state))
-            print("--------------------------------------")
-            print(f"{index+1}\n{str(game_state)}")
-
         # Step 6: Export List of Moves to Output Move File
         with open(output_move_file, "w") as output_f:
             for move in all_moves:
@@ -97,7 +94,6 @@ class FileScriber:
         # Read Board File
         with open(input_file, "r") as input_f:
             lines = input_f.readlines()
-            # print(lines)
 
         # Return Results
         return lines
