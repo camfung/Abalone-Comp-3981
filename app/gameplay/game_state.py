@@ -401,7 +401,8 @@ class GameState:
                                           remain_ball_f_x=remain_ball_f_x,
                                           remain_ball_f_y=remain_ball_f_y,
                                           last_ball_f_x=last_ball_f_x,
-                                          last_ball_f_y=last_ball_f_y
+                                          last_ball_f_y=last_ball_f_y,
+                                          num_balls_moved=num_balls_moved
                                           ):
                 return True
             return False
@@ -431,12 +432,20 @@ class GameState:
     def __check_sidestep_move(self, **kwargs):
         first_ball_f_x, first_ball_f_y, \
             remain_ball_f_x, remain_ball_f_y, \
-            last_ball_f_x, last_ball_f_y = map(int, kwargs.values())
+            last_ball_f_x, last_ball_f_y, \
+            num_balls_moved = map(int, kwargs.values())
+
+        first_ball_empty = self._board[first_ball_f_x][first_ball_f_y] == Marble.NONE
+
+        if num_balls_moved > 2:
+            remain_ball_empty = self._board[remain_ball_f_x][remain_ball_f_y] == Marble.NONE
+        else:
+            remain_ball_empty = True
+
+        last_ball_empty = self._board[last_ball_f_x][last_ball_f_y] == Marble.NONE
 
         # Check if the next space is an empty space
-        if (self._board[first_ball_f_x][first_ball_f_y] == Marble.NONE
-                and self._board[remain_ball_f_x][remain_ball_f_y] == Marble.NONE
-                and self._board[last_ball_f_x][last_ball_f_y] == Marble.NONE):
+        if first_ball_empty and remain_ball_empty and last_ball_empty:
             return True
 
         return False
