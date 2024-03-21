@@ -14,7 +14,7 @@ class HUD(Drawable, EventHandler):
     A Heads-Up Display (HUD) class that handles the creation and management of the game's interface elements.
     It extends both Drawable and EventHandler interfaces to allow for drawing the HUD and handling input events.
     """
-    HUD_HEIGHT = 150
+    HUD_HEIGHT = 200
     menu = None
 
     def __init__(self, gui, callbacks):
@@ -29,67 +29,56 @@ class HUD(Drawable, EventHandler):
         self.theme = self.ui_instance.theme
         self.theme.widget_width = 100
         self.score_label = None
+        self.time_left_black_label = None
+        self.time_left_white_label = None
         self.timer = None
         self._white_balls = 0
         self._black_balls = 0
 
-        self._start_time_black = time.time()
-        self._start_time_white = time.time()
+        self.start_game_cb, self.undo_move_cb, self.pause_game_cb, self.update_score_cb, self.start_timer_cb, self.reset_timer_cb, self.get_timer_values_cb = callbacks
 
-        self._elapsed_time_black = 0
-        self._elapsed_time_white = 0
-        self._game_started = False
+    # white move start time = time.time()
+    # time elapsed = time.time() - start time
 
-        self._black_check_time = True
-        self._white_check_time = True
+    # count down = 10 - time elapsed
+    def update_hud_values(self, game_manager):
+        current_turn_start_time, black_total_aggregate_time, white_total_aggregate_time, white_turn_time_limit, black_turn_time_limit = self.get_timer_values_cb()
+        # updating the time left for black
+        if game_manager.current_player_to_move == Marble.BLACK:
+            self.time_left_black_label.set_title(
+                f"Black Time Left: {black_turn_time_limit - current_turn_start_time:.2f}")
+            self.time_left_white_label.set_title(
+                f"White Time Left: {white_turn_time_limit:.2f}")
+        # updating the time left for white
+        elif game_manager.current_player_to_move == Marble.WHITE:
+            self.time_left_white_label.set_title(
+                f"White Time Left: {white_turn_time_limit - current_turn_start_time:.2f}")
+            self.time_left_black_label.set_title(
+                f"Black Time Left: {black_turn_time_limit:.2f}")
 
-        self._turn_end = Marble.BLACK
-
-        self.start_game_cb, self.undo_move_cb, self.pause_game_cb = callbacks
-
-    def update_timer(self, game_manager):
-        if self._game_started:
-            if game_manager.current_player_to_move == Marble.BLACK:
-                if self._black_check_time:
-                    self._start_time_black = time.time() - self._elapsed_time_black
-                    self._black_check_time = False
-                    self._white_check_time = True
-                self._elapsed_time_black = time.time() - self._start_time_black
-                self._turn_end = Marble.BLACK
-            elif game_manager.current_player_to_move == Marble.WHITE:
-                if self._white_check_time:
-                    self._start_time_white = time.time() - self._elapsed_time_white
-                    self._white_check_time = False
-                    self._black_check_time = True
-                self._elapsed_time_white = time.time() - self._start_time_white
-                self._turn_end = Marble.WHITE
-            self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
+        self.timer.set_title(
+            f"Time: {white_total_aggregate_time:.2f}     Time: {black_total_aggregate_time:.2f}")
+        # update the score
+        self.white_balls, self.black_balls = self.update_score_cb()
 
     def start_game(self):
-        self._game_started = True
-        self._black_check_time = True
-        self._white_check_time = True
+        self.start_timer_cb()
         self.start_game_cb()
 
     def stop_game(self):
-        self._elapsed_time_black = 0
-        self._elapsed_time_white = 0
-        self._game_started = False
-
-        self._black_check_time = True
-        self._white_check_time = True
-        self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
+        self.reset_timer_cb()
+        _, aggregate_time_black, aggregate_time_white, _, _ = self.get_timer_values_cb()
+        self.timer.set_title(
+            f"Time: {aggregate_time_white:.2f}     Time: {aggregate_time_black:.2f}")
         self.ui_instance.play_menu()
 
     def restart_game(self):
-        self._elapsed_time_black = 0
-        self._elapsed_time_white = 0
-        self._game_started = False
-
-        self._black_check_time = True
-        self._white_check_time = True
-        self.timer.set_title(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
-        thread = threading.Thread(target=self.ui_instance.reset_board, args=(threading.current_thread(), ))
+        self.reset_timer_cb()
+        _, aggregate_time_black, aggregate_time_white, _, _ = self.get_timer_values_cb()
+        self.timer.set_title(
+            f"Time: {aggregate_time_white:.2f}     Time: {aggregate_time_black:.2f}")
+        thread = threading.Thread(
+            target=self.ui_instance.reset_board, args=(threading.current_thread(),))
         thread.start()
 
     def pause_game(self):
@@ -104,6 +93,8 @@ class HUD(Drawable, EventHandler):
         Returns:
         - menu: A pygame_menu.Menu instance representing the HUD with all the control buttons.
         """
+        _, aggregate_time_black, aggregate_time_white, _, _ = self.get_timer_values_cb()
+
         menu = pygame_menu.Menu("Abalone", self.ui_instance.SCREEN_WIDTH, self.HUD_HEIGHT,
                                 theme=self.theme, position=(0, 0, True), columns=5, rows=2)
         menu.add.button("Start Game", self.start_game,
@@ -120,11 +111,14 @@ class HUD(Drawable, EventHandler):
                         align=pygame_menu.locals.ALIGN_CENTER)
 
         self.score_label = menu.add.label(
-            f"White Score: {self._white_balls}   Black Score:  {self._black_balls}  ")
+            f"White: {self._white_balls}   Black:  {self._black_balls}  ")
 
-        self.timer = menu.add.label(f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}",
+        self.timer = menu.add.label(f"Time: {aggregate_time_white:.2f} Time: {aggregate_time_black:.2f}",
                                     selectable=False)
-
+        self.time_left_white_label = menu.add.label(
+            f"White Time Left: {aggregate_time_white:.2f}", selectable=False)
+        self.time_left_black_label = menu.add.label(
+            f"Black Time Left: {aggregate_time_black:.2f}", selectable=False)
         return menu
 
     @property
@@ -202,7 +196,9 @@ class HUD(Drawable, EventHandler):
         - surface: The pygame surface to draw the HUD on.
         - game_manager: The game manager instance, used to access game-related data and methods.
         """
+
         menu = self.get_menu()
+        self.update_hud_values(game_manager)
         menu.draw(surface)
 
 
@@ -228,7 +224,7 @@ class RecordMenu(Drawable, EventHandler):
     def draw(self, surface, game_manager):
         # Created here so that it updates
         record_menu = pygame_menu.Menu(
-            "Move History", 450, 850, theme=self.theme, position=(100, 100, True))
+            "Move History", 450, 800, theme=self.theme, position=(100, 100, True))
         next_agent_move = record_menu.add.table(table_id='next_agent_move',
                                                 font_size=12, font_color="Black")
         next_agent_move.default_cell_padding = 5
@@ -237,11 +233,11 @@ class RecordMenu(Drawable, EventHandler):
                                 cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
 
         table = record_menu.add.table(table_id='black_records_table',
-                                            font_size=12, font_color="Black")
+                                      font_size=12, font_color="Black")
         table.default_cell_padding = 5
         table.default_row_background_color = 'white'
         table.add_row(['Black Moves', 'White Moves'],
-                            cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+                      cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
 
         # black_table = record_menu.add.table(table_id='black_records_table',
         #                                     font_size=12, font_color="Black")
@@ -264,12 +260,15 @@ class RecordMenu(Drawable, EventHandler):
         record_len = records.get_records_length()
 
         if record_len > 15:
-            record_menu.add.button('Show Full History', self.ui_instance.display_move_history)
+            record_menu.add.button('Show Full History',
+                                   self.ui_instance.display_move_history)
             start_index = record_len - math.ceil(record_len / 2)
 
         for i in range(start_index - 1, record_len, 2):
-            black_move = str(records.get_record(i).condensed_str()) if i < record_len else ''
-            white_move = str(records.get_record(i + 1).condensed_str()) if i + 1 < record_len else ''
+            black_move = str(records.get_record(
+                i).condensed_str()) if i < record_len else ''
+            white_move = str(records.get_record(
+                i + 1).condensed_str()) if i + 1 < record_len else ''
             table.add_row([black_move, white_move])
 
         for index, record in enumerate(records, start=1):

@@ -42,9 +42,6 @@ class Board(Drawable, EventHandler):
             # handle input for players turn
             if self.waiting_for_player_input:
                 row, col = Board.get_cell(pos)
-                # print(f"({row}, {col})")
-                # center_y, center_x = Board.get_circle_center(row, col)
-                # print(center_x, center_y)
                 # left click
                 if event.button == 1:
                     if row is not None and col is not None:
@@ -61,7 +58,8 @@ class Board(Drawable, EventHandler):
 
         # Check if positions are in the same row
         if row1 == row2:
-            new_ball = [(row1, col) for col in range(min(col1, col2) + 1, max(col1, col2))]
+            new_ball = [(row1, col)
+                        for col in range(min(col1, col2) + 1, max(col1, col2))]
             if len(new_ball) > 0:
                 returned_array.append(new_ball[0])
             returned_array.append((row2, col2))
@@ -70,7 +68,8 @@ class Board(Drawable, EventHandler):
 
         # Check if positions are in the same column
         if col1 == col2:
-            new_ball = [(row, col1) for row in range(min(row1, row2) + 1, max(row1, row2))]
+            new_ball = [(row, col1)
+                        for row in range(min(row1, row2) + 1, max(row1, row2))]
             if len(new_ball) > 0:
                 returned_array.append(new_ball[0])
             returned_array.append((row2, col2))
@@ -111,13 +110,15 @@ class Board(Drawable, EventHandler):
 
         if self.input_handler.first_marble is not None:
             if self.input_handler.second_marble is not None:
-                clicks = self.clicked_marbles(self.input_handler.first_marble, self.input_handler.second_marble)
+                clicks = self.clicked_marbles(
+                    self.input_handler.first_marble, self.input_handler.second_marble)
             else:
                 clicks.append(self.input_handler.first_marble)
         else:
             clicks = []
 
-        background_image = pygame.image.load("./app/images/Numbered_Board.png", "rb")
+        background_image = pygame.image.load(
+            "./app/images/Numbered_Board.png", "rb")
         background_image = pygame.transform.scale(
             background_image, (1000, 1000))
         background_image = pygame.transform.scale(
@@ -128,14 +129,18 @@ class Board(Drawable, EventHandler):
             for col in range(len(game_manager[row])):
                 if game_manager[row][col] == Marble.BLACK:
                     if (row, col) in clicks:
-                        ball_image = pygame.image.load("./app/images/dark_black_ball.png")
+                        ball_image = pygame.image.load(
+                            "./app/images/dark_black_ball.png")
                     else:
-                        ball_image = pygame.image.load("./app/images/black_ball.png")
+                        ball_image = pygame.image.load(
+                            "./app/images/black_ball.png")
                 elif game_manager[row][col] == Marble.WHITE:
                     if (row, col) in clicks:
-                        ball_image = pygame.image.load("./app/images/dark_white_ball.png")
+                        ball_image = pygame.image.load(
+                            "./app/images/dark_white_ball.png")
                     else:
-                        ball_image = pygame.image.load("./app/images/white_ball.png")
+                        ball_image = pygame.image.load(
+                            "./app/images/white_ball.png")
                 else:
                     continue
 

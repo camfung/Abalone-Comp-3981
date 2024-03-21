@@ -62,6 +62,8 @@ class PygameUI(UI):
         - app: A reference to the main application object, used for callback notifications.
         """
         super().__init__()
+        iconSurface = pygame.image.load('app/images/icon.png')
+        pygame.display.set_icon(iconSurface)
         self.theme = pygame_menu.themes.THEME_DARK
         self.screen = pygame.display.set_mode(
             (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
@@ -74,10 +76,25 @@ class PygameUI(UI):
 
         def pause_game_cb(): return self._app.notify(self, "PauseGame")
 
+        def update_score_cb(): return self._app.notify(self, "GetScore")
+
+        def start_timer_cb():
+            return self._app.notify(self, "StartTimer")
+
+        def reset_timer_cb():
+            return self._app.notify(self, "ResetTimer")
+
+        def get_timer_values_cb():
+            return self._app.notify(self, "GetTimerValues")
+
         callbacks = (
             start_game_cb,
             undo_move_cb,
-            pause_game_cb
+            pause_game_cb,
+            update_score_cb,
+            start_timer_cb,
+            reset_timer_cb,
+            get_timer_values_cb
         )
         hud = HUD(self, callbacks)
         record_menu = RecordMenu(self)
@@ -96,6 +113,7 @@ class PygameUI(UI):
             execute_move_cb,
             marble_player_to_move_cb,
             update_board_cb
+
         )
         board = Board(callbacks)
         self.board = board
@@ -126,7 +144,6 @@ class PygameUI(UI):
         The main game loop. Handles events, updates the game state, and redraws the screen.
         """
         while True:
-            self.drawable_elements[1].update_timer(self._app.game_manager)
             for event in pygame.event.get():
                 if event == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
@@ -154,6 +171,8 @@ class PygameUI(UI):
         - game_manager: An instance of the game manager class that holds the current state of the game.
         """
         self.screen.fill((0, 0, 0))
+
+        self._app.notify(self, "UpdateTimer")
 
         # update the score in the menu
         self.hud.white_balls, self.hud.black_balls = self._app.notify(
@@ -207,11 +226,14 @@ class PygameUI(UI):
             (f.name, f) for f in Formation], default=0, onchange=self.update_play_button)
 
         # Adding time limit and move limit selectors for both Black and White players
-        black_time_limit = menu.add.text_input('Black Time Limit (Seconds): ', default = 30, input_type=pygame_menu.locals.INPUT_INT, maxchar=4)
+        black_time_limit = menu.add.text_input(
+            'Black Time Limit (Seconds): ', default=30, input_type=pygame_menu.locals.INPUT_INT, maxchar=4)
 
-        white_time_limit = menu.add.text_input('White Time Limit (Seconds): ', default = 30, input_type=pygame_menu.locals.INPUT_INT, maxchar=4)
+        white_time_limit = menu.add.text_input(
+            'White Time Limit (Seconds): ', default=30, input_type=pygame_menu.locals.INPUT_INT, maxchar=4)
 
-        move_limit = menu.add.text_input('Move Limit: ', default = 20, input_type=pygame_menu.locals.INPUT_INT, maxchar = 3)
+        move_limit = menu.add.text_input(
+            'Move Limit: ', default=20, input_type=pygame_menu.locals.INPUT_INT, maxchar=3)
 
         menu.add.button('Play', lambda: self.start_the_game({
             'game_type': opponent_type.get_value(),
@@ -238,17 +260,19 @@ class PygameUI(UI):
         menu = pygame_menu.Menu(
             "Move History", self.SCREEN_WIDTH, self.SCREEN_HEIGHT, theme=self.theme)
         table = menu.add.table(table_id='records_table',
-                                            font_size=18, font_color="Black")
+                               font_size=18, font_color="Black")
         table.default_cell_padding = 5
         table.default_row_background_color = 'white'
-        table.add_row(['Black Moves', 'White Moves'], cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+        table.add_row(['Black Moves', 'White Moves'],
+                      cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
 
         records = self._app.notify(self, "getRecordHistory")
         record_len = records.get_records_length()
 
         for i in range(0, record_len, 2):
             black_move = str(records.get_record(i)) if i < record_len else ''
-            white_move = str(records.get_record(i + 1)) if i + 1 < record_len else ''
+            white_move = str(records.get_record(i + 1)) if i + \
+                1 < record_len else ''
             table.add_row([black_move, white_move])
 
         menu.add.button('Back', self.run_game)

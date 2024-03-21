@@ -66,6 +66,8 @@ class Move:
         elif direction == Direction.LEFT:
             position = ((first_ball_i[0], first_ball_i[1] - 1),
                         (last_ball_i[0], last_ball_i[1] - 1))
+        elif direction == None:
+            raise InvalidDirection("Direction passed to Move is None")
         else:
             raise InvalidDirection("Invalid direction passed to Move")
 
