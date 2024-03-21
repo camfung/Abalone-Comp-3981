@@ -265,11 +265,14 @@ class RecordMenu(Drawable, EventHandler):
             start_index = record_len - math.ceil(record_len / 2)
 
         for i in range(start_index - 1, record_len, 2):
-            black_move = str(records.get_record(
-                i).condensed_str()) if i < record_len else ''
-            white_move = str(records.get_record(
-                i + 1).condensed_str()) if i + 1 < record_len else ''
-            table.add_row([black_move, white_move])
+            try:
+                black_move = str(records.get_record(
+                    i).condensed_str()) if i < record_len else ''
+                white_move = str(records.get_record(
+                    i + 1).condensed_str()) if i + 1 < record_len else ''
+                table.add_row([black_move, white_move])
+            except IndexError as e:
+                pass
 
         for index, record in enumerate(records, start=1):
             str_record = str(record)
