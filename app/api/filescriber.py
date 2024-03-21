@@ -81,8 +81,9 @@ class FileScriber:
                         elif col == Marble.WHITE:
                             formatted_space = f"{str_row}{cIndex}w"
                             spaces += f"{formatted_space},"
-                spaces = spaces[:-1]
-                spaces += f"{spaces}\n"
+                spaces = FileScriber.sort_line(spaces)
+                spaces = spaces[1:]
+                spaces += "\n"
                 output_f.writelines(spaces)
 
     @staticmethod
@@ -90,8 +91,13 @@ class FileScriber:
         # Read Board File
         with open(input_file, "r") as input_f:
             lines = input_f.readlines()
-            print(lines)
+            # print(lines)
 
         # Return Results
         return lines
+
+    @staticmethod
+    def sort_line(line):
+        sorted_line = ",".join(sorted(line.split(','), key=str.lower))
+        return sorted_line
 
