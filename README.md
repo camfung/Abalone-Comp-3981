@@ -46,11 +46,12 @@ Follow these steps to set up and run the program:
 4. **Export Python Driver to Executable File:**
     - Execute the program using the following command:
         ```
-        pyinstaller driver.py --onefile --noconsole
+        pyinstaller --onefile driver.py --name Abalone_Group2 --noconsole
         ```
 
 5. **Copy assets to correct**
-    - Copy the following folders into ./dist
+    - Create a new folder called app inside ./dist
+    - Copy the following folders into ./dist/app
         - formations
         - games
         - images
