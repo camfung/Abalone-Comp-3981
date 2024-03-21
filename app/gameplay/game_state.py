@@ -95,6 +95,33 @@ class GameState:
                                                     direction=direction)
                             if move is not None:
                                 moves.append(move)
+
+        # Remove Duplicates
+        """
+        unique_moves = []
+        
+        for i in range(0, len(moves)-1):
+            # Invert First and Last Balls for First ball.
+            m1 = moves[i]
+            m1_inverted_pos_i = (m1.get_pos_i()[1], m1.get_pos_i()[0])
+            m1_inverted_pos_f = (m1.get_pos_f()[1], m1.get_pos_f()[0])
+
+            duplicate_move = False
+
+            for j in range(i, len(moves)):
+                m2 = moves[j]
+                duplicate_pos_i = m1_inverted_pos_i == m2.get_pos_i()
+                duplicate_pos_f = m1_inverted_pos_f == m2.get_pos_f()
+
+                if duplicate_pos_i and duplicate_pos_f:
+                    duplicate_move = True
+
+            if not duplicate_move:
+                unique_moves.append(m1)
+        
+        return unique_moves
+        """
+
         return moves
 
     def convert_moves_to_board_states(self):
