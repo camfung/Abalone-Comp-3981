@@ -64,7 +64,7 @@ class FileScriber:
         # Step 6: Export List of Moves to Output Move File
         with open(output_move_file, "w") as output_f:
             for move in all_moves:
-                output_f.write(f"{str(move)}\n")
+                output_f.write(f"{move.move_notation_str()}\n")
 
         # Step 7: Export List of Boards to Output Board File
         with open(output_board_file, "w") as output_f:

@@ -160,3 +160,18 @@ class Move:
                 f"{char_last_i_x}{self._pos_i[1][1]} "
                 f"-> {char_first_f_x}{self._pos_f[0][1]}, "
                 f"{char_last_f_x}{self._pos_f[1][1]}")
+
+    def move_notation_str(self):
+        """
+        String representation of the move that matches the report format
+        :return: String
+        """
+        char_first_i_x = chr(self._pos_i[0][0] + 74 - 2 * (self._pos_i[0][0]))
+        char_first_f_x = chr(self._pos_f[0][0] + 74 - 2 * (self._pos_f[0][0]))
+        char_last_i_x = chr(self._pos_i[1][0] + 74 - 2 * (self._pos_i[1][0]))
+        char_last_f_x = chr(self._pos_f[1][0] + 74 - 2 * (self._pos_f[1][0]))
+
+        return (f"({char_first_i_x}{self._pos_i[0][1]}, "
+                f"{char_last_i_x}{self._pos_i[1][1]}) "
+                f"-> ({char_first_f_x}{self._pos_f[0][1]}, "
+                f"{char_last_f_x}{self._pos_f[1][1]}) {self._move_type.name} {self._marble.name}")
