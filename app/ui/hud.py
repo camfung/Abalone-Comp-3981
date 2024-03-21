@@ -45,13 +45,16 @@ class HUD(Drawable, EventHandler):
         current_turn_start_time, black_total_aggregate_time, white_total_aggregate_time, white_turn_time_limit, black_turn_time_limit = self.get_timer_values_cb()
         # updating the time left for black
         if game_manager.current_player_to_move == Marble.BLACK:
-            self.time_left_black_label.set_title(f"Black Time Left: {black_turn_time_limit - current_turn_start_time:.2f}")
+            self.time_left_black_label.set_title(
+                f"Black Time Left: {black_turn_time_limit - current_turn_start_time:.2f}")
             self.time_left_white_label.set_title(
                 f"White Time Left: {white_turn_time_limit:.2f}")
         # updating the time left for white
         elif game_manager.current_player_to_move == Marble.WHITE:
-            self.time_left_white_label.set_title(f"White Time Left: {white_turn_time_limit - current_turn_start_time:.2f}")
-            self.time_left_black_label.set_title(f"Black Time Left: {black_turn_time_limit:.2f}")
+            self.time_left_white_label.set_title(
+                f"White Time Left: {white_turn_time_limit - current_turn_start_time:.2f}")
+            self.time_left_black_label.set_title(
+                f"Black Time Left: {black_turn_time_limit:.2f}")
 
         self.timer.set_title(
             f"Time: {white_total_aggregate_time:.2f}     Time: {black_total_aggregate_time:.2f}")
@@ -221,7 +224,7 @@ class RecordMenu(Drawable, EventHandler):
     def draw(self, surface, game_manager):
         # Created here so that it updates
         record_menu = pygame_menu.Menu(
-            "Move History", 400, 800, theme=self.theme, position=(100, 100, True))
+            "Move History", 450, 800, theme=self.theme, position=(100, 100, True))
         next_agent_move = record_menu.add.table(table_id='next_agent_move',
                                                 font_size=12, font_color="Black")
         next_agent_move.default_cell_padding = 5
