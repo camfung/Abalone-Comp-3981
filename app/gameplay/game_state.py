@@ -62,7 +62,7 @@ class GameState:
             list: A list of Move objects representing all legal moves the current player can make.
         """
         moves = []
-        row_col_modifiers = [(0, 1), (1, 0), (1, -1)]
+        row_col_modifiers = [(0, 1), (1, 0), (1, -1), (0, -1), (-1, 0), (-1, 1)]
 
         for row_index, row in enumerate(self._board):
             if row_index == 0 or row_index == len(self._board) - 1:
@@ -76,7 +76,8 @@ class GameState:
                     continue
 
                 for mod_index, (mod_row, mod_col) in enumerate(row_col_modifiers):
-                    start_range = 0 if mod_row == 0 else 1
+                    # Ensure that Selecting Single only happens once
+                    start_range = 0 if mod_row == 0 and mod_col == 1 else 1
 
                     for group_size in range(start_range, 3):
                         first_ball_i = (row_index, space_index)
@@ -93,9 +94,6 @@ class GameState:
                                                     last_ball_i=last_ball_i,
                                                     direction=direction)
                             if move is not None:
-                                if move.get_pos_i == move.get_pos_f:
-                                    continue
-
                                 moves.append(move)
         return moves
 
@@ -402,7 +400,9 @@ class GameState:
         return False
 
     def __check_sidestep_move(self, **kwargs):
-        first_ball_f_x, first_ball_f_y, remain_ball_f_x, remain_ball_f_y, last_ball_f_x, last_ball_f_y = kwargs.values()
+        first_ball_f_x, first_ball_f_y, \
+            remain_ball_f_x, remain_ball_f_y, \
+            last_ball_f_x, last_ball_f_y = map(int, kwargs.values())
 
         # Check if the next space is an empty space
         if (self._board[first_ball_f_x][first_ball_f_y] == Marble.NONE
@@ -420,13 +420,11 @@ class GameState:
             num_balls_moved = map(int, kwargs.values())
 
         # Declare Multipliers to Search for Subsequent Balls
-        move_x = 1 if first_ball_f_x > first_ball_i_x else (
-            -1 if first_ball_f_x < first_ball_i_x else 0)
-        move_y = 1 if first_ball_f_y > first_ball_i_y else (
-            -1 if first_ball_f_y < first_ball_i_y else 0)
+        move_x = 1 if first_ball_f_x > first_ball_i_x else (-1 if first_ball_f_x < first_ball_i_x else 0)
+        move_y = 1 if first_ball_f_y > first_ball_i_y else (-1 if first_ball_f_y < first_ball_i_y else 0)
 
-        sub_ball_f_x = (copy.deepcopy(last_ball_i_x) if move_x < 0 else copy.deepcopy(first_ball_i_x)) + move_x
-        sub_ball_f_y = (copy.deepcopy(last_ball_i_y) if move_y > 0 else copy.deepcopy(first_ball_i_y)) + move_y
+        sub_ball_f_x = (copy.deepcopy(last_ball_f_x) if move_x < 0 else copy.deepcopy(first_ball_f_x))
+        sub_ball_f_y = (copy.deepcopy(last_ball_f_y) if move_y > 0 else copy.deepcopy(first_ball_f_y))
 
         # Check if it is possible to push a piece
         # (Pusher outnumbers the Opponent's pieces)
@@ -435,9 +433,10 @@ class GameState:
             # (Break from Loop if True because it is your piece that is going out of bounds)
             if self._board[sub_ball_f_x][sub_ball_f_y] is None and i == 0:
                 break
+
             # Check if Pushing Piece is edge of board
             # (return True because it is enemy piece that is going out of bounds)
-            elif self._board[sub_ball_f_x][sub_ball_f_y] is None:
+            if self._board[sub_ball_f_x][sub_ball_f_y] is None:
                 return True
 
             # Check if Edge Piece is overriding own piece (Break from Loop if True)
