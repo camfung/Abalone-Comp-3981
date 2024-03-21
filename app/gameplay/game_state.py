@@ -169,6 +169,7 @@ class GameState:
         # Fetch Middle Ball Positions
         remain_ball_i_x = copy.deepcopy(first_ball_i_x)
         remain_ball_i_y = copy.deepcopy(first_ball_i_y)
+
         if abs(first_ball_i_x - last_ball_i_x) > 1:
             remain_ball_i_x = (first_ball_i_x + last_ball_i_x) // 2
 
@@ -192,7 +193,7 @@ class GameState:
             "last_ball_f_x": last_ball_f_x,
             "last_ball_f_y": last_ball_f_y,
             "move": move,
-            "new_board": new_board,
+            "new_board": new_board
         }
 
         # Move Subsequent Pieces in Same Direction
@@ -218,7 +219,6 @@ class GameState:
 
         first_ball_f_x = kwargs['first_ball_f_x']
         first_ball_f_y = kwargs['first_ball_f_y']
-        move = kwargs['move']
         new_board = kwargs['new_board']
 
         # Declare Multipliers to Search for Subsequent Balls
@@ -297,12 +297,14 @@ class GameState:
         new_board = kwargs['new_board']
 
         # Remove the all the Mover's marbles in the move
-        new_board[remain_ball_i_x][remain_ball_i_y] = Marble.NONE
+        if move.get_num_balls_moved() > 2:
+            new_board[remain_ball_i_x][remain_ball_i_y] = Marble.NONE
         new_board[first_ball_i_x][first_ball_i_y] = Marble.NONE
         new_board[last_ball_i_x][last_ball_i_y] = Marble.NONE
 
         # Place the Mover's marbles back on the board
-        new_board[remain_ball_f_x][remain_ball_f_y] = move.get_marble()
+        if move.get_num_balls_moved() > 2:
+            new_board[remain_ball_f_x][remain_ball_f_y] = move.get_marble()
         new_board[first_ball_f_x][first_ball_f_y] = move.get_marble()
         new_board[last_ball_f_x][last_ball_f_y] = move.get_marble()
 
