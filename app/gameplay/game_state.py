@@ -446,7 +446,6 @@ class GameState:
         return own_marbles_num, opp_marbles_num
 
     def is_valid_inline_move(self, move: Move):
-        return False
         # find the caboose
         front = None
         caboose = None
@@ -467,9 +466,18 @@ class GameState:
             return False
 
         line = self.line_to_edge(caboose, move.get_direction())
+
         # Determine the number of own and opponent marbles in the line.
         own_marbles_num, opp_marbles_num = self._inline_marbles_nums(line)
 
+        # check if there are marbles surrounding the opposite color marble
+        checking_own = True
+        opp_color = Marble.BLACK if self._current_move_color == Marble.WHITE else Marble.WHITE
+        for pos in line:
+            if self.get_marble(pos) == opp_color:
+                checking_own = False
+            if not checking_own and self.get_marble(pos) == self._current_move_color:
+                return False
         # check if the caboose is the current player
         if self.get_marble(caboose) != self._current_move_color:
             return False
@@ -479,7 +487,7 @@ class GameState:
             return False
 
         # check that own players final marbles stay on the board
-        if not self._check_marble_inbounds(move.get_pos_f()[0]) and not self._check_marble_inbounds(move.get_pos_f()[1]):
+        if not self._check_pos_inbounds(move.get_pos_f()[0]) or not self._check_pos_inbounds(move.get_pos_f()[1]):
             return False
 
         # Check if there are opponent's marbles to push (sumito condition).
@@ -601,7 +609,7 @@ class GameState:
 
         return False
 
-    def _check_marble_inbounds(self, pos):
+    def _check_pos_inbounds(self, pos):
         """
         Checks if a marble is within the bounds of the board.
 

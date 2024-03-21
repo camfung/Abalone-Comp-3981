@@ -1,4 +1,6 @@
+import copy
 import csv
+from typing import List
 import unittest
 from app.api.enums import Direction, Formation, Marble
 from app.api.exceptions import InvalidMarbleValue
@@ -124,7 +126,7 @@ def convert_to_string(coords):
 
 def main():
     gameState = getBoardStateFromFile(
-        "test/player/state_space_test/Input/Test1.input")
+        "test/player/state_space_test/Input/Test2.input")
 
     # gameState = Game(Formation.DEFAULT).get_current_game_state()
 
@@ -139,19 +141,58 @@ def main():
     for move in moves:
         print(move.move_notation_str())
     print(len(moves))
+    input("enter to exit")
 
     # a = gameState.line_to_edge((6, 3), Direction.UP_LEFT)
     # print(a)
 
 
 def viewAllBoards():
-    with open("/home/camer/Documents/projects/Abalone-Comp-3981/test/player/state_space_test/Verify/Test1.board") as file:
+    with open("/home/camer/Documents/projects/Abalone-Comp-3981/test/player/state_space_test/Verify/Test2.board") as file:
         lines = file.readlines()
         for index, line in enumerate(lines):
             line = line.strip()
-            a = getBoardState(line, Marble.BLACK)
+            a = getBoardState(line, Marble.WHITE)
             print(a)
             print(index)
 
 
-viewAllBoards()
+def visualizeTestAllMoves(moves: List[Move], gameState):
+    game = Game(Formation.DEFAULT)
+    copyGameState: GameState = copy.deepcopy(gameState)
+    game.set_game_state(copyGameState)
+    for index, move in enumerate(moves):
+        print(game.get_current_game_state())
+        game.set_move(move.get_marble(), move, None)
+        print(game.get_current_game_state())
+
+        copyGameState: GameState = copy.deepcopy(gameState)
+        game.set_game_state(copyGameState)
+        input("enter to continue")
+
+
+def driveVis():
+    gameState = getBoardStateFromFile(
+        "test/player/state_space_test/Input/Test2.input")
+
+    moves = gameState.get_possible_moves()
+    visualizeTestAllMoves(moves, gameState)
+
+
+main()
+driveVis()
+
+
+def testMove(move: Move):
+    game = Game(Formation.DEFAULT)
+    gameState = getBoardStateFromFile(
+        "test/player/state_space_test/Input/Test2.input")
+    a = gameState.validate_move(move)
+    print(a)
+    game.set_game_state(gameState)
+    game.set_move(move.get_marble(), move, None)
+    print(game.get_current_game_state())
+
+
+# testMove(Move((3, 7), (2, 7), Direction.DOWN_RIGHT, Marble.WHITE))
+# input()
