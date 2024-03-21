@@ -43,9 +43,21 @@ class FileScriber:
 
             file.close()
 
+            char_board = {
+                # Row on Board: Char Value
+                'I': 1,
+                'H': 2,
+                'G': 3,
+                'F': 4,
+                'E': 5,
+                'D': 6,
+                'C': 7,
+                'B': 8,
+                'A': 9
+            }
+
             for board_spot in board_spots:
-                int_val = ord(board_spot[0])
-                row = (int_val - 74) * -1
+                row = char_board[board_spot[0]]
                 col = int(board_spot[1])
                 r_marble = board_spot[2]
                 if r_marble == "b":
@@ -66,24 +78,43 @@ class FileScriber:
             for move in all_moves:
                 output_f.write(f"{move.move_notation_str()}\n")
 
-        # Step 7: Export List of Boards to Output Board File
+        int_to_char_board = {v: k for k, v in char_board.items()}
+
+        # Step 7: Order List to Chi En's standard
+        board_positions = []
+        for board in all_boards:
+            spaces = ""
+            # Iterate through rows in reverse order
+            for rIndex in range(len(board) - 1, -1, -1):
+                row = board[rIndex]
+                for cIndex, col in enumerate(row):
+                    try:
+                        row_key = int_to_char_board[rIndex]
+                        str_row = f"{row_key}"
+                    except KeyError:
+                        continue
+                    if col is None or col == Marble.NONE:
+                        continue
+                    elif col == Marble.BLACK:
+                        formatted_space = f"{str_row}{cIndex}b"
+                        spaces += f"{formatted_space},"
+                    elif col == Marble.WHITE:
+                        formatted_space = f"{str_row}{cIndex}w"
+                        spaces += f"{formatted_space},"
+            spaces = spaces.rstrip(',')
+            spaces_list = spaces.split(',')
+            spaces_list = sorted(spaces_list, key=lambda x: (x[2], x[0], x[1]))
+            board_positions.append(spaces_list)
+
+        # Step 8: Export List of Boards to Output Board File
         with open(output_board_file, "w") as output_f:
-            for board in all_boards:
-                spaces = ""
-                for rIndex, row in enumerate(board):
-                    for cIndex, col in enumerate(row):
-                        str_row = f"{chr(74 - rIndex)}"
-                        if col is None or col == Marble.NONE:
-                            continue
-                        elif col == Marble.BLACK:
-                            formatted_space = f"{str_row}{cIndex}b"
-                            spaces += f"{formatted_space},"
-                        elif col == Marble.WHITE:
-                            formatted_space = f"{str_row}{cIndex}w"
-                            spaces += f"{formatted_space},"
-                spaces = spaces[:-1]
-                spaces += f"{spaces}\n"
-                output_f.writelines(spaces)
+            for position in board_positions:
+                formation = ""
+                for piece in position:
+                    formation += f"{piece},"
+                formation = formation.rstrip(',')
+                formation += "\n"
+                output_f.writelines(formation)
 
     @staticmethod
     def import_board_from_text_files(input_file):

@@ -73,30 +73,31 @@ class GameState:
                 if space_index == 0 or space_index == len(row) - 1:
                     continue
 
-                if space is self._current_move_color:
-                    for mod_index, (mod_row, mod_col) in enumerate(row_col_modifiers):
-                        start_range = 0 if mod_row == 0 else 1
+                if space is not self._current_move_color:
+                    continue
 
-                        for group_size in range(start_range, 3):
-                            first_ball_i = (row_index, space_index)
-                            last_ball_i = (
-                                row_index + group_size * mod_row, space_index + group_size * mod_col)
+                for mod_index, (mod_row, mod_col) in enumerate(row_col_modifiers):
+                    start_range = 0 if mod_row == 0 else 1
 
-                            if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
-                                break
+                    for group_size in range(start_range, 3):
+                        first_ball_i = (row_index, space_index)
+                        last_ball_i = (row_index + group_size * mod_row, space_index + group_size * mod_col)
 
-                            if not self.__check_inbounds(first_ball_i, last_ball_i, row):
-                                continue
+                        if self._board[last_ball_i[0]][last_ball_i[1]] is not self._current_move_color:
+                            break
 
-                            for direction in Direction:
-                                move = self.__calc_move(first_ball_i=first_ball_i,
-                                                        last_ball_i=last_ball_i,
-                                                        direction=direction)
-                                if move is not None:
-                                    if move.get_pos_i == move.get_pos_f:
-                                        continue
+                        if not self.__check_inbounds(first_ball_i, last_ball_i, row):
+                            continue
 
-                                    moves.append(move)
+                        for direction in Direction:
+                            move = self.__calc_move(first_ball_i=first_ball_i,
+                                                    last_ball_i=last_ball_i,
+                                                    direction=direction)
+                            if move is not None:
+                                if move.get_pos_i == move.get_pos_f:
+                                    continue
+
+                                moves.append(move)
         return moves
 
     def convert_moves_to_board_states(self):
