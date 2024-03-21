@@ -9,7 +9,7 @@ class Move:
     Represents a move in the game, including its start and end positions, direction, marble involved, and move type.
     """
 
-    def __init__(self, first_ball_i, last_ball_i, direction, marble):
+    def __init__(self, first_ball_i, last_ball_i, direction, marble, middle_ball_i=(0, 0)):
         """
         Initializes a new move with specified parameters.
 
@@ -22,20 +22,22 @@ class Move:
         """
         self._direction = direction
         self._marble = marble
-        self._pos_i = (first_ball_i, last_ball_i)
-        self._pos_f = Move.__calc_pos_f(first_ball_i, last_ball_i, direction)
+        self._pos_i = (first_ball_i, last_ball_i, middle_ball_i)
+        self._pos_f = Move.__calc_pos_f(
+            first_ball_i, last_ball_i, direction, middle_ball_i)
         self._selection_type = Move.__calc_selection_type(
             first_ball_i, last_ball_i)
         self._move_type = Move.__calc_move_type(
             first_ball_i, last_ball_i, direction, self._selection_type)
-        self._num_balls_moved = Move.__calc_num_balls_moved(first_ball_i, last_ball_i)
+        self._num_balls_moved = Move.__calc_num_balls_moved(
+            first_ball_i, last_ball_i)
 
     @property
     def marble(self):
         return self._marble
 
     @staticmethod
-    def __calc_pos_f(f_ball_i, l_ball_i, direction):
+    def __calc_pos_f(f_ball_i, l_ball_i, direction, m_ball_i=None):
         """
         Calculates the final positions of the balls after the move.
 
@@ -49,24 +51,31 @@ class Move:
         """
         first_ball_i = copy.deepcopy(f_ball_i)
         last_ball_i = copy.deepcopy(l_ball_i)
+        middle_ball_i = copy.deepcopy(m_ball_i)
         if direction == Direction.UP_LEFT:
             position = ((first_ball_i[0] - 1, first_ball_i[1]),
-                        (last_ball_i[0] - 1, last_ball_i[1]))
+                        (last_ball_i[0] - 1, last_ball_i[1]),
+                        (middle_ball_i[0] - 1, middle_ball_i[1]))
         elif direction == Direction.UP_RIGHT:
             position = ((first_ball_i[0] - 1, first_ball_i[1] + 1),
-                        (last_ball_i[0] - 1, last_ball_i[1] + 1))
+                        (last_ball_i[0] - 1, last_ball_i[1] + 1),
+                        (middle_ball_i[0] - 1, middle_ball_i[1] + 1))
         elif direction == Direction.RIGHT:
             position = ((first_ball_i[0], first_ball_i[1] + 1),
-                        (last_ball_i[0], last_ball_i[1] + 1))
+                        (last_ball_i[0], last_ball_i[1] + 1),
+                        (middle_ball_i[0], middle_ball_i[1] + 1))
         elif direction == Direction.DOWN_RIGHT:
             position = ((first_ball_i[0] + 1, first_ball_i[1]),
-                        (last_ball_i[0] + 1, last_ball_i[1]))
+                        (last_ball_i[0] + 1, last_ball_i[1]),
+                        (middle_ball_i[0] + 1, middle_ball_i[1]))
         elif direction == Direction.DOWN_LEFT:
             position = ((first_ball_i[0] + 1, first_ball_i[1] - 1),
-                        (last_ball_i[0] + 1, last_ball_i[1] - 1))
+                        (last_ball_i[0] + 1, last_ball_i[1] - 1),
+                        (middle_ball_i[0] + 1, middle_ball_i[1] - 1))
         elif direction == Direction.LEFT:
             position = ((first_ball_i[0], first_ball_i[1] - 1),
-                        (last_ball_i[0], last_ball_i[1] - 1))
+                        (last_ball_i[0], last_ball_i[1] - 1),
+                        (middle_ball_i[0], middle_ball_i[1] - 1))
         else:
             raise InvalidDirection("Invalid direction passed to Move")
 
