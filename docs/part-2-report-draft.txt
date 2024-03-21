@@ -1,0 +1,10 @@
+State representation, actions, and transition model used
+
+Design and architecture of state space generator
+- How legality of a resulting game board configuration is determined
+
+Move notation
+
+Team member contribution
+
+References and additional documentation
