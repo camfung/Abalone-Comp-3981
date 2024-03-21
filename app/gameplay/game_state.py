@@ -73,17 +73,17 @@ class GameState:
         if row < 1 or row >= len(self._board)-1 or col < 1 or col >= len(self._board[0])-1:
             return None
         if direction == Direction.UP_LEFT:
-            return (row - 1, col)
+            return row - 1, col
         elif direction == Direction.UP_RIGHT:
-            return (row - 1, col+1)
+            return row - 1, col + 1
         elif direction == Direction.RIGHT:
-            return (row, col + 1)
+            return row, col + 1
         elif direction == Direction.DOWN_RIGHT:
-            return (row + 1, col)
+            return row + 1, col
         elif direction == Direction.DOWN_LEFT:
-            return (row + 1, col-1)
+            return row + 1, col - 1
         elif direction == Direction.LEFT:
-            return (row, col - 1)
+            return row, col - 1
 
     def get_marble(self, pos):
         """
@@ -525,63 +525,6 @@ class GameState:
             if self._board[pos[0]][pos[1]] != Marble.NONE:
                 return False
         return True
-
-    def _check_move(self, move):
-        """
-        Checks the validity of a move. This method is a placeholder and currently always returns True,
-        indicating all moves are considered valid.
-
-        Parameters:
-        - move: The Move object to be checked.
-
-        Returns:
-        bool: True if the move is valid, False otherwise.
-        """
-        if move.get_move_type() == MoveType.SIDE_STEP:
-            return self.is_valid_sidestep_move(move)
-        if move.get_move_type() == MoveType.SINGLE:
-            return self.is_valid_single_move(move)
-        # Fetch Initial Ball Positions
-        first_ball_i_x = copy.deepcopy(move.get_pos_i()[0][0])
-        first_ball_i_y = copy.deepcopy(move.get_pos_i()[0][1])
-        last_ball_i_x = copy.deepcopy(move.get_pos_i()[1][0])
-        last_ball_i_y = copy.deepcopy(move.get_pos_i()[1][1])
-
-        # Fetch Middle Ball Positions
-        remain_ball_f_x = (first_ball_f_x + last_ball_f_x) // 2
-        remain_ball_f_y = (first_ball_f_y + last_ball_f_y) // 2
-
-        if abs(first_ball_f_y - last_ball_f_y) > 1:
-            remain_ball_f_y = (first_ball_f_y + last_ball_f_y) // 2
-
-        # Side-Step Move
-        if move.get_move_type() == MoveType.SIDE_STEP:
-            if self.__check_sidestep_move(first_ball_f_x=first_ball_f_x,
-                                          first_ball_f_y=first_ball_f_y,
-                                          remain_ball_f_x=remain_ball_f_x,
-                                          remain_ball_f_y=remain_ball_f_y,
-                                          last_ball_f_x=last_ball_f_x,
-                                          last_ball_f_y=last_ball_f_y,
-                                          num_balls_moved=num_balls_moved
-                                          ):
-                return True
-            return False
-
-        # Inline Move
-        if self.__check_inline_move(
-                first_ball_i_x=first_ball_i_x,
-                first_ball_i_y=first_ball_i_y,
-                last_ball_i_x=last_ball_i_x,
-                last_ball_i_y=last_ball_i_y,
-                first_ball_f_x=first_ball_f_x,
-                first_ball_f_y=first_ball_f_y,
-                last_ball_f_x=last_ball_f_x,
-                last_ball_f_y=last_ball_f_y,
-                num_balls_moved=num_balls_moved
-        ):
-            return True
-
-        return False
 
     def __check_single_move(self, **kwargs):
         # Check if the next space is an empty space
