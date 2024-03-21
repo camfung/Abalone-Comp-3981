@@ -28,6 +28,7 @@ class Move:
             first_ball_i, last_ball_i)
         self._move_type = Move.__calc_move_type(
             first_ball_i, last_ball_i, direction, self._selection_type)
+        self._num_balls_moved = Move.__calc_num_balls_moved(first_ball_i, last_ball_i)
 
     @property
     def marble(self):
@@ -129,6 +130,26 @@ class Move:
 
         return MoveType.SIDE_STEP
 
+    @staticmethod
+    def __calc_num_balls_moved(first_ball_i, last_ball_i):
+        """
+        Calculates the number of balls being moved.
+
+        :param first_ball_i: first ball position
+        :param last_ball_i: last ball position
+        :return: integer representing the number of balls being moved.
+        """
+
+        # Check if 3 balls are being moved
+        if (abs(first_ball_i[0] - last_ball_i[0]) > 1
+                or abs(first_ball_i[1] - last_ball_i[1]) > 1):
+            return 3
+
+        if first_ball_i != last_ball_i:
+            return 2
+
+        return 1
+
     def get_pos_i(self):
         return self._pos_i
 
@@ -146,6 +167,9 @@ class Move:
 
     def get_move_type(self):
         return self._move_type
+
+    def get_num_balls_moved(self):
+        return self._num_balls_moved
 
     def __str__(self):
         char_first_i_x = chr(self._pos_i[0][0] + 74 - 2 * (self._pos_i[0][0]))

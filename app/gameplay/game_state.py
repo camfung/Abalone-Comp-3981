@@ -1,4 +1,3 @@
-
 import copy
 
 from app.api.exceptions import InvalidMarbleValue
@@ -355,6 +354,9 @@ class GameState:
         remain_ball_f_x = (first_ball_f_x + last_ball_f_x) // 2
         remain_ball_f_y = (first_ball_f_y + last_ball_f_y) // 2
 
+        # Get Number of Balls Moved
+        num_balls_moved = move.get_num_balls_moved()
+
         if abs(first_ball_f_y - last_ball_f_y) > 1:
             remain_ball_f_y = (first_ball_f_y + last_ball_f_y) // 2
 
@@ -364,11 +366,12 @@ class GameState:
         move_y = 1 if first_ball_f_y > first_ball_i_y else (
             -1 if first_ball_f_y < first_ball_i_y else 0)
 
-        for _ in range(1, 4):
+        for i in range(1, 4):
             # Check if the next space is an empty space
             if (self._board[first_ball_f_x][first_ball_f_y] == Marble.NONE
                     and self._board[remain_ball_f_x][remain_ball_f_y] == Marble.NONE
-                    and self._board[last_ball_f_x][last_ball_f_y] == Marble.NONE):
+                    and self._board[last_ball_f_x][last_ball_f_y] == Marble.NONE
+                    and i < num_balls_moved):
                 return True
 
             # Check if the next space is edge of board and not directly next to original position.
