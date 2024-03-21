@@ -61,6 +61,13 @@ class FileScriber:
         all_moves = start_state.get_possible_moves()
         all_boards = start_state.convert_moves_to_board_states()
 
+        for index, board in enumerate(all_boards):
+            game_state = GameState(board, Marble.WHITE)
+            print("--------------------------------------")
+            print("Start State:\n", str(start_state))
+            print("--------------------------------------")
+            print(f"{index+1}\n{str(game_state)}")
+
         # Step 6: Export List of Moves to Output Move File
         with open(output_move_file, "w") as output_f:
             for move in all_moves:
@@ -82,7 +89,6 @@ class FileScriber:
                             formatted_space = f"{str_row}{cIndex}w"
                             spaces += f"{formatted_space},"
                 spaces = FileScriber.sort_line(spaces)
-                spaces = spaces[1:]
                 spaces += "\n"
                 output_f.writelines(spaces)
 
@@ -96,8 +102,22 @@ class FileScriber:
         # Return Results
         return lines
 
+    # Define the custom sorting key function
+    @staticmethod
+    def custom_key(item):
+        marble_order = {'b': 0, 'w': 1}  # Define the order of marble colors
+
+        # Extract information from the item
+        row = ord(item[0]) - ord('A')  # Convert row letter to index (assuming A=0, B=1, ...)
+        col = int(item[1])  # Extract column number
+        color = item[-1]  # Extract marble color
+
+        # Return a tuple with the sorting criteria
+        return marble_order[color], row, col
+
     @staticmethod
     def sort_line(line):
-        sorted_line = ",".join(sorted(line.split(','), key=str.lower))
+        line = line[:-1]
+        sorted_line = ",".join(sorted(line.split(','), key=FileScriber.custom_key))
         return sorted_line
 

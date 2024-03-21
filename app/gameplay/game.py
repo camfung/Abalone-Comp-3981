@@ -75,7 +75,7 @@ class Game:
             [None, None, None, None, None, None, None, None, None, None, None])
         return GameState(starting_board)
 
-    def get_current_game_state(self):
+    def get_current_game_state(self) -> GameState:
         return self._current_game_state
 
     def get_possible_game_states(self):
