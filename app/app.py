@@ -10,6 +10,7 @@ from app.players.agent import AbaloneAgent
 from app.players.human import HumanPlayer
 
 from app.ui.ui import PygameUI
+from app.gameplay.timer import Timer
 
 
 class App:
@@ -27,6 +28,7 @@ class App:
         self.game_manager = GameManager(self)
         self.gui = PygameUI(self)
         self.players = []
+        self.timer = Timer()
 
         self.game_manager.join_room(self.gui)
 
@@ -62,6 +64,8 @@ class App:
 
             black_time_limit = kwargs["config"]["black_time_limit"]
             white_time_limit = kwargs["config"]["white_time_limit"]
+            self.timer._white_turn_time_limit = white_time_limit
+            self.timer._black_turn_time_limit = black_time_limit
             self.players = self.initialize_players(
                 game_type, player_color, move_limit, black_time_limit, white_time_limit)
 
@@ -87,6 +91,8 @@ class App:
                 self.gui.start_button_clicked = True
             if thread.is_alive():
                 thread.join()
+            self.timer.current_turn_start_time = time.time()
+            self.timer._elapsed_time = time.time()
             self.gui.waiting_for_player_input = True
 
         if event == "PlayerMakeMove":
@@ -102,7 +108,7 @@ class App:
             first_marble = kwargs["first_marble"]
             second_marble = kwargs["second_marble"]
             direction = kwargs["direction"]
-            time_stamp = 1
+            time_stamp = time.time() - self.timer.current_turn_start_time
             move = Move(first_marble, second_marble, direction,
                         self.game_manager.current_player_to_move)
             # either here or in commit move we want to do is_valid_move(move)
@@ -112,6 +118,8 @@ class App:
                 self.players[1]
             self.game_manager.commit_move(
                 move=move, player=move.marble, timestamp=time_stamp)
+            self.timer.current_turn_start_time = time.time()
+            self.timer._elapsed_time = time.time()
             thread.start()
         if event == "IsMarblePlayerToMove":
             """
@@ -135,6 +143,20 @@ class App:
 
         if event == "GetScore":
             return self.game_manager.game_score
+
+        if event == "StartTimer":
+            self.timer.start_timer()
+
+        if event == "ResetTimer":
+            self.timer.reset_time()
+
+        if event == "GetTimerValues":
+            return self.timer.get_timer_values()
+
+        if event == "UpdateTimer":
+            self.timer.update_timer(self.game_manager)
+
+        ##Add pause timer thing here
 
     def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit: int, white_time_limit: int):
         """

@@ -29,88 +29,53 @@ class HUD(Drawable, EventHandler):
         self.theme = self.ui_instance.theme
         self.theme.widget_width = 100
         self.score_label = None
+        self.time_left_black_label = None
+        self.time_left_white_label = None
         self.timer = None
-        self.time_left_black = None
-        self.time_left_white = None
         self._white_balls = 0
         self._black_balls = 0
 
-        self._start_time_black = time.time()
-        self._start_time_white = time.time()
+        self.start_game_cb, self.undo_move_cb, self.pause_game_cb, self.update_score_cb, self.start_timer_cb, self.reset_timer_cb, self.get_timer_values_cb = callbacks
 
-        self._elapsed_time_black = 0
-        self._elapsed_time_white = 0
-        self._game_started = False
+    # white move start time = time.time()
+    # time elapsed = time.time() - start time
 
-        self._black_check_time = True
-        self._white_check_time = True
-
-        self._turn_end = Marble.BLACK
-
-        self.start_game_cb, self.undo_move_cb, self.pause_game_cb, self.update_score_cb = callbacks
-
-# white move start time = time.time()
-# time elapsed = time.time() - start time
-
-# count down = 10 - time elapsed
+    # count down = 10 - time elapsed
     def update_hud_values(self, game_manager):
-        if self._game_started:
-            if game_manager.current_player_to_move == Marble.BLACK:
-                if self._black_check_time:
-                    self._start_time_black = time.time() - self._elapsed_time_black
-                    self._black_check_time = False
-                    self._white_check_time = True
-                self._elapsed_time_black = time.time() - self._start_time_black
-                self._turn_end = Marble.BLACK
+        current_turn_start_time, black_total_aggregate_time, white_total_aggregate_time, white_turn_time_limit, black_turn_time_limit = self.get_timer_values_cb()
+        # updating the time left for black
+        if game_manager.current_player_to_move == Marble.BLACK:
+            self.time_left_black_label.set_title(f"Black Time Left: {black_turn_time_limit - current_turn_start_time:.2f}")
+            self.time_left_white_label.set_title(
+                f"White Time Left: {white_turn_time_limit:.2f}")
+        # updating the time left for white
+        elif game_manager.current_player_to_move == Marble.WHITE:
+            self.time_left_white_label.set_title(f"White Time Left: {white_turn_time_limit - current_turn_start_time:.2f}")
+            self.time_left_black_label.set_title(f"Black Time Left: {black_turn_time_limit:.2f}")
 
-                # updating the time left for black
-                self.time_left_black.set_title(
-                    f"Black Time Left: {self._elapsed_time_black:.2f}")
-            elif game_manager.current_player_to_move == Marble.WHITE:
-                if self._white_check_time:
-                    self._start_time_white = time.time() - self._elapsed_time_white
-                    self._white_check_time = False
-                    self._black_check_time = True
-                self._elapsed_time_white = time.time() - self._start_time_white
-                self._turn_end = Marble.WHITE
-
-                # updating the time left for white
-                self.time_left_white.set_title(
-                    f"White Time Left: {self._elapsed_time_white:.2f}")
-
-            self.timer.set_title(
-                f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
-            # update the score
-            self.white_balls, self.black_balls = self.update_score_cb()
+        self.timer.set_title(
+            f"Time: {white_total_aggregate_time:.2f}     Time: {black_total_aggregate_time:.2f}")
+        # update the score
+        self.white_balls, self.black_balls = self.update_score_cb()
 
     def start_game(self):
-        self._game_started = True
-        self._black_check_time = True
-        self._white_check_time = True
+        self.start_timer_cb()
         self.start_game_cb()
 
     def stop_game(self):
-        self._elapsed_time_black = 0
-        self._elapsed_time_white = 0
-        self._game_started = False
-
-        self._black_check_time = True
-        self._white_check_time = True
+        self.reset_timer_cb()
+        _, aggregate_time_black, aggregate_time_white, _, _ = self.get_timer_values_cb()
         self.timer.set_title(
-            f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
+            f"Time: {aggregate_time_white:.2f}     Time: {aggregate_time_black:.2f}")
         self.ui_instance.play_menu()
 
     def restart_game(self):
-        self._elapsed_time_black = 0
-        self._elapsed_time_white = 0
-        self._game_started = False
-
-        self._black_check_time = True
-        self._white_check_time = True
+        self.reset_timer_cb()
+        _, aggregate_time_black, aggregate_time_white, _, _ = self.get_timer_values_cb()
         self.timer.set_title(
-            f"Time: {self._elapsed_time_white:.2f}     Time: {self._elapsed_time_black:.2f}")
+            f"Time: {aggregate_time_white:.2f}     Time: {aggregate_time_black:.2f}")
         thread = threading.Thread(
-            target=self.ui_instance.reset_board, args=(threading.current_thread(), ))
+            target=self.ui_instance.reset_board, args=(threading.current_thread(),))
         thread.start()
 
     def pause_game(self):
@@ -125,6 +90,8 @@ class HUD(Drawable, EventHandler):
         Returns:
         - menu: A pygame_menu.Menu instance representing the HUD with all the control buttons.
         """
+        _, aggregate_time_black, aggregate_time_white, _, _ = self.get_timer_values_cb()
+
         menu = pygame_menu.Menu("Abalone", self.ui_instance.SCREEN_WIDTH, self.HUD_HEIGHT,
                                 theme=self.theme, position=(0, 0, True), columns=5, rows=2)
         menu.add.button("Start Game", self.start_game,
@@ -143,12 +110,12 @@ class HUD(Drawable, EventHandler):
         self.score_label = menu.add.label(
             f"White: {self._white_balls}   Black:  {self._black_balls}  ")
 
-        self.timer = menu.add.label(f"Time: {self._elapsed_time_white:.2f} Time: {self._elapsed_time_black:.2f}",
+        self.timer = menu.add.label(f"Time: {aggregate_time_white:.2f} Time: {aggregate_time_black:.2f}",
                                     selectable=False)
-        self.time_left_white = menu.add.label(
-            f"White Time Left: {self._elapsed_time_white:.2f}", selectable=False)
-        self.time_left_black = menu.add.label(
-            f"Black Time Left: {self._elapsed_time_black:.2f}", selectable=False)
+        self.time_left_white_label = menu.add.label(
+            f"White Time Left: {aggregate_time_white:.2f}", selectable=False)
+        self.time_left_black_label = menu.add.label(
+            f"Black Time Left: {aggregate_time_black:.2f}", selectable=False)
         return menu
 
     @property
@@ -227,8 +194,8 @@ class HUD(Drawable, EventHandler):
         - game_manager: The game manager instance, used to access game-related data and methods.
         """
 
-        self.update_hud_values(game_manager)
         menu = self.get_menu()
+        self.update_hud_values(game_manager)
         menu.draw(surface)
 
 

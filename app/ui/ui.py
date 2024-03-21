@@ -78,11 +78,23 @@ class PygameUI(UI):
 
         def update_score_cb(): return self._app.notify(self, "GetScore")
 
+        def start_timer_cb():
+            return self._app.notify(self, "StartTimer")
+
+        def reset_timer_cb():
+            return self._app.notify(self, "ResetTimer")
+
+        def get_timer_values_cb():
+            return self._app.notify(self, "GetTimerValues")
+
         callbacks = (
             start_game_cb,
             undo_move_cb,
             pause_game_cb,
-            update_score_cb
+            update_score_cb,
+            start_timer_cb,
+            reset_timer_cb,
+            get_timer_values_cb
         )
         hud = HUD(self, callbacks)
         record_menu = RecordMenu(self)
@@ -159,6 +171,8 @@ class PygameUI(UI):
         - game_manager: An instance of the game manager class that holds the current state of the game.
         """
         self.screen.fill((0, 0, 0))
+
+        self._app.notify(self, "UpdateTimer")
 
         # update the score in the menu
         self.hud.white_balls, self.hud.black_balls = self._app.notify(
