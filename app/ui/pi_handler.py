@@ -96,7 +96,11 @@ class PlayerInputHandler:
         else:
             direction = self.calculate_direction(
                 self.second_marble, marble_position)
+            if direction == None:
+                return
             if self.is_valid_direction(self.second_marble, marble_position):
+                if self.first_marble == None or self.second_marble == None:
+                    return
                 self.execute_move(self.first_marble,
                                   self.second_marble, direction)
                 self.reset_state()
