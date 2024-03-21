@@ -61,13 +61,6 @@ class FileScriber:
         all_moves = start_state.get_possible_moves()
         all_boards = start_state.convert_moves_to_board_states()
 
-        for index, board in enumerate(all_boards):
-            game_state = GameState(board, Marble.WHITE)
-            print("--------------------------------------")
-            print("Start State:\n", str(start_state))
-            print("--------------------------------------")
-            print(f"{index+1}\n{str(game_state)}")
-
         # Step 6: Export List of Moves to Output Move File
         with open(output_move_file, "w") as output_f:
             for move in all_moves:
@@ -97,7 +90,6 @@ class FileScriber:
         # Read Board File
         with open(input_file, "r") as input_f:
             lines = input_f.readlines()
-            # print(lines)
 
         # Return Results
         return lines
