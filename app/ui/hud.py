@@ -77,6 +77,10 @@ class HUD(Drawable, EventHandler):
         _, aggregate_time_black, aggregate_time_white, _, _ = self.get_timer_values_cb()
         self.timer.set_title(
             f"Time: {aggregate_time_white:.2f}     Time: {aggregate_time_black:.2f}")
+        self.time_left_black_label.set_title(
+            f"Black Time Left: {aggregate_time_black:.2f}")
+        self.time_left_white_label.set_title(
+            f"White Time Left: {aggregate_time_white:.2f}")
         thread = threading.Thread(
             target=self.ui_instance.reset_board, args=(threading.current_thread(),))
         thread.start()

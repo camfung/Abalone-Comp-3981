@@ -156,7 +156,8 @@ class App:
         if event == "UpdateTimer":
             self.timer.update_timer(self.game_manager)
 
-        ##Add pause timer thing here
+        if event == "PauseGame":
+            self.timer.pause(self.game_manager)
 
     def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit: int, white_time_limit: int):
         """
