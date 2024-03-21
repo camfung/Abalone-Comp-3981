@@ -1,6 +1,6 @@
 
 import unittest
-from app.api.filescriber import FileScriber
+from filescriber import FileScriber
 from collections import Counter
 from pathlib import Path
 

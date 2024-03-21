@@ -1,11 +1,8 @@
 import copy
 import csv
 from typing import List
-import unittest
-from app.api.enums import Direction, Formation, Marble
+from app.api.enums import Formation, Marble
 from app.api.exceptions import InvalidMarbleValue
-from app.api.filescriber import FileScriber
-from collections import Counter
 
 from app.gameplay.game import Game
 from app.gameplay.game_state import GameState
