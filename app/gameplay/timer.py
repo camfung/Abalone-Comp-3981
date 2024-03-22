@@ -39,6 +39,11 @@ class Timer:
         return (self._elapsed_time - self.current_turn_start_time, self._black_total_aggregate_time, self._white_total_aggregate_time, self._white_turn_time_limit,
         self._black_turn_time_limit)
 
+    def pause_timer(self):
+        self._game_started = False
+        self._black_start_turn = True
+        self._white_start_turn = True
+
 
     def update_timer(self, game_manager):
         if self._game_started:
