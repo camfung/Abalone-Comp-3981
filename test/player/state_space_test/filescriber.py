@@ -22,7 +22,7 @@ class FileScriber:
             r_board_config = input_f.readline().strip()
             board_spots = r_board_config.split(",")
 
-            blank_board_path = Path('../../../app/formations/blank_board.csv').resolve()
+            blank_board_path = Path('./app/formations/blank_board.csv').resolve()
 
             file = open(blank_board_path, 'r')
             csv_reader = csv.reader(file, delimiter=',')
@@ -117,3 +117,6 @@ class FileScriber:
         sorted_line = ",".join(sorted(line.split(','), key=FileScriber.custom_key))
         return sorted_line
 
+file = input("Input the name of the input file: ")
+num = file[4]
+FileScriber.export_state_space_to_text_files(file, f"output{num}.move", f"output{num}.board")
