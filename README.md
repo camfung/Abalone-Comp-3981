@@ -5,6 +5,15 @@
 - Callum Goss (A01328294)
 - Joseph Driedger (A01320740)
 
+## How to Run the State Space Generator on the BCIT Lab Computer
+1. **Run Python on Apps Anywhere**
+2. **Download and Unzip the zip file**
+3. **Navigate to the \test\player\state_space_test folder**
+4. **Place input files in the input folder. Output files will be in the output folder**
+5. **Change the file path names in StateSpaceTest.py to test new files**
+6. **Run command**
+```python StateSpaceTest.py```
+
 ## How to Run the Game on the BCIT Lab Computer
 1. **Run Python on Apps Anywhere**
 2. **Unzip the zip file**
