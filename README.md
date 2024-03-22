@@ -5,10 +5,10 @@
 - Callum Goss (A01328294)
 - Joseph Driedger (A01320740)
 
-## How to Run on the BCIT Lab Computer
+## How to Run the Game on the BCIT Lab Computer
 1. **Run Python on Apps Anywhere**
 2. **Unzip the zip file**
-3. **Navigate to the /dist folder and run driver.exe**
+3. **Navigate to the /dist folder and run Abalone_Group2.exe**
    - Ignore the security warnings that pop up and click "run anyways" 
 
 ## How to Run on any computer
@@ -53,12 +53,12 @@ Follow these steps to set up and run the program:
     - Create a new folder called app inside ./dist
     - Copy the following folders into ./dist/app
         - formations
-        - games
+        - gameplay
         - images
 
 6. **Run the program and Have Fun.**
     - Open the dist directory
-    - Open driver.exe
+    - Open Abalone_Group2.exe
   
 ![Screenshot](docs/diagram.png)
 
