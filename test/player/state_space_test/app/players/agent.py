@@ -1,0 +1,119 @@
+
+import datetime
+import random
+import sys
+import time
+
+from app.api.exceptions import InvalidMarbleValue
+from app.communication.game_manager import GameManager
+from app.api.enums import Marble
+from app.gameplay.game_state import GameState
+from app.gameplay.move import Move
+from app.players.player import Player
+
+
+class AbaloneAgent(Player):
+
+    """
+    A concrete implementation of the Player class representing an AI agent player.
+    """
+
+    def generate_move(self, game_manager: GameManager):
+        """
+        Generates a move for the AI agent based on the current game state.
+
+        Parameters:
+        - game_manager: The GameManager instance managing the game state.
+
+        Returns:
+        A tuple containing the chosen Move object and the time taken to generate the move.
+        """
+        initial_time = datetime.datetime.now()
+        # sample for making a random move
+        move = random.choice(game_manager.get_possible_moves())
+        time.sleep(random.uniform(1, 3))
+        final_time = datetime.datetime.now()
+        time_delta = final_time - initial_time
+        return move, time_delta.total_seconds()
+
+    def make_move(self, game_manager: GameManager, player: Marble, move: Move, time_stamp: float) -> None:
+        """
+        Commits a move made by the AI agent to the game manager, simulating a delay before making the move.
+
+        Parameters:
+        - game_manager: The GameManager instance managing the game state.
+        - player: The color of the player making the move.
+        - move: The Move object representing the move to be made.
+        - time_stamp: The timestamp when the move was generated.
+        """
+        game_manager.commit_move(player, move, time_stamp)
+
+    def calc_move(self, game_manager: GameManager):
+        if self._color == Marble.WHITE:
+            v = self.min_move(game_manager.get_current_game_state(), sys.maxsize * -1, sys.maxsize)
+        elif self._color == Marble.BLACK:
+            v = self.max_move(game_manager.get_current_game_state(), sys.maxsize * -1, sys.maxsize)
+        else:
+            raise InvalidMarbleValue("Calculate Move can only be White or Black.")
+
+        for state in game_manager.get_possible_game_states():
+            if self.evaluation(state) == v:
+                return state
+        return None
+
+    @staticmethod
+    def terminal_test(state: GameState) -> bool:
+        white_balls, black_balls = state.get_ball_count()
+
+        if white_balls <= 8:
+            return True
+        if black_balls <= 8:
+            return True
+
+        return False
+
+    @classmethod
+    def evaluation(cls, state):
+        """
+        Evaluate the current state based on heuristics.
+
+        Heuristics will be implemented in Part 3.
+        :param state: GameState
+        :return: Evaluation Value as an integer.
+        """
+        return 0
+
+    @classmethod
+    def max_move(cls, state: GameState, alpha, beta):
+        # if Terminal Test state return Utility
+        if cls.terminal_test(state):
+            return cls.evaluation(state)
+
+        # Assign Lowest Value
+        v = sys.maxsize * -1
+
+        # Check each possible state from current game state
+        for child_states in state.convert_moves_to_game_states():
+            v = max(v, cls.min_move(child_states, alpha, beta))
+            if v > beta:
+                return v
+            alpha = max(alpha, v)
+
+        return v
+
+    @classmethod
+    def min_move(cls, state: GameState, alpha, beta):
+        # if Terminal Test state return Utility
+        if cls.terminal_test(state):
+            return cls.evaluation(state)
+
+        # Assign Highest Value
+        v = sys.maxsize
+
+        # Check each possible state from current game state
+        for child_states in state.convert_moves_to_game_states():
+            v = min(v, cls.max_move(child_states, alpha, beta))
+            if v < alpha:
+                return v
+            beta = max(alpha, v)
+        return v
