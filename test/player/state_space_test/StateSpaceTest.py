@@ -7,7 +7,7 @@ from pathlib import Path
 
 class StateSpaceTest(unittest.TestCase):
     def test_chi_en_1(self):
-        input_file = Path("./Input/Test1.input").resolve()
+        input_file = Path("Test1.input").resolve()
         output_move_file = Path("./Output/Test1.move").resolve()
         output_board_file = Path("./Output/Test1.board").resolve()
         verify_board_file = Path("./Verify/Test1.board").resolve()
@@ -18,7 +18,7 @@ class StateSpaceTest(unittest.TestCase):
         self.assertTrue(Counter(exported_results) == Counter(verified_results))
 
     def test_chi_en_2(self):
-        input_file = Path("./Input/Test2.input").resolve()
+        input_file = Path("Test2.input").resolve()
         output_move_file = Path("./Output/Test2.move").resolve()
         output_board_file = Path("./Output/Test2.board").resolve()
         verify_board_file = Path("./Verify/Test2.board").resolve()
