@@ -52,36 +52,15 @@ class Move:
         first_ball_i = copy.deepcopy(f_ball_i)
         last_ball_i = copy.deepcopy(l_ball_i)
         middle_ball_i = copy.deepcopy(m_ball_i)
-        if direction == Direction.UP_LEFT:
-            position = ((first_ball_i[0] - 1, first_ball_i[1]),
-                        (last_ball_i[0] - 1, last_ball_i[1]),
-                        (middle_ball_i[0] - 1, middle_ball_i[1]))
-        elif direction == Direction.UP_RIGHT:
-            position = ((first_ball_i[0] - 1, first_ball_i[1] + 1),
-                        (last_ball_i[0] - 1, last_ball_i[1] + 1),
-                        (middle_ball_i[0] - 1, middle_ball_i[1] + 1))
-        elif direction == Direction.RIGHT:
-            position = ((first_ball_i[0], first_ball_i[1] + 1),
-                        (last_ball_i[0], last_ball_i[1] + 1),
-                        (middle_ball_i[0], middle_ball_i[1] + 1))
-        elif direction == Direction.DOWN_RIGHT:
-            position = ((first_ball_i[0] + 1, first_ball_i[1]),
-                        (last_ball_i[0] + 1, last_ball_i[1]),
-                        (middle_ball_i[0] + 1, middle_ball_i[1]))
-        elif direction == Direction.DOWN_LEFT:
-            position = ((first_ball_i[0] + 1, first_ball_i[1] - 1),
-                        (last_ball_i[0] + 1, last_ball_i[1] - 1),
-                        (middle_ball_i[0] + 1, middle_ball_i[1] - 1))
-        elif direction == Direction.LEFT:
-            position = ((first_ball_i[0], first_ball_i[1] - 1),
-                        (last_ball_i[0], last_ball_i[1] - 1),
-                        (middle_ball_i[0], middle_ball_i[1] - 1))
-        elif direction == None:
-            raise InvalidDirection("Direction passed to Move is None")
-        else:
-            raise InvalidDirection("Invalid direction passed to Move")
 
-        return position
+        try:
+            position = ((first_ball_i[0] + direction.value[0], first_ball_i[1] + direction.value[1]),
+                        (last_ball_i[0] + direction.value[0], last_ball_i[1] + direction.value[1]),
+                        (middle_ball_i[0] + direction.value[0], middle_ball_i[1] + direction.value[1])
+            )
+            return position
+        except TypeError:
+            raise InvalidDirection("Direction passed to Move is None")
 
     @staticmethod
     def __calc_selection_type(first_ball_i, last_ball_i):

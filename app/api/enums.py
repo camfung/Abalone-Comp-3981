@@ -25,12 +25,12 @@ class Direction(Enum):
     """
     Direction Enumeration for Move Directions
     """
-    UP_LEFT = auto()
-    UP_RIGHT = auto()
-    RIGHT = auto()
-    DOWN_RIGHT = auto()
-    DOWN_LEFT = auto()
-    LEFT = auto()
+    UP_LEFT = (-1, 0)
+    UP_RIGHT = (-1, 1)
+    RIGHT = (0, 1)
+    DOWN_RIGHT = (1, 0)
+    DOWN_LEFT = (1, -1)
+    LEFT = (0, -1)
 
 
 class MarbleSelection(Enum):
