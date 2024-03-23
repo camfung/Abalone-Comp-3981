@@ -7,21 +7,29 @@ To Be Implemented in Part 3.
 
 
 class AgentJoey(AbaloneAgent):
+    """
+    A sample agent created by Joey (A01320740) to calculate Evaluation Function.
+    """
+
     @classmethod
     def evaluation(cls, state):
+        """
+        Base Evaluation Function for Agent which calls all other evaluation functions.
+        :param state: GameState
+        :return: integer representing the current evaluation value.
+        """
+        # Get Board State and Marble Positions on Board
         board = state.get_board()
-        pieces = state.get_ball_count()
         black_positions, white_positions = cls.find_positions_of_pieces(board)
 
-        # Add up all white's pieces
-        total_reward = pieces[0] * -1
+        # List of Weights on Heuristic Functions
+        weights = [50, 2, 5, 100]
 
-        # Add up all black's pieces
-        total_reward += pieces[1]
-
-        total_reward += cls.grouped_together(board, black_positions, white_positions)
-        total_reward += cls.center_of_board(black_positions, white_positions)
-        total_reward += cls.anchored_pieces(board, black_positions, white_positions)
+        # Call Reward Functions to Calculate Toward Reward
+        total_reward = cls.number_of_pieces(state, weights[0])
+        total_reward += cls.grouped_together(board, black_positions, white_positions, weights[1])
+        total_reward += cls.center_of_board(black_positions, white_positions, weights[2])
+        total_reward += cls.anchored_pieces(board, black_positions, white_positions, weights[3])
 
         return total_reward
 
@@ -29,7 +37,8 @@ class AgentJoey(AbaloneAgent):
     def find_positions_of_pieces(cls, board):
         """
         Find positions of all pieces on board.
-        Possibly implemented into GameState instead of Agent to be stored in GameState.
+        Possibly implemented into GameState instead of this Agent to be stored in GameState.
+
         :param board: Array Representation of GameState Board
         :return: Tuple containing List of Black Positions and White Positions
         """
@@ -47,12 +56,33 @@ class AgentJoey(AbaloneAgent):
         return black_positions, white_positions
 
     @classmethod
-    def grouped_together(cls, board, black_positions, white_positions):
+    def number_of_pieces(cls, state, weight):
+        """
+        Heavily Reward Players for having more Pieces on the board.
+
+        :param state: GameState
+        :param weight: int representing the weight in evaluation
+        :return: int value indicating total reward
+        """
+        pieces = state.get_ball_count()
+
+        # Add up all white's pieces
+        total_reward = (pieces[0] * -1)
+
+        # Add up all black's pieces
+        total_reward += pieces[1]
+
+        return total_reward * weight
+
+    @classmethod
+    def grouped_together(cls, board, black_positions, white_positions, weight):
         """
         Reward Sides for Grouping Together.
+
         :param board: Array Representation of GameState Board
         :param black_positions: List of Tuples representing Black Positions
         :param white_positions: List of Tuples representing White Positions
+        :param weight: int representing the weight in evaluation
         :return: int value indicating total reward
         """
         total_reward = 0
@@ -81,15 +111,16 @@ class AgentJoey(AbaloneAgent):
                     if board[pos_x + (dir_x * i)][pos_y + (dir_y * i)] == Marble.WHITE:
                         total_reward -= i
 
-        return total_reward
+        return total_reward * weight
 
     @classmethod
-    def center_of_board(cls, black_positions, white_positions):
+    def center_of_board(cls, black_positions, white_positions, weight):
         """
         Reward Players for having pieces at Center of Board
 
         :param black_positions: List of Tuples representing Black Positions
         :param white_positions: List of Tuples representing White Positions
+        :param weight: int representing the weight in evaluation
         :return: int value indicating total reward
         """
         total_reward = 0
@@ -117,16 +148,17 @@ class AgentJoey(AbaloneAgent):
 
             total_reward += white_distance
 
-        return total_reward
+        return total_reward * weight
 
     @classmethod
-    def anchored_pieces(cls, board, black_positions, white_positions):
+    def anchored_pieces(cls, board, black_positions, white_positions, weight):
         """
         Punish Players for having single pieces close to being surrounded or is completely by opposing pieces
 
         :param board: Array Representation of GameState Board
         :param black_positions: List of Tuples representing Black Positions
         :param white_positions: List of Tuples representing White Positions
+        :param weight: int representing the weight in evaluation
         :return: int value indicating total reward
         """
         total_reward = 0
@@ -147,7 +179,7 @@ class AgentJoey(AbaloneAgent):
                     pieces_surrounded += 1
 
             if pieces_surrounded > 4:
-                total_reward -= (pieces_surrounded * 10)
+                total_reward -= pieces_surrounded
 
         # Calculate White's Punishment
         for white_position in white_positions:
@@ -165,6 +197,6 @@ class AgentJoey(AbaloneAgent):
                     pieces_surrounded += 1
 
             if pieces_surrounded > 4:
-                total_reward += (pieces_surrounded * 10)
+                total_reward += pieces_surrounded
 
-        return total_reward
+        return total_reward * weight
