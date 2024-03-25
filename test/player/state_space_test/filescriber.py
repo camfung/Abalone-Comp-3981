@@ -1,3 +1,4 @@
+import re
 
 from app.api.exceptions import InvalidMarbleValue
 from app.gameplay.game_state import GameState
@@ -118,5 +119,5 @@ class FileScriber:
         return sorted_line
 
 file = input("Input the name of the input file: ")
-num = file[4]
-FileScriber.export_state_space_to_text_files(file, f"output{num}.move", f"output{num}.board")
+num = int(re.search(r'\d+', file).group())
+FileScriber.export_state_space_to_text_files(file, f"Test{num}.move", f"Test{num}.board")
