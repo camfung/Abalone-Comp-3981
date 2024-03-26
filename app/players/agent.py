@@ -1,5 +1,6 @@
 
 import datetime
+import math
 import random
 import sys
 import time
@@ -50,14 +51,22 @@ class AbaloneAgent(Player):
 
     def calc_move(self, game_manager: GameManager):
         if self._color == Marble.WHITE:
-            v = self.min_move(game_manager.get_current_game_state(), sys.maxsize * -1, sys.maxsize)
+            best_value = math.inf
+            for distance in range(1, 25, 2):
+                v = self.min_move(game_manager.get_current_game_state(), -math.inf, math.inf, distance)
+                if best_value < v:
+                    best_value = v
         elif self._color == Marble.BLACK:
-            v = self.max_move(game_manager.get_current_game_state(), sys.maxsize * -1, sys.maxsize)
+            best_value = -math.inf
+            for distance in range(1, 25, 2):
+                v = self.max_move(game_manager.get_current_game_state(), -math.inf, math.inf, distance)
+                if best_value > v:
+                    best_value = v
         else:
             raise InvalidMarbleValue("Calculate Move can only be White or Black.")
 
         for state in game_manager.get_possible_game_states():
-            if self.evaluation(state) == v:
+            if self.evaluation(state) == best_value:
                 return state
         return None
 
@@ -84,35 +93,35 @@ class AbaloneAgent(Player):
         return 0
 
     @classmethod
-    def max_move(cls, state: GameState, alpha, beta):
+    def max_move(cls, state: GameState, alpha, beta, distance):
         # if Terminal Test state return Utility
-        if cls.terminal_test(state):
+        if cls.terminal_test(state) or distance <= 0:
             return cls.evaluation(state)
 
         # Assign Lowest Value
-        v = sys.maxsize * -1
+        v = -math.inf
 
         # Check each possible state from current game state
         for child_states in state.convert_moves_to_game_states():
-            v = max(v, cls.min_move(child_states, alpha, beta))
+            v = max(v, cls.min_move(child_states, alpha, beta, distance - 1))
             if v > beta:
-                return v
+                return v, state
             alpha = max(alpha, v)
 
         return v
 
     @classmethod
-    def min_move(cls, state: GameState, alpha, beta):
+    def min_move(cls, state: GameState, alpha, beta, distance):
         # if Terminal Test state return Utility
-        if cls.terminal_test(state):
+        if cls.terminal_test(state) or distance <= 0:
             return cls.evaluation(state)
 
         # Assign Highest Value
-        v = sys.maxsize
+        v = math.inf
 
         # Check each possible state from current game state
         for child_states in state.convert_moves_to_game_states():
-            v = min(v, cls.max_move(child_states, alpha, beta))
+            v = min(v, cls.max_move(child_states, alpha, beta, distance - 1))
             if v < alpha:
                 return v
             beta = max(alpha, v)
