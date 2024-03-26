@@ -2,7 +2,6 @@
 import datetime
 import math
 import random
-import sys
 import time
 
 from app.api.exceptions import InvalidMarbleValue
