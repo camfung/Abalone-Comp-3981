@@ -5,10 +5,17 @@
 - Callum Goss (A01328294)
 - Joseph Driedger (A01320740)
 
-## How to Run on the BCIT Lab Computer
+## How to Run the State Space Generator on the BCIT Lab Computer
+1. **Run Python on Apps Anywhere**
+2. **Download and Unzip the zip file**
+3. **Navigate to \test\player\state_space_test\dist folder and run filescriber.exe**
+- Ignore the security warnings that pop up and run anyways
+4. **Ensure the input file is in the same directory.  The program will prompt you to enter the name of the input file.  The output files will be in the same directory.**
+
+## How to Run the Game on the BCIT Lab Computer
 1. **Run Python on Apps Anywhere**
 2. **Unzip the zip file**
-3. **Navigate to the /dist folder and run driver.exe**
+3. **Navigate to the /dist folder and run Abalone_Group2.exe**
    - Ignore the security warnings that pop up and click "run anyways" 
 
 ## How to Run on any computer
@@ -46,18 +53,19 @@ Follow these steps to set up and run the program:
 4. **Export Python Driver to Executable File:**
     - Execute the program using the following command:
         ```
-        pyinstaller driver.py --onefile --noconsole
+        pyinstaller --onefile driver.py --name Abalone_Group2 --noconsole
         ```
 
 5. **Copy assets to correct**
-    - Copy the following folders into ./dist
+    - Create a new folder called app inside ./dist
+    - Copy the following folders into ./dist/app
         - formations
-        - games
+        - gameplay
         - images
 
 6. **Run the program and Have Fun.**
     - Open the dist directory
-    - Open driver.exe
+    - Open Abalone_Group2.exe
   
 ![Screenshot](docs/diagram.png)
 

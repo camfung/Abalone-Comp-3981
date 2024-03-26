@@ -9,7 +9,7 @@ class Move:
     Represents a move in the game, including its start and end positions, direction, marble involved, and move type.
     """
 
-    def __init__(self, first_ball_i, last_ball_i, direction, marble):
+    def __init__(self, first_ball_i, last_ball_i, direction, marble, middle_ball_i=(0, 0)):
         """
         Initializes a new move with specified parameters.
 
@@ -22,19 +22,22 @@ class Move:
         """
         self._direction = direction
         self._marble = marble
-        self._pos_i = (first_ball_i, last_ball_i)
-        self._pos_f = Move.__calc_pos_f(first_ball_i, last_ball_i, direction)
+        self._pos_i = (first_ball_i, last_ball_i, middle_ball_i)
+        self._pos_f = Move.__calc_pos_f(
+            first_ball_i, last_ball_i, direction, middle_ball_i)
         self._selection_type = Move.__calc_selection_type(
             first_ball_i, last_ball_i)
         self._move_type = Move.__calc_move_type(
             first_ball_i, last_ball_i, direction, self._selection_type)
+        self._num_balls_moved = Move.__calc_num_balls_moved(
+            first_ball_i, last_ball_i)
 
     @property
     def marble(self):
         return self._marble
 
     @staticmethod
-    def __calc_pos_f(f_ball_i, l_ball_i, direction):
+    def __calc_pos_f(f_ball_i, l_ball_i, direction, m_ball_i=None):
         """
         Calculates the final positions of the balls after the move.
 
@@ -48,24 +51,31 @@ class Move:
         """
         first_ball_i = copy.deepcopy(f_ball_i)
         last_ball_i = copy.deepcopy(l_ball_i)
+        middle_ball_i = copy.deepcopy(m_ball_i)
         if direction == Direction.UP_LEFT:
             position = ((first_ball_i[0] - 1, first_ball_i[1]),
-                        (last_ball_i[0] - 1, last_ball_i[1]))
+                        (last_ball_i[0] - 1, last_ball_i[1]),
+                        (middle_ball_i[0] - 1, middle_ball_i[1]))
         elif direction == Direction.UP_RIGHT:
             position = ((first_ball_i[0] - 1, first_ball_i[1] + 1),
-                        (last_ball_i[0] - 1, last_ball_i[1] + 1))
+                        (last_ball_i[0] - 1, last_ball_i[1] + 1),
+                        (middle_ball_i[0] - 1, middle_ball_i[1] + 1))
         elif direction == Direction.RIGHT:
             position = ((first_ball_i[0], first_ball_i[1] + 1),
-                        (last_ball_i[0], last_ball_i[1] + 1))
+                        (last_ball_i[0], last_ball_i[1] + 1),
+                        (middle_ball_i[0], middle_ball_i[1] + 1))
         elif direction == Direction.DOWN_RIGHT:
             position = ((first_ball_i[0] + 1, first_ball_i[1]),
-                        (last_ball_i[0] + 1, last_ball_i[1]))
+                        (last_ball_i[0] + 1, last_ball_i[1]),
+                        (middle_ball_i[0] + 1, middle_ball_i[1]))
         elif direction == Direction.DOWN_LEFT:
             position = ((first_ball_i[0] + 1, first_ball_i[1] - 1),
-                        (last_ball_i[0] + 1, last_ball_i[1] - 1))
+                        (last_ball_i[0] + 1, last_ball_i[1] - 1),
+                        (middle_ball_i[0] + 1, middle_ball_i[1] - 1))
         elif direction == Direction.LEFT:
             position = ((first_ball_i[0], first_ball_i[1] - 1),
-                        (last_ball_i[0], last_ball_i[1] - 1))
+                        (last_ball_i[0], last_ball_i[1] - 1),
+                        (middle_ball_i[0], middle_ball_i[1] - 1))
         elif direction == None:
             raise InvalidDirection("Direction passed to Move is None")
         else:
@@ -131,6 +141,26 @@ class Move:
 
         return MoveType.SIDE_STEP
 
+    @staticmethod
+    def __calc_num_balls_moved(first_ball_i, last_ball_i):
+        """
+        Calculates the number of balls being moved.
+
+        :param first_ball_i: first ball position
+        :param last_ball_i: last ball position
+        :return: integer representing the number of balls being moved.
+        """
+
+        # Check if 3 balls are being moved
+        if (abs(first_ball_i[0] - last_ball_i[0]) > 1
+                or abs(first_ball_i[1] - last_ball_i[1]) > 1):
+            return 3
+
+        if first_ball_i != last_ball_i:
+            return 2
+
+        return 1
+
     def get_pos_i(self):
         return self._pos_i
 
@@ -148,6 +178,9 @@ class Move:
 
     def get_move_type(self):
         return self._move_type
+
+    def get_num_balls_moved(self):
+        return self._num_balls_moved
 
     def __str__(self):
         char_first_i_x = chr(self._pos_i[0][0] + 74 - 2 * (self._pos_i[0][0]))

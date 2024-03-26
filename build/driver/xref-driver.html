@@ -21,7 +21,7 @@ imports:
     <a href="#_collections_abc">_collections_abc</a>
  &#8226;   <a href="#_weakrefset">_weakrefset</a>
  &#8226;   <a href="#abc">abc</a>
- &#8226;   <a href="#app">app</a>
+ &#8226;   <a href="#app.app">app.app</a>
  &#8226;   <a href="#codecs">codecs</a>
  &#8226;   <a href="#collections">collections</a>
  &#8226;   <a href="#collections.abc">collections.abc</a>
@@ -1305,7 +1305,9 @@ imports:
   <div class="import">
 imported by:
     <a href="#_collections_abc">_collections_abc</a>
- &#8226;   <a href="#communication">communication</a>
+ &#8226;   <a href="#app.players.player">app.players.player</a>
+ &#8226;   <a href="#app.ui.ui">app.ui.ui</a>
+ &#8226;   <a href="#app.ui.ui_components">app.ui.ui_components</a>
  &#8226;   <a href="#contextlib">contextlib</a>
  &#8226;   <a href="#dataclasses">dataclasses</a>
  &#8226;   <a href="#driver.py">driver.py</a>
@@ -1326,7 +1328,6 @@ imported by:
  &#8226;   <a href="#pkg_resources._vendor.packaging.specifiers">pkg_resources._vendor.packaging.specifiers</a>
  &#8226;   <a href="#pkg_resources._vendor.platformdirs.api">pkg_resources._vendor.platformdirs.api</a>
  &#8226;   <a href="#pkg_resources._vendor.typing_extensions">pkg_resources._vendor.typing_extensions</a>
- &#8226;   <a href="#players">players</a>
  &#8226;   <a href="#pygame_menu.widgets.widget.button">pygame_menu.widgets.widget.button</a>
  &#8226;   <a href="#pygame_menu.widgets.widget.colorinput">pygame_menu.widgets.widget.colorinput</a>
  &#8226;   <a href="#pygame_menu.widgets.widget.dropselect">pygame_menu.widgets.widget.dropselect</a>
@@ -1349,8 +1350,6 @@ imported by:
  &#8226;   <a href="#selectors">selectors</a>
  &#8226;   <a href="#typing">typing</a>
  &#8226;   <a href="#typing_extensions">typing_extensions</a>
- &#8226;   <a href="#ui">ui</a>
- &#8226;   <a href="#ui_components">ui_components</a>
 
   </div>
 
@@ -1358,19 +1357,470 @@ imported by:
 
 <div class="node">
   <a name="app"></a>
-  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app.py" type="text/plain"><tt>app</tt></a>
+  <a target="code" href="-" type="text/plain"><tt>app</tt></a>
+<span class="moduletype">NamespacePackage</span>  <div class="import">
+imported by:
+    <a href="#app.api">app.api</a>
+ &#8226;   <a href="#app.app">app.app</a>
+ &#8226;   <a href="#app.communication">app.communication</a>
+ &#8226;   <a href="#app.gameplay">app.gameplay</a>
+ &#8226;   <a href="#app.players">app.players</a>
+ &#8226;   <a href="#app.ui">app.ui</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.api"></a>
+  <a target="code" href="-" type="text/plain"><tt>app.api</tt></a>
+<span class="moduletype">NamespacePackage</span>  <div class="import">
+imports:
+    <a href="#app">app</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#app.api.exceptions">app.api.exceptions</a>
+ &#8226;   <a href="#app.api.records">app.api.records</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.api.enums"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/api/enums.py" type="text/plain"><tt>app.api.enums</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#communication">communication</a>
- &#8226;   <a href="#enums">enums</a>
- &#8226;   <a href="#gameplay">gameplay</a>
- &#8226;   <a href="#players">players</a>
- &#8226;   <a href="#ui">ui</a>
+    <a href="#app.api">app.api</a>
+ &#8226;   <a href="#enum">enum</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.app">app.app</a>
+ &#8226;   <a href="#app.gameplay.game">app.gameplay.game</a>
+ &#8226;   <a href="#app.gameplay.game_state">app.gameplay.game_state</a>
+ &#8226;   <a href="#app.gameplay.move">app.gameplay.move</a>
+ &#8226;   <a href="#app.gameplay.timer">app.gameplay.timer</a>
+ &#8226;   <a href="#app.players.agent">app.players.agent</a>
+ &#8226;   <a href="#app.players.human">app.players.human</a>
+ &#8226;   <a href="#app.players.player">app.players.player</a>
+ &#8226;   <a href="#app.ui.board">app.ui.board</a>
+ &#8226;   <a href="#app.ui.hud">app.ui.hud</a>
+ &#8226;   <a href="#app.ui.pi_handler">app.ui.pi_handler</a>
+ &#8226;   <a href="#app.ui.ui">app.ui.ui</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.api.exceptions"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/api/exceptions.py" type="text/plain"><tt>app.api.exceptions</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#app.api">app.api</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.communication.game_manager">app.communication.game_manager</a>
+ &#8226;   <a href="#app.gameplay.game">app.gameplay.game</a>
+ &#8226;   <a href="#app.gameplay.game_state">app.gameplay.game_state</a>
+ &#8226;   <a href="#app.gameplay.move">app.gameplay.move</a>
+ &#8226;   <a href="#app.players.agent">app.players.agent</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.api.records"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/api/records.py" type="text/plain"><tt>app.api.records</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#app.api">app.api</a>
+ &#8226;   <a href="#datetime">datetime</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.gameplay.game">app.gameplay.game</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.app"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/app.py" type="text/plain"><tt>app.app</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#app">app</a>
+ &#8226;   <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#app.communication.game_manager">app.communication.game_manager</a>
+ &#8226;   <a href="#app.gameplay.move">app.gameplay.move</a>
+ &#8226;   <a href="#app.gameplay.timer">app.gameplay.timer</a>
+ &#8226;   <a href="#app.players.agent">app.players.agent</a>
+ &#8226;   <a href="#app.players.human">app.players.human</a>
+ &#8226;   <a href="#app.ui.ui">app.ui.ui</a>
+ &#8226;   <a href="#threading">threading</a>
+ &#8226;   <a href="#time">time</a>
 
   </div>
   <div class="import">
 imported by:
     <a href="#driver.py">driver.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.communication"></a>
+  <a target="code" href="-" type="text/plain"><tt>app.communication</tt></a>
+<span class="moduletype">NamespacePackage</span>  <div class="import">
+imports:
+    <a href="#app">app</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.communication.game_manager">app.communication.game_manager</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.communication.game_manager"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/communication/game_manager.py" type="text/plain"><tt>app.communication.game_manager</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#app.api.exceptions">app.api.exceptions</a>
+ &#8226;   <a href="#app.communication">app.communication</a>
+ &#8226;   <a href="#app.gameplay.game">app.gameplay.game</a>
+ &#8226;   <a href="#copy">copy</a>
+ &#8226;   <a href="#time">time</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.app">app.app</a>
+ &#8226;   <a href="#app.players.agent">app.players.agent</a>
+ &#8226;   <a href="#app.players.human">app.players.human</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.gameplay"></a>
+  <a target="code" href="-" type="text/plain"><tt>app.gameplay</tt></a>
+<span class="moduletype">NamespacePackage</span>  <div class="import">
+imports:
+    <a href="#app">app</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.gameplay.game">app.gameplay.game</a>
+ &#8226;   <a href="#app.gameplay.game_state">app.gameplay.game_state</a>
+ &#8226;   <a href="#app.gameplay.move">app.gameplay.move</a>
+ &#8226;   <a href="#app.gameplay.timer">app.gameplay.timer</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.gameplay.game"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/gameplay/game.py" type="text/plain"><tt>app.gameplay.game</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#app.api.exceptions">app.api.exceptions</a>
+ &#8226;   <a href="#app.api.records">app.api.records</a>
+ &#8226;   <a href="#app.gameplay">app.gameplay</a>
+ &#8226;   <a href="#app.gameplay.game_state">app.gameplay.game_state</a>
+ &#8226;   <a href="#csv">csv</a>
+ &#8226;   <a href="#pathlib">pathlib</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.communication.game_manager">app.communication.game_manager</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.gameplay.game_state"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/gameplay/game_state.py" type="text/plain"><tt>app.gameplay.game_state</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#app.api.exceptions">app.api.exceptions</a>
+ &#8226;   <a href="#app.gameplay">app.gameplay</a>
+ &#8226;   <a href="#app.gameplay.move">app.gameplay.move</a>
+ &#8226;   <a href="#copy">copy</a>
+ &#8226;   <a href="#typing">typing</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.gameplay.game">app.gameplay.game</a>
+ &#8226;   <a href="#app.players.agent">app.players.agent</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.gameplay.move"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/gameplay/move.py" type="text/plain"><tt>app.gameplay.move</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#app.api.exceptions">app.api.exceptions</a>
+ &#8226;   <a href="#app.gameplay">app.gameplay</a>
+ &#8226;   <a href="#copy">copy</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.app">app.app</a>
+ &#8226;   <a href="#app.gameplay.game_state">app.gameplay.game_state</a>
+ &#8226;   <a href="#app.players.agent">app.players.agent</a>
+ &#8226;   <a href="#app.players.human">app.players.human</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.gameplay.timer"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/gameplay/timer.py" type="text/plain"><tt>app.gameplay.timer</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#app.gameplay">app.gameplay</a>
+ &#8226;   <a href="#time">time</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.app">app.app</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.players"></a>
+  <a target="code" href="-" type="text/plain"><tt>app.players</tt></a>
+<span class="moduletype">NamespacePackage</span>  <div class="import">
+imports:
+    <a href="#app">app</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.players.agent">app.players.agent</a>
+ &#8226;   <a href="#app.players.human">app.players.human</a>
+ &#8226;   <a href="#app.players.player">app.players.player</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.players.agent"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/players/agent.py" type="text/plain"><tt>app.players.agent</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#app.api.exceptions">app.api.exceptions</a>
+ &#8226;   <a href="#app.communication.game_manager">app.communication.game_manager</a>
+ &#8226;   <a href="#app.gameplay.game_state">app.gameplay.game_state</a>
+ &#8226;   <a href="#app.gameplay.move">app.gameplay.move</a>
+ &#8226;   <a href="#app.players">app.players</a>
+ &#8226;   <a href="#app.players.player">app.players.player</a>
+ &#8226;   <a href="#datetime">datetime</a>
+ &#8226;   <a href="#random">random</a>
+ &#8226;   <a href="#sys">sys</a>
+ &#8226;   <a href="#time">time</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.app">app.app</a>
+ &#8226;   <a href="#app.ui.hud">app.ui.hud</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.players.human"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/players/human.py" type="text/plain"><tt>app.players.human</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#app.communication.game_manager">app.communication.game_manager</a>
+ &#8226;   <a href="#app.gameplay.move">app.gameplay.move</a>
+ &#8226;   <a href="#app.players">app.players</a>
+ &#8226;   <a href="#app.players.player">app.players.player</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.app">app.app</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.players.player"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/players/player.py" type="text/plain"><tt>app.players.player</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#abc">abc</a>
+ &#8226;   <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#app.players">app.players</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.players.agent">app.players.agent</a>
+ &#8226;   <a href="#app.players.human">app.players.human</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.ui"></a>
+  <a target="code" href="-" type="text/plain"><tt>app.ui</tt></a>
+<span class="moduletype">NamespacePackage</span>  <div class="import">
+imports:
+    <a href="#app">app</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.ui.board">app.ui.board</a>
+ &#8226;   <a href="#app.ui.hud">app.ui.hud</a>
+ &#8226;   <a href="#app.ui.pi_handler">app.ui.pi_handler</a>
+ &#8226;   <a href="#app.ui.ui">app.ui.ui</a>
+ &#8226;   <a href="#app.ui.ui_components">app.ui.ui_components</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.ui.board"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/ui/board.py" type="text/plain"><tt>app.ui.board</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#app.ui">app.ui</a>
+ &#8226;   <a href="#app.ui.pi_handler">app.ui.pi_handler</a>
+ &#8226;   <a href="#app.ui.ui_components">app.ui.ui_components</a>
+ &#8226;   <a href="#pygame">pygame</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.ui.ui">app.ui.ui</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.ui.hud"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/ui/hud.py" type="text/plain"><tt>app.ui.hud</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#app.players.agent">app.players.agent</a>
+ &#8226;   <a href="#app.ui">app.ui</a>
+ &#8226;   <a href="#app.ui.ui_components">app.ui.ui_components</a>
+ &#8226;   <a href="#math">math</a>
+ &#8226;   <a href="#pygame_menu">pygame_menu</a>
+ &#8226;   <a href="#threading">threading</a>
+ &#8226;   <a href="#time">time</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.ui.ui">app.ui.ui</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.ui.pi_handler"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/ui/pi_handler.py" type="text/plain"><tt>app.ui.pi_handler</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#app.ui">app.ui</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.ui.board">app.ui.board</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.ui.ui"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/ui/ui.py" type="text/plain"><tt>app.ui.ui</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#abc">abc</a>
+ &#8226;   <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#app.ui">app.ui</a>
+ &#8226;   <a href="#app.ui.board">app.ui.board</a>
+ &#8226;   <a href="#app.ui.hud">app.ui.hud</a>
+ &#8226;   <a href="#pygame">pygame</a>
+ &#8226;   <a href="#pygame_menu">pygame_menu</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.app">app.app</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="app.ui.ui_components"></a>
+  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/app/ui/ui_components.py" type="text/plain"><tt>app.ui.ui_components</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#abc">abc</a>
+ &#8226;   <a href="#app.ui">app.ui</a>
+ &#8226;   <a href="#pygame">pygame</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#app.ui.board">app.ui.board</a>
+ &#8226;   <a href="#app.ui.hud">app.ui.hud</a>
 
   </div>
 
@@ -1830,25 +2280,6 @@ imported by:
 </div>
 
 <div class="node">
-  <a name="communication"></a>
-  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/communication.py" type="text/plain"><tt>communication</tt></a>
-<span class="moduletype">SourceModule</span>  <div class="import">
-imports:
-    <a href="#abc">abc</a>
- &#8226;   <a href="#exceptions">exceptions</a>
- &#8226;   <a href="#gameplay">gameplay</a>
-
-  </div>
-  <div class="import">
-imported by:
-    <a href="#app">app</a>
- &#8226;   <a href="#players">players</a>
-
-  </div>
-
-</div>
-
-<div class="node">
   <a name="configparser"></a>
   <a target="code" href="///C:/Users/Admin/AppData/Local/Programs/Python/Python312/Lib/configparser.py" type="text/plain"><tt>configparser</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
@@ -1944,11 +2375,13 @@ imports:
   <div class="import">
 imported by:
     <a href="#_sre">_sre</a>
+ &#8226;   <a href="#app.communication.game_manager">app.communication.game_manager</a>
+ &#8226;   <a href="#app.gameplay.game_state">app.gameplay.game_state</a>
+ &#8226;   <a href="#app.gameplay.move">app.gameplay.move</a>
  &#8226;   <a href="#argparse">argparse</a>
  &#8226;   <a href="#collections">collections</a>
  &#8226;   <a href="#dataclasses">dataclasses</a>
  &#8226;   <a href="#email.generator">email.generator</a>
- &#8226;   <a href="#gameplay">gameplay</a>
  &#8226;   <a href="#gettext">gettext</a>
  &#8226;   <a href="#http.cookiejar">http.cookiejar</a>
  &#8226;   <a href="#pygame_menu.themes">pygame_menu.themes</a>
@@ -1997,7 +2430,7 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#gameplay">gameplay</a>
+    <a href="#app.gameplay.game">app.gameplay.game</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
 
   </div>
@@ -2104,12 +2537,12 @@ imports:
   <div class="import">
 imported by:
     <a href="#_strptime">_strptime</a>
+ &#8226;   <a href="#app.api.records">app.api.records</a>
+ &#8226;   <a href="#app.players.agent">app.players.agent</a>
  &#8226;   <a href="#calendar">calendar</a>
  &#8226;   <a href="#email.utils">email.utils</a>
  &#8226;   <a href="#http.cookiejar">http.cookiejar</a>
- &#8226;   <a href="#players">players</a>
  &#8226;   <a href="#plistlib">plistlib</a>
- &#8226;   <a href="#records">records</a>
 
   </div>
 
@@ -5175,10 +5608,10 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#ast">ast</a>
+    <a href="#app.api.enums">app.api.enums</a>
+ &#8226;   <a href="#ast">ast</a>
  &#8226;   <a href="#calendar">calendar</a>
  &#8226;   <a href="#driver.py">driver.py</a>
- &#8226;   <a href="#enums">enums</a>
  &#8226;   <a href="#http">http</a>
  &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#packaging._elffile">packaging._elffile</a>
@@ -5190,25 +5623,6 @@ imported by:
  &#8226;   <a href="#socket">socket</a>
  &#8226;   <a href="#ssl">ssl</a>
  &#8226;   <a href="#uuid">uuid</a>
-
-  </div>
-
-</div>
-
-<div class="node">
-  <a name="enums"></a>
-  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/enums.py" type="text/plain"><tt>enums</tt></a>
-<span class="moduletype">SourceModule</span>  <div class="import">
-imports:
-    <a href="#enum">enum</a>
-
-  </div>
-  <div class="import">
-imported by:
-    <a href="#app">app</a>
- &#8226;   <a href="#gameplay">gameplay</a>
- &#8226;   <a href="#players">players</a>
- &#8226;   <a href="#ui">ui</a>
 
   </div>
 
@@ -5228,18 +5642,6 @@ imported by:
  &#8226;   <a href="#ssl">ssl</a>
  &#8226;   <a href="#subprocess">subprocess</a>
  &#8226;   <a href="#tempfile">tempfile</a>
-
-  </div>
-
-</div>
-
-<div class="node">
-  <a name="exceptions"></a>
-  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/exceptions.py" type="text/plain"><tt>exceptions</tt></a>
-<span class="moduletype">SourceModule</span>  <div class="import">
-imported by:
-    <a href="#communication">communication</a>
- &#8226;   <a href="#gameplay">gameplay</a>
 
   </div>
 
@@ -5386,28 +5788,6 @@ imported by:
  &#8226;   <a href="#typing">typing</a>
  &#8226;   <a href="#typing_extensions">typing_extensions</a>
  &#8226;   <a href="#urllib.parse">urllib.parse</a>
-
-  </div>
-
-</div>
-
-<div class="node">
-  <a name="gameplay"></a>
-  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/gameplay.py" type="text/plain"><tt>gameplay</tt></a>
-<span class="moduletype">SourceModule</span>  <div class="import">
-imports:
-    <a href="#copy">copy</a>
- &#8226;   <a href="#csv">csv</a>
- &#8226;   <a href="#enums">enums</a>
- &#8226;   <a href="#exceptions">exceptions</a>
- &#8226;   <a href="#records">records</a>
-
-  </div>
-  <div class="import">
-imported by:
-    <a href="#app">app</a>
- &#8226;   <a href="#communication">communication</a>
- &#8226;   <a href="#players">players</a>
 
   </div>
 
@@ -5698,6 +6078,7 @@ imports:
  &#8226;   <a href="#importlib">importlib</a>
  &#8226;   <a href="#importlib._bootstrap">importlib._bootstrap</a>
  &#8226;   <a href="#importlib._bootstrap_external">importlib._bootstrap_external</a>
+ &#8226;   <a href="#importlib.machinery">importlib.machinery</a>
  &#8226;   <a href="#sys">sys</a>
  &#8226;   <a href="#warnings">warnings</a>
 
@@ -5831,7 +6212,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#importlib.abc">importlib.abc</a>
+    <a href="#importlib">importlib</a>
+ &#8226;   <a href="#importlib.abc">importlib.abc</a>
  &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#packaging.tags">packaging.tags</a>
  &#8226;   <a href="#pkg_resources">pkg_resources</a>
@@ -6542,6 +6924,7 @@ imported by:
 imported by:
     <a href="#_pydatetime">_pydatetime</a>
  &#8226;   <a href="#_pydecimal">_pydecimal</a>
+ &#8226;   <a href="#app.ui.hud">app.ui.hud</a>
  &#8226;   <a href="#fractions">fractions</a>
  &#8226;   <a href="#pkg_resources._vendor.more_itertools.more">pkg_resources._vendor.more_itertools.more</a>
  &#8226;   <a href="#pkg_resources._vendor.more_itertools.recipes">pkg_resources._vendor.more_itertools.recipes</a>
@@ -7255,7 +7638,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#importlib.metadata">importlib.metadata</a>
+    <a href="#app.gameplay.game">app.gameplay.game</a>
+ &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#importlib.resources._common">importlib.resources._common</a>
  &#8226;   <a href="#importlib.resources._legacy">importlib.resources._legacy</a>
  &#8226;   <a href="#importlib.resources.abc">importlib.resources.abc</a>
@@ -8534,29 +8918,6 @@ imported by:
 </div>
 
 <div class="node">
-  <a name="players"></a>
-  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/players.py" type="text/plain"><tt>players</tt></a>
-<span class="moduletype">SourceModule</span>  <div class="import">
-imports:
-    <a href="#abc">abc</a>
- &#8226;   <a href="#communication">communication</a>
- &#8226;   <a href="#datetime">datetime</a>
- &#8226;   <a href="#enums">enums</a>
- &#8226;   <a href="#gameplay">gameplay</a>
- &#8226;   <a href="#random">random</a>
- &#8226;   <a href="#time">time</a>
- &#8226;   <a href="#typing">typing</a>
-
-  </div>
-  <div class="import">
-imported by:
-    <a href="#app">app</a>
-
-  </div>
-
-</div>
-
-<div class="node">
   <a name="plistlib"></a>
   <a target="code" href="///C:/Users/Admin/AppData/Local/Programs/Python/Python312/Lib/plistlib.py" type="text/plain"><tt>plistlib</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
@@ -8763,7 +9124,10 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#pygame._freetype">pygame._freetype</a>
+    <a href="#app.ui.board">app.ui.board</a>
+ &#8226;   <a href="#app.ui.ui">app.ui.ui</a>
+ &#8226;   <a href="#app.ui.ui_components">app.ui.ui_components</a>
+ &#8226;   <a href="#pygame._freetype">pygame._freetype</a>
  &#8226;   <a href="#pygame.base">pygame.base</a>
  &#8226;   <a href="#pygame.bufferproxy">pygame.bufferproxy</a>
  &#8226;   <a href="#pygame.color">pygame.color</a>
@@ -8840,8 +9204,6 @@ imported by:
  &#8226;   <a href="#pygame_menu.widgets.widget.toggleswitch">pygame_menu.widgets.widget.toggleswitch</a>
  &#8226;   <a href="#pygame_menu.widgets.widget.vfill">pygame_menu.widgets.widget.vfill</a>
  &#8226;   <a href="#pygame_menu.widgets.widget.vmargin">pygame_menu.widgets.widget.vmargin</a>
- &#8226;   <a href="#ui">ui</a>
- &#8226;   <a href="#ui_components">ui_components</a>
 
   </div>
 
@@ -9610,7 +9972,9 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#pygame_menu._base">pygame_menu._base</a>
+    <a href="#app.ui.hud">app.ui.hud</a>
+ &#8226;   <a href="#app.ui.ui">app.ui.ui</a>
+ &#8226;   <a href="#pygame_menu._base">pygame_menu._base</a>
  &#8226;   <a href="#pygame_menu._decorator">pygame_menu._decorator</a>
  &#8226;   <a href="#pygame_menu._scrollarea">pygame_menu._scrollarea</a>
  &#8226;   <a href="#pygame_menu._types">pygame_menu._types</a>
@@ -9653,7 +10017,6 @@ imported by:
  &#8226;   <a href="#pygame_menu.widgets.widget.toggleswitch">pygame_menu.widgets.widget.toggleswitch</a>
  &#8226;   <a href="#pygame_menu.widgets.widget.vfill">pygame_menu.widgets.widget.vfill</a>
  &#8226;   <a href="#pygame_menu.widgets.widget.vmargin">pygame_menu.widgets.widget.vmargin</a>
- &#8226;   <a href="#ui">ui</a>
 
   </div>
 
@@ -11137,11 +11500,11 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#email.generator">email.generator</a>
+    <a href="#app.players.agent">app.players.agent</a>
+ &#8226;   <a href="#email.generator">email.generator</a>
  &#8226;   <a href="#email.utils">email.utils</a>
  &#8226;   <a href="#pkg_resources._vendor.more_itertools.more">pkg_resources._vendor.more_itertools.more</a>
  &#8226;   <a href="#pkg_resources._vendor.more_itertools.recipes">pkg_resources._vendor.more_itertools.recipes</a>
- &#8226;   <a href="#players">players</a>
  &#8226;   <a href="#pygame_menu.font">pygame_menu.font</a>
  &#8226;   <a href="#pygame_menu.widgets.core.widget">pygame_menu.widgets.core.widget</a>
  &#8226;   <a href="#statistics">statistics</a>
@@ -11330,23 +11693,6 @@ imported by:
  &#8226;   <a href="#re">re</a>
  &#8226;   <a href="#re._compiler">re._compiler</a>
  &#8226;   <a href="#sre_parse">sre_parse</a>
-
-  </div>
-
-</div>
-
-<div class="node">
-  <a name="records"></a>
-  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/records.py" type="text/plain"><tt>records</tt></a>
-<span class="moduletype">SourceModule</span>  <div class="import">
-imports:
-    <a href="#datetime">datetime</a>
-
-  </div>
-  <div class="import">
-imported by:
-    <a href="#gameplay">gameplay</a>
- &#8226;   <a href="#ui">ui</a>
 
   </div>
 
@@ -11780,6 +12126,8 @@ imported by:
  &#8226;   <a href="#_pydatetime">_pydatetime</a>
  &#8226;   <a href="#_pydecimal">_pydecimal</a>
  &#8226;   <a href="#_pyi_rth_utils">_pyi_rth_utils</a>
+ &#8226;   <a href="#app.players.agent">app.players.agent</a>
+ &#8226;   <a href="#app.ui.ui">app.ui.ui</a>
  &#8226;   <a href="#argparse">argparse</a>
  &#8226;   <a href="#ast">ast</a>
  &#8226;   <a href="#base64">base64</a>
@@ -11876,7 +12224,6 @@ imported by:
  &#8226;   <a href="#types">types</a>
  &#8226;   <a href="#typing">typing</a>
  &#8226;   <a href="#typing_extensions">typing_extensions</a>
- &#8226;   <a href="#ui">ui</a>
  &#8226;   <a href="#urllib.request">urllib.request</a>
  &#8226;   <a href="#uuid">uuid</a>
  &#8226;   <a href="#warnings">warnings</a>
@@ -12041,6 +12388,8 @@ imports:
   <div class="import">
 imported by:
     <a href="#_threading_local">_threading_local</a>
+ &#8226;   <a href="#app.app">app.app</a>
+ &#8226;   <a href="#app.ui.hud">app.ui.hud</a>
  &#8226;   <a href="#http.cookiejar">http.cookiejar</a>
  &#8226;   <a href="#logging">logging</a>
  &#8226;   <a href="#pygame.threads">pygame.threads</a>
@@ -12066,6 +12415,11 @@ imported by:
     <a href="#_datetime">_datetime</a>
  &#8226;   <a href="#_pydatetime">_pydatetime</a>
  &#8226;   <a href="#_strptime">_strptime</a>
+ &#8226;   <a href="#app.app">app.app</a>
+ &#8226;   <a href="#app.communication.game_manager">app.communication.game_manager</a>
+ &#8226;   <a href="#app.gameplay.timer">app.gameplay.timer</a>
+ &#8226;   <a href="#app.players.agent">app.players.agent</a>
+ &#8226;   <a href="#app.ui.hud">app.ui.hud</a>
  &#8226;   <a href="#datetime">datetime</a>
  &#8226;   <a href="#email._parseaddr">email._parseaddr</a>
  &#8226;   <a href="#email.generator">email.generator</a>
@@ -12077,7 +12431,6 @@ imported by:
  &#8226;   <a href="#pkg_resources">pkg_resources</a>
  &#8226;   <a href="#pkg_resources._vendor.jaraco.functools">pkg_resources._vendor.jaraco.functools</a>
  &#8226;   <a href="#pkg_resources._vendor.more_itertools.more">pkg_resources._vendor.more_itertools.more</a>
- &#8226;   <a href="#players">players</a>
  &#8226;   <a href="#pygame.threads">pygame.threads</a>
  &#8226;   <a href="#pygame_menu.menu">pygame_menu.menu</a>
  &#8226;   <a href="#pygame_menu.sound">pygame_menu.sound</a>
@@ -12262,7 +12615,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#functools">functools</a>
+    <a href="#app.gameplay.game_state">app.gameplay.game_state</a>
+ &#8226;   <a href="#functools">functools</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#importlib.metadata._meta">importlib.metadata._meta</a>
  &#8226;   <a href="#importlib.resources._common">importlib.resources._common</a>
@@ -12305,7 +12659,6 @@ imported by:
  &#8226;   <a href="#pkg_resources._vendor.platformdirs.api">pkg_resources._vendor.platformdirs.api</a>
  &#8226;   <a href="#pkg_resources._vendor.platformdirs.windows">pkg_resources._vendor.platformdirs.windows</a>
  &#8226;   <a href="#pkg_resources._vendor.typing_extensions">pkg_resources._vendor.typing_extensions</a>
- &#8226;   <a href="#players">players</a>
  &#8226;   <a href="#pygame_menu._types">pygame_menu._types</a>
  &#8226;   <a href="#pygame_menu.controls">pygame_menu.controls</a>
  &#8226;   <a href="#pygame_menu.events">pygame_menu.events</a>
@@ -12338,45 +12691,6 @@ imported by:
     <a href="#packaging.metadata">packaging.metadata</a>
  &#8226;   <a href="#pkg_resources._vendor.packaging.metadata">pkg_resources._vendor.packaging.metadata</a>
  &#8226;   <a href="#pygame_menu._types">pygame_menu._types</a>
-
-  </div>
-
-</div>
-
-<div class="node">
-  <a name="ui"></a>
-  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/ui.py" type="text/plain"><tt>ui</tt></a>
-<span class="moduletype">SourceModule</span>  <div class="import">
-imports:
-    <a href="#abc">abc</a>
- &#8226;   <a href="#enums">enums</a>
- &#8226;   <a href="#pygame">pygame</a>
- &#8226;   <a href="#pygame_menu">pygame_menu</a>
- &#8226;   <a href="#records">records</a>
- &#8226;   <a href="#sys">sys</a>
- &#8226;   <a href="#ui_components">ui_components</a>
-
-  </div>
-  <div class="import">
-imported by:
-    <a href="#app">app</a>
-
-  </div>
-
-</div>
-
-<div class="node">
-  <a name="ui_components"></a>
-  <a target="code" href="///C:/Users/Admin/CST_Program/Level3/COMP3981/Project/Abalone-Comp-3981/ui_components.py" type="text/plain"><tt>ui_components</tt></a>
-<span class="moduletype">SourceModule</span>  <div class="import">
-imports:
-    <a href="#abc">abc</a>
- &#8226;   <a href="#pygame">pygame</a>
-
-  </div>
-  <div class="import">
-imported by:
-    <a href="#ui">ui</a>
 
   </div>
 

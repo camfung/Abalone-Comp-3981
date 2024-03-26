@@ -1,25 +1,32 @@
 
-
 import unittest
-from app.api.filescriber import FileScriber
+from filescriber import FileScriber
+from collections import Counter
+from pathlib import Path
 
 
 class StateSpaceTest(unittest.TestCase):
-    def test_chi_en_test_1(self):
-        FileScriber.export_state_space_to_text_files("./Input/Test1.input",
-                                                     "./Output/Test1.move",
-                                                     "./Output/Test1.board")
-        exported_results = FileScriber.import_board_from_text_files("./Output/Test1.board")
-        verified_results = FileScriber.import_board_from_text_files("./Verify/Test1.board")
-        self.assertEqual(sorted(exported_results), sorted(verified_results))
+    def test_chi_en_1(self):
+        input_file = Path("Test1.input").resolve()
+        output_move_file = Path("./Output/Test1.move").resolve()
+        output_board_file = Path("./Output/Test1.board").resolve()
+        verify_board_file = Path("./Verify/Test1.board").resolve()
 
-    def test_chi_en_test_2(self):
-        FileScriber.export_state_space_to_text_files("./Input/Test2.input",
-                                                     "./Output/Test2.move",
-                                                     "./Output/Test2.board")
-        exported_results = FileScriber.import_board_from_text_files("./Output/Test2.board")
-        verified_results = FileScriber.import_board_from_text_files("./Verify/Test2.board")
-        self.assertEqual(sorted(exported_results), sorted(verified_results))
+        FileScriber.export_state_space_to_text_files(input_file, output_move_file, output_board_file)
+        exported_results = FileScriber.import_board_from_text_files(output_board_file)
+        verified_results = FileScriber.import_board_from_text_files(verify_board_file)
+        self.assertTrue(Counter(exported_results) == Counter(verified_results))
+
+    def test_chi_en_2(self):
+        input_file = Path("Test2.input").resolve()
+        output_move_file = Path("./Output/Test2.move").resolve()
+        output_board_file = Path("./Output/Test2.board").resolve()
+        verify_board_file = Path("./Verify/Test2.board").resolve()
+
+        FileScriber.export_state_space_to_text_files(input_file, output_move_file, output_board_file)
+        exported_results = FileScriber.import_board_from_text_files(output_board_file)
+        verified_results = FileScriber.import_board_from_text_files(verify_board_file)
+        self.assertTrue(Counter(exported_results) == Counter(verified_results))
 
     def test_team_num_balls_test_1(self):
         self.assertEqual(True, True)
