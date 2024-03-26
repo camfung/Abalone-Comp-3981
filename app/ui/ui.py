@@ -74,7 +74,7 @@ class PygameUI(UI):
 
         def undo_move_cb(): return self._app.notify(self, "UndoLastMove")
 
-        def pause_game_cb(): return self._app.notify(self, "PauseGame")
+        def pause_game_cb(): return self._app.notify(self, "PauseTimer")
 
         def update_score_cb(): return self._app.notify(self, "GetScore")
 
