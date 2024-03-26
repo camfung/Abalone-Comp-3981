@@ -34,7 +34,7 @@ class App:
 
     def notify(self, sender, event, **kwargs):
         thread = threading.Thread(
-            target=self.notify, args=(self, "AiMakeMove"))
+            target=self.notify, args=(self, "ThreadedAiMakeMove"))
         """
         Handles notifications sent from different parts of the application,
         acting upon various events like starting the game, making moves, undoing moves, and querying game state.
@@ -81,18 +81,24 @@ class App:
             No specific parameters are required for this event 
             as the AI's decision-making process is internal and based on the current game state.
             """
+            thread.start()
+
+        if event == "ThreadedAiMakeMove":
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else \
                 self.players[1]
             if isinstance(player, AbaloneAgent):
                 # trigger the agent to make a move
                 move, time_stamp = player.generate_move(self.game_manager)
-                player.make_move(self.game_manager,
-                                 player.color, move, time_stamp=time_stamp)
-                self.gui.start_button_clicked = True
+                if self.timer._game_started:
+                    player.make_move(self.game_manager,
+                                    player.color, move, time_stamp=time_stamp)
+                    self.gui.start_button_clicked = True
             if thread.is_alive():
                 thread.join()
-            self.timer.current_turn_start_time = time.time()
-            self.timer._elapsed_time = time.time()
+            if not self.timer.paused:
+                self.timer.current_turn_start_time = time.time()
+                self.timer._elapsed_time = time.time()
+            self.timer.paused = False
             self.gui.waiting_for_player_input = True
 
         if event == "PlayerMakeMove":
@@ -120,7 +126,7 @@ class App:
                 move=move, player=move.marble, timestamp=time_stamp)
             self.timer.current_turn_start_time = time.time()
             self.timer._elapsed_time = time.time()
-            thread.start()
+            self.notify(self, "AiMakeMove")
         if event == "IsMarblePlayerToMove":
             """
             Checks if the marble at a given position belongs to the current player to move.
@@ -155,6 +161,20 @@ class App:
 
         if event == "UpdateTimer":
             self.timer.update_timer(self.game_manager)
+
+        if event == "ReduceAggregateTime":
+            if kwargs["player"] == Marble.BLACK:
+                self.timer._black_total_aggregate_time -= kwargs["time"]
+                if self.timer._black_total_aggregate_time < 0:
+                    self.timer._black_total_aggregate_time = 0
+            elif kwargs["player"] == Marble.WHITE:
+                self.timer._white_total_aggregate_time -= kwargs["time"]
+                if self.timer._white_total_aggregate_time < 0:
+                    self.timer._white_total_aggregate_time = 0
+
+        if event == "PauseTimer":
+            self.gui.waiting_for_player_input = False
+            self.timer.pause_timer()
 
         ##Add pause timer thing here
 

@@ -400,6 +400,13 @@ class GameState:
         # if 3 long check the middle one
         if move.get_num_balls_moved() == 3 and self.get_marble(move.get_pos_i()[2]) != self._current_move_color:
             return False
+        # check if the final position is on the board
+        if not self._check_pos_inbounds(move.get_pos_f()[0]):
+            return False
+        # check if the final positions are empty
+        if self.get_marble(move.get_pos_f()[0]) != Marble.NONE:
+            return False
+        return True
 
     def is_valid_sidestep_move(self, move: Move):
         # check if the move is a side step
@@ -413,8 +420,9 @@ class GameState:
         # check that the line is 2 or 3 marbles long
         if move.get_pos_i()[0] == move.get_pos_i()[1]:
             return False
+
         # # check that the line is straight
-        # if move.get_pos_i()[0][0] == move.get_pos_i()[1][0] and move.get_pos_i()[0][1] == move.get_pos_i()[1][1]:
+    # if move.get_pos_i()[0][0] == move.get_pos_i()[1][0] and move.get_pos_i()[0][1] == movem.get_pos_i()[1][1]:
         #     return False
 
         # check that all the marbles are the player to moves color
@@ -431,6 +439,9 @@ class GameState:
             if self._board[pos[0]][pos[1]] != Marble.NONE:
                 return False
         return True
+
+        # check that the final positions are all on the board
+        final_pos = move.get_pos_f()
 
     def _inline_marbles_nums(self, line: List[tuple]):
         """
@@ -516,15 +527,6 @@ class GameState:
             return self.is_valid_inline_move(move)
         else:
             return self.is_valid_single_move(move)
-
-    def is_valid_single_move(self, move: Move):
-        # check if the final position is empty
-        for pos in move.get_pos_f():
-            if pos[0] < 1 or pos[1] < 1:
-                continue
-            if self._board[pos[0]][pos[1]] != Marble.NONE:
-                return False
-        return True
 
     def __check_single_move(self, **kwargs):
         # Check if the next space is an empty space
