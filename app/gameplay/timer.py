@@ -30,6 +30,7 @@ class Timer:
         self._white_check_time = True
 
     def reset_time(self):
+        self.paused = False
         self._game_started = False
         self._black_total_aggregate_time = 0
         self._white_total_aggregate_time = 0
