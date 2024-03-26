@@ -14,10 +14,11 @@ from app.players.player import Player
 
 
 class AbaloneAgent(Player):
-
     """
     A concrete implementation of the Player class representing an AI agent player.
     """
+    def __init__(self, time_limit: int, move_limit: int, color: Marble):
+        super().__init__(time_limit, move_limit, color)
 
     def generate_move(self, game_manager: GameManager):
         """
@@ -30,9 +31,14 @@ class AbaloneAgent(Player):
         A tuple containing the chosen Move object and the time taken to generate the move.
         """
         initial_time = datetime.datetime.now()
-        # sample for making a random move
-        move = random.choice(game_manager.get_possible_moves())
-        time.sleep(random.uniform(1, 3))
+
+        # Decide if the move is going to be random or calculated.
+        if self._current_move <= 0 and self._color == Marble.BLACK:
+            move = random.choice(game_manager.get_possible_moves())
+            time.sleep(random.uniform(1, 3))
+        else:
+            move = self.calc_move(game_manager)
+
         final_time = datetime.datetime.now()
         time_delta = final_time - initial_time
         return move, time_delta.total_seconds()
@@ -52,13 +58,13 @@ class AbaloneAgent(Player):
     def calc_move(self, game_manager: GameManager):
         if self._color == Marble.WHITE:
             best_value = math.inf
-            for distance in range(1, 25, 2):
+            for distance in range(1, 25, 1):
                 v = self.min_move(game_manager.get_current_game_state(), -math.inf, math.inf, distance)
                 if best_value < v:
                     best_value = v
         elif self._color == Marble.BLACK:
             best_value = -math.inf
-            for distance in range(1, 25, 2):
+            for distance in range(1, 25, 1):
                 v = self.max_move(game_manager.get_current_game_state(), -math.inf, math.inf, distance)
                 if best_value > v:
                     best_value = v
