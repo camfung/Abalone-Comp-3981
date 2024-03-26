@@ -26,7 +26,6 @@ class Timer:
 
     def start_timer(self):
         self._game_started = True
-        self.paused = False
         self._black_check_time = True
         self._white_check_time = True
 
