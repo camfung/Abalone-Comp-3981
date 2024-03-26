@@ -95,8 +95,10 @@ class App:
                     self.gui.start_button_clicked = True
             if thread.is_alive():
                 thread.join()
-            self.timer.current_turn_start_time = time.time()
-            self.timer._elapsed_time = time.time()
+            if not self.timer.paused:
+                self.timer.current_turn_start_time = time.time()
+                self.timer._elapsed_time = time.time()
+            self.timer.paused = False
             self.gui.waiting_for_player_input = True
 
         if event == "PlayerMakeMove":
@@ -171,6 +173,7 @@ class App:
                     self.timer._white_total_aggregate_time = 0
 
         if event == "PauseTimer":
+            self.gui.waiting_for_player_input = False
             self.timer.pause_timer()
 
         ##Add pause timer thing here
