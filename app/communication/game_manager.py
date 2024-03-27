@@ -133,3 +133,6 @@ class GameManager:
 
     def get_record_history(self):
         return self._game.get_record_history()
+
+    def get_possible_game_states(self):
+        return self._game.get_possible_game_states()

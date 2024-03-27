@@ -94,10 +94,10 @@ class App:
                 self.players[1]
             if isinstance(player, AbaloneAgent):
                 # trigger the agent to make a move
-                move, time_stamp = player.generate_move(self.game_manager)
+                move, time_stamp = player.generate_move(self.game_manager, self.timer)
                 if self.timer._game_started:
                     player.make_move(self.game_manager,
-                                    player.color, move, time_stamp=time_stamp)
+                                    player.color, move, timestamp=time_stamp)
                     self.gui.start_button_clicked = True
             if thread.is_alive():
                 thread.join()
