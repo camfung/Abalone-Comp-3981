@@ -122,13 +122,13 @@ class AbaloneAgent(Player):
         self.add_board_hash_to_transposition_table(state.get_board(), v)
         return v
 
-    def min_move(self, transposition_table, state: GameState, alpha, beta, distance):
+    def min_move(self, state: GameState, alpha, beta, distance):
         # if Terminal Test state return Utility
         if self.terminal_test(state) or distance <= 0:
             return self.evaluation(state)
 
         # Check if Position is in Transposition Table
-        v = self.board_value_in_transposition_table(state.get_board(), transposition_table)
+        v = self.board_value_in_transposition_table(state.get_board())
         if v is not None:
             return v
 
@@ -137,7 +137,7 @@ class AbaloneAgent(Player):
 
         # Check each possible state from current game state
         for child_states in state.convert_moves_to_game_states():
-            v = min(v, self.max_move(transposition_table, child_states, alpha, beta, distance - 1))
+            v = min(v, self.max_move(child_states, alpha, beta, distance - 1))
             if v < alpha:
                 break
             beta = max(alpha, v)
