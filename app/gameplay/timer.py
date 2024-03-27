@@ -39,8 +39,13 @@ class Timer:
         self._white_start_turn = True
 
     def get_timer_values(self):
-        return (self._elapsed_time - self.current_turn_start_time, self._black_total_aggregate_time, self._white_total_aggregate_time, self._white_turn_time_limit,
-        self._black_turn_time_limit)
+        return (
+            self._elapsed_time - self.current_turn_start_time,
+            self._black_total_aggregate_time,
+            self._white_total_aggregate_time,
+            self._white_turn_time_limit,
+            self._black_turn_time_limit
+        )
 
     def pause_timer(self):
         self.paused = True
