@@ -101,14 +101,14 @@ class AbaloneAgent(Player):
         return 0
 
     def max_move(self, state: GameState, alpha, beta, distance):
+        # if Terminal Test state return Utility
+        if self.terminal_test(state) or distance <= 0:
+            return self.evaluation(state)
+
         # Check if Position is in Transposition Table
         v = self.board_value_in_transposition_table(state.get_board())
         if v is not None:
             return v
-
-        # if Terminal Test state return Utility
-        if self.terminal_test(state) or distance <= 0:
-            return self.evaluation(state)
 
         # Assign Lowest Value
         v = -math.inf
