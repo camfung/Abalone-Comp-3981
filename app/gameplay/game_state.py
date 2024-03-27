@@ -212,7 +212,7 @@ class GameState:
 
         for move in self._moves:
             new_board_state = self.generate_new_board_state(move)
-            new_game_state = GameState(new_board_state, next_marble, self)
+            new_game_state = GameState(new_board_state, move, next_marble, self)
             game_states.append(new_game_state)
 
         return game_states

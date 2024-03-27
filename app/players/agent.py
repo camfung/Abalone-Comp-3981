@@ -2,13 +2,13 @@ import copy
 import datetime
 import math
 import random
-import time
 
 from app.api.exceptions import InvalidMarbleValue
 from app.communication.game_manager import GameManager
 from app.api.enums import Marble
 from app.gameplay.game_state import GameState
 from app.gameplay.move import Move
+from app.gameplay.timer import Timer
 from app.players.player import Player
 
 
@@ -20,7 +20,7 @@ class AbaloneAgent(Player):
         super().__init__(time_limit, move_limit, color)
         self._transposition_table = {}
 
-    def generate_move(self, game_manager: GameManager):
+    def generate_move(self, game_manager: GameManager, timer: Timer):
         """
         Generates a move for the AI agent based on the current game state.
 
@@ -35,15 +35,14 @@ class AbaloneAgent(Player):
         # Decide if the move is going to be random or calculated.
         if self._current_move <= 0 and self._color == Marble.BLACK:
             move = random.choice(game_manager.get_possible_moves())
-            time.sleep(random.uniform(1, 3))
         else:
-            move = self.calc_move(game_manager)
+            move = self.calc_move(game_manager, timer)
 
         final_time = datetime.datetime.now()
         time_delta = final_time - initial_time
         return move, time_delta.total_seconds()
 
-    def make_move(self, game_manager: GameManager, player: Marble, move: Move, time_stamp: float) -> None:
+    def make_move(self, game_manager: GameManager, player: Marble, move: Move, timestamp: float) -> None:
         """
         Commits a move made by the AI agent to the game manager, simulating a delay before making the move.
 
@@ -53,27 +52,44 @@ class AbaloneAgent(Player):
         - move: The Move object representing the move to be made.
         - time_stamp: The timestamp when the move was generated.
         """
-        game_manager.commit_move(player, move, time_stamp)
+        self._current_move += 1
+        game_manager.commit_move(player, move, timestamp)
 
-    def calc_move(self, game_manager: GameManager):
+    def calc_move(self, game_manager: GameManager, timer: Timer) -> Move:
         best_state = None
         if self._color == Marble.WHITE:
             best_value = math.inf
             for distance in range(1, 25, 1):
                 self._transposition_table = {}
-                v, v_state = self.white_move(game_manager.get_current_game_state(), -math.inf, math.inf, distance)
-                print(v)
+                v, v_state = self.white_move(game_manager.get_current_game_state(),
+                                             -math.inf, math.inf, distance, timer)
+                print(distance)
                 if best_value > v:
                     best_value = v
                     best_state = copy.deepcopy(v_state)
+
+                # If Running Out Of Time
+                time_limit = timer.get_timer_values()[4]
+                elapsed_time = timer.get_timer_values()[0]
+                if time_limit - elapsed_time < 2:
+                    break
+
         elif self._color == Marble.BLACK:
             best_value = -math.inf
             for distance in range(1, 25, 1):
                 self._transposition_table = {}
-                v, v_state = self.black_move(game_manager.get_current_game_state(), -math.inf, math.inf, distance)
+                v, v_state = self.black_move(game_manager.get_current_game_state(),
+                                             -math.inf, math.inf, distance, timer)
+                print(distance)
                 if best_value < v:
                     best_value = v
                     best_state = copy.deepcopy(v_state)
+
+                # If Running Out Of Time
+                time_limit = timer.get_timer_values()[3]
+                elapsed_time = timer.get_timer_values()[0]
+                if time_limit - elapsed_time < 2:
+                    break
         else:
             raise InvalidMarbleValue("Calculate Move can only be White or Black.")
 
@@ -101,17 +117,22 @@ class AbaloneAgent(Player):
         """
         return 0
 
-    def black_move(self, state: GameState, alpha, beta, distance):
+    def black_move(self, state: GameState, alpha, beta, distance, timer):
         """
         Calculate Best Black Move.
         :param state: GameState
         :param alpha: White's Best Value (Int)
         :param beta: Black's Best Value (Int)
         :param distance: Iterative Deepening Distance (Int)
+        :param timer: Timer
         :return: Tuple of Best Value and Best State for Black
         """
+        # Assign Correct Time Limit
+        time_limit = timer.get_timer_values()[4] if self.color == Marble.BLACK else timer.get_timer_values()[3]
+        elapsed_time = timer.get_timer_values()[0]
+
         # if Terminal Test state return Utility
-        if self.terminal_test(state) or distance <= 0:
+        if self.terminal_test(state) or distance <= 0 or time_limit - elapsed_time < 2:
             return self.evaluation(state), state
 
         # Check if Position is in Transposition Table
@@ -124,9 +145,9 @@ class AbaloneAgent(Player):
         best_state = None
 
         # Check each possible state from current game state
-        for child_states in state.convert_moves_to_game_states():
+        for child_state in state.convert_moves_to_game_states():
             # Get White's Best State
-            v, v_state = self.white_move(child_states, alpha, beta, distance - 1)
+            v, v_state = self.white_move(child_state, alpha, beta, distance - 1, timer)
 
             # Re-assign Best Value if White's Best State is better than the current Best State
             if v > best_value:
@@ -142,17 +163,22 @@ class AbaloneAgent(Player):
         self.add_board_hash_to_transposition_table(best_state, best_value)
         return best_value, best_state
 
-    def white_move(self, state: GameState, alpha, beta, distance):
+    def white_move(self, state: GameState, alpha, beta, distance, timer):
         """
         Calculate Best White Move
         :param state: GameState
         :param alpha: White's Best Value (Int)
         :param beta: Black's Best Value (Int)
         :param distance: Iterative Deepening Distance (Int)
+        :param timer: Timer
         :return: Tuple of Best Value and Best State for White
         """
+        # Assign Correct Time Limit
+        time_limit = timer.get_timer_values()[4] if self.color == Marble.BLACK else timer.get_timer_values()[3]
+        elapsed_time = timer.get_timer_values()[0]
+
         # if Terminal Test state return Utility
-        if self.terminal_test(state) or distance <= 0:
+        if self.terminal_test(state) or distance <= 0 or time_limit - elapsed_time < 2:
             return self.evaluation(state), state
 
         # Check if Position is in Transposition Table
@@ -165,9 +191,9 @@ class AbaloneAgent(Player):
         best_state = None
 
         # Check each possible state from current game state
-        for child_states in state.convert_moves_to_game_states():
+        for child_state in state.convert_moves_to_game_states():
             # Get Best Black State
-            v, v_state = self.black_move(child_states, alpha, beta, distance - 1)
+            v, v_state = self.black_move(child_state, alpha, beta, distance - 1, timer)
 
             # Re-assign Best Value if Black's Best State is better than the current Best State
             if v < best_value:
