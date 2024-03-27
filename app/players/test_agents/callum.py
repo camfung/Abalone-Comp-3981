@@ -23,16 +23,21 @@ class AgentCallum(AbaloneAgent):
         ##go through valid moves, evaluate based on new methods, along with if the move reduces opponent
         ##ball count
         ##check if time is up, if it is return best move so far
-        return 0
+
+        bunch = evaluate_bunching(state)
+        distance_edge = distance_from_edge(state)
+        white_balls, black_balls = state.get_ball_count()
+
+        return bunch + distance_edge
 
 
 def evaluate_bunching(board):
-    bunching_scores = [[0] * len(board[0]) for _ in range(len(board))]
+    bunching_scores = 0
 
     for i in range(len(board)):
         for j in range(len(board[i])):
             if board[i][j] == Marble.WHITE:
-                bunching_scores[i][j] = count_neighbors(board, i, j)
+                bunching_scores += count_neighbors(board, i, j)
 
     return bunching_scores
 
@@ -50,12 +55,12 @@ def count_neighbors(board, x, y):
 
 
 def distance_from_edge(board):
-    distances = [[None] * len(board[0]) for _ in range(len(board))]
+    distances = 0
 
     for i in range(len(board)):
         for j in range(len(board[i])):
             if board[i][j] == Marble.WHITE:
                 min_distance = min(i, j, len(board) - 1 - i, len(board[0]) - 1 - j)
-                distances[i][j] = min_distance
+                distances += min_distance
 
     return distances
