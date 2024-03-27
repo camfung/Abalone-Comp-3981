@@ -124,12 +124,8 @@ class GameManager:
     def leave_room(self, player):
         self._observers.remove(player)
 
-    def notify(self):
-        """
-        Notifies all observers about a change in the game state.
-        """
-        ##for observer in self._observers:
-            ##observer.update(self)
-
     def get_record_history(self):
         return self._game.get_record_history()
+
+    def get_possible_game_states(self):
+        return self._game.get_possible_game_states()

@@ -61,6 +61,7 @@ class AbaloneAgent(Player):
             for distance in range(1, 25, 1):
                 self._transposition_table = {}
                 v = self.min_move(game_manager.get_current_game_state(), -math.inf, math.inf, distance)
+                print(v)
                 if best_value < v:
                     best_value = v
         elif self._color == Marble.BLACK:
