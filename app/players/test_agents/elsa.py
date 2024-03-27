@@ -1,3 +1,5 @@
+import timer as timer
+
 from app.players.agent import AbaloneAgent
 
 import datetime
@@ -13,26 +15,7 @@ from app.players.player import Player
 
 
 class AgentElsa(AbaloneAgent):
-    def generate_move(self, game_manager):
-        """
-        Generates a move for the AI agent based on the current game state.
-
-        Parameters:
-        - game_manager: The GameManager instance managing the game state.
-
-        Returns:
-        A tuple containing the chosen Move object and the time taken to generate the move.
-        """
-
-        initial_time = datetime.datetime.now()
-
-        move = random.choice(game_manager.get_possible_moves())
-        time.sleep(random.uniform(1, 3))
-        final_time = datetime.datetime.now()
-        time_delta = final_time - initial_time
-        return move, time_delta.total_seconds()
-
-    def make_move(self, game_manager: GameManager, player: Marble, move: Move, time_stamp: float) -> None:
+    def make_move(self, game_manager: GameManager, player: Marble, move: Move, timestamp: float) -> None:
         """
         Commits a move made by the AI agent to the game manager, simulating a delay before making the move.
 
@@ -42,23 +25,16 @@ class AgentElsa(AbaloneAgent):
         - move: The Move object representing the move to be made.
         - time_stamp: The timestamp when the move was generated.
         """
-        if self._current_move == 0 and self.color == Marble.WHITE:
-            game_manager.commit_move(player, self.opening_moves(game_manager), time_stamp)
-            self.calc_center_distance(game_manager.get_current_game_state()._board) #Test
-            print("move made")
-            return
-        print("2move made")
-        game_manager.commit_move(player, move, time_stamp)
+        move_to_make = self.move_to_center(game_manager.get_current_game_state().get_possible_moves())
+        game_manager.commit_move(player, move_to_make, timestamp)
 
-    def opening_moves(self, game_manager):  # Test
-        if self.color == Marble.BLACK:
-            if self._current_move == 0:
-                return random.choice(game_manager.get_possible_moves())
-        else:
-            if self._current_move == 1:
-                return Move(((9, 5), (7, 5)), ((8, 5), (6, 5)), Direction.DOWN_RIGHT, marble=self.color)
-
-        return random.choice(game_manager.get_possible_moves())
+    @staticmethod
+    def calc_single_distance(coord):
+        """
+        Calculates the distance of a single marble from the center of the board
+        """
+        center = (5, 5)
+        return abs(coord[0] - center[0]) + abs(coord[1] - center[1])
 
     @staticmethod
     def calc_center_distance(board):
@@ -92,6 +68,23 @@ class AgentElsa(AbaloneAgent):
             avg_black_dist = black_dist / black_count
         else:
             avg_black_dist = 0
+
+    @staticmethod
+    def move_to_center(self, moves):
+        best_move_pos = (10, 10)  # Pick a position off the board
+        best_move_str = ""
+        best_move = None
+
+        for move in moves:
+            if self.calc_single_distance(move.get_pos_f()[0]) < self.calc_single_distance(best_move_pos):
+                best_move_pos = move.get_pos_f()[0]
+                best_move_str = str(move)
+                best_move = move
+                print(f"current best move is {move.get_pos_i()} {move.get_pos_f()} {best_move_pos} {best_move_str} "
+                      f"{move.get_marble()}")
+
+        print(str(f"best move is {best_move_str} {best_move_str}"))
+        return best_move
 
     @classmethod
     def evaluation(cls, state):
