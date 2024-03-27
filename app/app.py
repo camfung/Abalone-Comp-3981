@@ -1,13 +1,17 @@
 import threading
 import time
 
-from app.api.enums import GameType, Marble
+from app.api.enums import GameType, Marble, AgentType
 from app.gameplay.move import Move
 
 from app.communication.game_manager import GameManager
 
 from app.players.agent import AbaloneAgent
 from app.players.human import HumanPlayer
+from app.players.test_agents.callum import AgentCallum
+from app.players.test_agents.cameron import AgentCameron
+from app.players.test_agents.elsa import AgentElsa
+from app.players.test_agents.joey import AgentJoey
 
 from app.ui.ui import PygameUI
 from app.gameplay.timer import Timer
@@ -64,10 +68,12 @@ class App:
 
             black_time_limit = kwargs["config"]["black_time_limit"]
             white_time_limit = kwargs["config"]["white_time_limit"]
+            agent_level = kwargs["config"]["agent_level"][0][1]
+
             self.timer._white_turn_time_limit = white_time_limit
             self.timer._black_turn_time_limit = black_time_limit
             self.players = self.initialize_players(
-                game_type, player_color, move_limit, black_time_limit, white_time_limit)
+                game_type, player_color, move_limit, black_time_limit, white_time_limit, agent_level)
 
             self.game_manager.start_game(formation)
             self.gui.update(self.game_manager)
@@ -178,7 +184,8 @@ class App:
 
         ##Add pause timer thing here
 
-    def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit: int, white_time_limit: int):
+    def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit: int,
+                           white_time_limit: int, agent_level: AgentType):
         """
         Initializes players based on the selected game type and player colors.
 
@@ -192,11 +199,36 @@ class App:
         """
         if game_type == GameType.AGENT_VS_AGENT:
             return [AbaloneAgent(black_time_limit, move_limit, Marble.BLACK), AbaloneAgent(white_time_limit, move_limit, Marble.WHITE)]
+
         elif game_type == GameType.PLAYER_VS_AGENT:
             if player_color == Marble.BLACK:
-                return [HumanPlayer(black_time_limit, move_limit, Marble.BLACK), AbaloneAgent(white_time_limit, move_limit, Marble.WHITE)]
+                human_player = HumanPlayer(black_time_limit, move_limit, Marble.BLACK)
+
+                if agent_level == AgentType.ABALONE_AGENT:
+                    return [human_player, AbaloneAgent(white_time_limit, move_limit, Marble.WHITE)]
+                elif agent_level == AgentType.AGENT_CAMERON:
+                    return [human_player, AgentCameron(white_time_limit, move_limit, Marble.WHITE)]
+                elif agent_level == AgentType.AGENT_CALLUM:
+                    return [human_player, AgentCallum(white_time_limit, move_limit, Marble.WHITE)]
+                elif agent_level == AgentType.AGENT_JOEY:
+                    return [human_player, AgentJoey(white_time_limit, move_limit, Marble.WHITE)]
+                elif agent_level == AgentType.AGENT_ELSA:
+                    return [human_player, AgentElsa(white_time_limit, move_limit, Marble.WHITE)]
+
             else:
-                return [AbaloneAgent(black_time_limit, move_limit, Marble.BLACK), HumanPlayer(white_time_limit, move_limit, Marble.WHITE)]
+                human_player = HumanPlayer(white_time_limit, move_limit, Marble.WHITE)
+
+                if agent_level == AgentType.ABALONE_AGENT:
+                    return [AbaloneAgent(black_time_limit, move_limit, Marble.BLACK), human_player]
+                elif agent_level == AgentType.AGENT_CAMERON:
+                    return [AgentCameron(black_time_limit, move_limit, Marble.BLACK), human_player]
+                elif agent_level == AgentType.AGENT_CALLUM:
+                    return [AgentCallum(black_time_limit, move_limit, Marble.BLACK), human_player]
+                elif agent_level == AgentType.AGENT_JOEY:
+                    return [AgentJoey(black_time_limit, move_limit, Marble.BLACK), human_player]
+                elif agent_level == AgentType.AGENT_ELSA:
+                    return [AgentElsa(black_time_limit, move_limit, Marble.BLACK), human_player]
+
         elif game_type == GameType.PLAYER_VS_PLAYER:
             return [HumanPlayer(black_time_limit, move_limit, Marble.BLACK), HumanPlayer(white_time_limit, move_limit, Marble.WHITE)]
 
