@@ -12,7 +12,7 @@ class GameState:
     including the board configuration and the current player's turn.
     """
 
-    def __init__(self, board, marble=Marble.BLACK, prev_game_state=None):
+    def __init__(self, board, move=None, marble=Marble.BLACK, prev_game_state=None):
         """
         Initializes a new game state.
 
@@ -22,6 +22,7 @@ class GameState:
         - prev_game_state: The previous game state, if any.
         """
         self._board = board
+        self._move = move
         self._current_move_color = marble
         self._prev_game_state = prev_game_state
         self._moves = self.__generate_possible_moves()
@@ -38,6 +39,9 @@ class GameState:
 
     def get_possible_moves(self):
         return self._moves
+
+    def get_move(self):
+        return self._move
 
     def get_ball_count(self):
         white_count = 0
