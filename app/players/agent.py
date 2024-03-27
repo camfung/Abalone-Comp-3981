@@ -69,9 +69,7 @@ class AbaloneAgent(Player):
                     best_state = copy.deepcopy(v_state)
 
                 # If Running Out Of Time
-                time_limit = timer.get_timer_values()[4]
-                elapsed_time = timer.get_timer_values()[0]
-                if time_limit - elapsed_time < 2:
+                if self.running_out_of_time(timer):
                     break
 
         elif self._color == Marble.BLACK:
@@ -86,9 +84,7 @@ class AbaloneAgent(Player):
                     best_state = copy.deepcopy(v_state)
 
                 # If Running Out Of Time
-                time_limit = timer.get_timer_values()[3]
-                elapsed_time = timer.get_timer_values()[0]
-                if time_limit - elapsed_time < 2:
+                if self.running_out_of_time(timer):
                     break
         else:
             raise InvalidMarbleValue("Calculate Move can only be White or Black.")
@@ -105,6 +101,19 @@ class AbaloneAgent(Player):
             return True
 
         return False
+
+    def running_out_of_time(self, timer: Timer) -> bool:
+        """
+        Checks if Agent is running out of time.
+        :param timer: Timer
+        :return: Boolean
+        """
+        time_limit = timer.get_timer_values()[4] if self.color == Marble.BLACK else timer.get_timer_values()[3]
+        elapsed_time = timer.get_timer_values()[0]
+        if time_limit - elapsed_time < 2:
+            return True
+        else:
+            return False
 
     @classmethod
     def evaluation(cls, state):
@@ -127,12 +136,8 @@ class AbaloneAgent(Player):
         :param timer: Timer
         :return: Tuple of Best Value and Best State for Black
         """
-        # Assign Correct Time Limit
-        time_limit = timer.get_timer_values()[4] if self.color == Marble.BLACK else timer.get_timer_values()[3]
-        elapsed_time = timer.get_timer_values()[0]
-
         # if Terminal Test state return Utility
-        if self.terminal_test(state) or distance <= 0 or time_limit - elapsed_time < 2:
+        if self.terminal_test(state) or distance <= 0 or self.running_out_of_time(timer):
             return self.evaluation(state), state
 
         # Check if Position is in Transposition Table
@@ -173,12 +178,8 @@ class AbaloneAgent(Player):
         :param timer: Timer
         :return: Tuple of Best Value and Best State for White
         """
-        # Assign Correct Time Limit
-        time_limit = timer.get_timer_values()[4] if self.color == Marble.BLACK else timer.get_timer_values()[3]
-        elapsed_time = timer.get_timer_values()[0]
-
         # if Terminal Test state return Utility
-        if self.terminal_test(state) or distance <= 0 or time_limit - elapsed_time < 2:
+        if self.terminal_test(state) or distance <= 0 or self.running_out_of_time(timer):
             return self.evaluation(state), state
 
         # Check if Position is in Transposition Table
