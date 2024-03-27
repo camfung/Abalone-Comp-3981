@@ -46,9 +46,9 @@ class MoveType(Enum):
     """
     Move Type Enumeration for type of move made by Player
     """
-    SINGLE = auto()
     INLINE = auto()
     SIDE_STEP = auto()
+    SINGLE = auto()
 
 
 class UIState(Enum):
