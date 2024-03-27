@@ -508,6 +508,8 @@ class GameState:
                 checking_own = False
             if not checking_own and self.get_marble(pos) == self._current_move_color:
                 return False
+            if self.get_marble(pos) == Marble.NONE:
+                break
         # check if the caboose is the current player
         if self.get_marble(caboose) != self._current_move_color:
             return False

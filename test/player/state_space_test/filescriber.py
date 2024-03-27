@@ -125,4 +125,4 @@ class FileScriber:
 file = input("Input the name of the input file: ")
 num = int(re.search(r'\d+', file).group())
 FileScriber.export_state_space_to_text_files(
-    file, f"Test{num}.move, f"Test{num}.board")
+    file, f"Test{num}.move", f"Test{num}.board")
