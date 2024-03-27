@@ -18,6 +18,7 @@ class AbaloneAgent(Player):
     """
     def __init__(self, time_limit: int, move_limit: int, color: Marble):
         super().__init__(time_limit, move_limit, color)
+        self._transposition_table = {}
 
     def generate_move(self, game_manager: GameManager):
         """
@@ -58,12 +59,14 @@ class AbaloneAgent(Player):
         if self._color == Marble.WHITE:
             best_value = math.inf
             for distance in range(1, 25, 1):
+                self._transposition_table = {}
                 v = self.min_move(game_manager.get_current_game_state(), -math.inf, math.inf, distance)
                 if best_value < v:
                     best_value = v
         elif self._color == Marble.BLACK:
             best_value = -math.inf
             for distance in range(1, 25, 1):
+                self._transposition_table = {}
                 v = self.max_move(game_manager.get_current_game_state(), -math.inf, math.inf, distance)
                 if best_value > v:
                     best_value = v
@@ -97,37 +100,64 @@ class AbaloneAgent(Player):
         """
         return 0
 
-    @classmethod
-    def max_move(cls, state: GameState, alpha, beta, distance):
+    def max_move(self, state: GameState, alpha, beta, distance):
+        # Check if Position is in Transposition Table
+        v = self.board_value_in_transposition_table(state.get_board())
+        if v is not None:
+            return v
+
         # if Terminal Test state return Utility
-        if cls.terminal_test(state) or distance <= 0:
-            return cls.evaluation(state)
+        if self.terminal_test(state) or distance <= 0:
+            return self.evaluation(state)
 
         # Assign Lowest Value
         v = -math.inf
 
         # Check each possible state from current game state
         for child_states in state.convert_moves_to_game_states():
-            v = max(v, cls.min_move(child_states, alpha, beta, distance - 1))
+            v = max(v, self.min_move(child_states, alpha, beta, distance - 1))
             if v > beta:
-                return v, state
+                break
             alpha = max(alpha, v)
-
+        self.add_board_hash_to_transposition_table(state.get_board(), v)
         return v
 
-    @classmethod
-    def min_move(cls, state: GameState, alpha, beta, distance):
+    def min_move(self, transposition_table, state: GameState, alpha, beta, distance):
         # if Terminal Test state return Utility
-        if cls.terminal_test(state) or distance <= 0:
-            return cls.evaluation(state)
+        if self.terminal_test(state) or distance <= 0:
+            return self.evaluation(state)
+
+        # Check if Position is in Transposition Table
+        v = self.board_value_in_transposition_table(state.get_board(), transposition_table)
+        if v is not None:
+            return v
 
         # Assign Highest Value
         v = math.inf
 
         # Check each possible state from current game state
         for child_states in state.convert_moves_to_game_states():
-            v = min(v, cls.max_move(child_states, alpha, beta, distance - 1))
+            v = min(v, self.max_move(transposition_table, child_states, alpha, beta, distance - 1))
             if v < alpha:
-                return v
+                break
             beta = max(alpha, v)
+        self.add_board_hash_to_transposition_table(state.get_board(), v)
         return v
+
+    def add_board_hash_to_transposition_table(self, board, value):
+        # Hash the Board
+        board_hash = hash(tuple(tuple(row) for row in board))
+
+        # Add Hash and Value to Transposition Table
+        self._transposition_table[board_hash] = value
+
+    def board_value_in_transposition_table(self, board):
+        # Hash the Board
+        board_hash = hash(tuple(tuple(row) for row in board))
+
+        # Try to get Value of Board from Transposition Table
+        try:
+            value = self._transposition_table[board_hash]
+            return value
+        except KeyError:
+            return None
