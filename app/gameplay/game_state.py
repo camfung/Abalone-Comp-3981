@@ -168,6 +168,7 @@ class GameState:
                     moves.append(move)
 
         # Return the list of all valid moves
+        moves.sort(key=lambda x: x.get_move_type().value, reverse=False)
         return moves
 
     def convert_moves_to_board_states(self):
