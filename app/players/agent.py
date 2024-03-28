@@ -61,14 +61,14 @@ class AbaloneAgent(Player):
             for distance in range(1, 25, 1):
                 self._transposition_table = {}
                 v = self.min_move(game_manager.get_current_game_state(), -math.inf, math.inf, distance)
-                if best_value < v:
+                if best_value > v:
                     best_value = v
         elif self._color == Marble.BLACK:
             best_value = -math.inf
             for distance in range(1, 25, 1):
                 self._transposition_table = {}
                 v = self.max_move(game_manager.get_current_game_state(), -math.inf, math.inf, distance)
-                if best_value > v:
+                if best_value < v:
                     best_value = v
         else:
             raise InvalidMarbleValue("Calculate Move can only be White or Black.")

@@ -24,8 +24,9 @@ class AgentCallum(AbaloneAgent):
         ##ball count
         ##check if time is up, if it is return best move so far
 
-        bunch = evaluate_bunching(state)
-        distance_edge = distance_from_edge(state)
+        board = state._board
+        bunch = evaluate_bunching(board)
+        distance_edge = distance_from_edge(board)
         white_balls, black_balls = state.get_ball_count()
 
         return bunch + distance_edge
