@@ -230,8 +230,9 @@ class PygameUI(UI):
             'I Play As: ', [('Black', Marble.BLACK), ('White', Marble.WHITE)])  # Adding selector for player color
 
         agent_level = menu.add.dropselect('Agent:     ', [
-            ('Random moves', AgentType.ABALONE_AGENT), ('Cameron', AgentType.AGENT_CAMERON),
-            ('Joey', AgentType.AGENT_JOEY), ('Elsa', AgentType.AGENT_ELSA), ('Callum', AgentType.AGENT_CALLUM)],
+            ('Default', AgentType.ABALONE_AGENT), ('Random Moves', AgentType.RANDOM_AGENT),
+            ('Cameron', AgentType.AGENT_CAMERON), ('Joey', AgentType.AGENT_JOEY),
+            ('Elsa', AgentType.AGENT_ELSA), ('Callum', AgentType.AGENT_CALLUM)],
                                           default=0, onchange=self.update_play_button)
         formation = menu.add.dropselect('Formation: ', [
             (f.name, f) for f in Formation], default=0, onchange=self.update_play_button)

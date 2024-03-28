@@ -20,4 +20,5 @@ class HumanPlayer(Player):
         - player: The color of the player making the move.
         - move: The Move object representing the move to be made.
         """
+        self._current_move += 1
         game_manager.commit_move(move=move, player=player, timestamp=timestamp)

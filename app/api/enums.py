@@ -46,9 +46,9 @@ class MoveType(Enum):
     """
     Move Type Enumeration for type of move made by Player
     """
-    SINGLE = auto()
     INLINE = auto()
     SIDE_STEP = auto()
+    SINGLE = auto()
 
 
 class UIState(Enum):
@@ -98,6 +98,7 @@ class AgentType(Enum):
         AGENT_JOEY: Joey's heuristic
     """
     ABALONE_AGENT = auto()
+    RANDOM_AGENT = auto()
     AGENT_CALLUM = auto()
     AGENT_CAMERON = auto()
     AGENT_ELSA = auto()
