@@ -37,9 +37,17 @@ class GameState:
         return self._prev_game_state
 
     def get_move(self):
+        """
+        Get Move that made up the current game state
+        :return: Move
+        """
         return self._move
 
     def get_ball_count(self):
+        """
+        Get Ball Count of Board
+        :return: white_ball_count (int), black_ball_count (int)
+        """
         white_count = 0
         black_count = 0
         for row in self._board:
@@ -89,8 +97,8 @@ class GameState:
     def get_marble(self, pos):
         """
         Get the marble at a given position
-        :param pos: The position of the marble
-        :return: The marble at the position
+        :param pos: The Marble position
+        :return: The Marble color at the position
         """
         return self._board[pos[0]][pos[1]]
 
