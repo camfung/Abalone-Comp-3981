@@ -2,6 +2,7 @@
 import copy
 import time
 
+from app.api.enums import Formation
 from app.gameplay.game import Game
 from app.api.exceptions import DuplicateSingletons
 from app.players.human import HumanPlayer
@@ -28,7 +29,7 @@ class GameManager:
             GameManager.__instance = GameManager()
         return GameManager.__instance
 
-    def __init__(self, app):
+    def __init__(self, app, game_state=None):
         """
         Initializes the GameManager instance. This method is private to enforce the singleton pattern.
 
@@ -46,7 +47,11 @@ class GameManager:
         self._app = app
         self._move_history = []
         self._observers = []
-        self._game = None
+        if game_state != None:
+            self._game = Game(Formation.BELGIAN_DAISY)
+            self._game.set_game_state(game_state)
+        else:
+            self._game = None
         GameManager.__instance = self
 
     def commit_move(self, player, move, timestamp):
@@ -71,7 +76,8 @@ class GameManager:
         if len(self._move_history) != 0:
             move = self._game.get_record_history().remove_last_record()
             self._game.set_game_state(self._move_history.pop())
-            self._app.notify(self, "ReduceAggregateTime", time=move._time_taken, player=move._player_turn)
+            self._app.notify(self, "ReduceAggregateTime",
+                             time=move._time_taken, player=move._player_turn)
 
             self._app.notify(self, "PauseTimer")
 
@@ -128,8 +134,8 @@ class GameManager:
         """
         Notifies all observers about a change in the game state.
         """
-        ##for observer in self._observers:
-            ##observer.update(self)
+        # for observer in self._observers:
+        # observer.update(self)
 
     def get_record_history(self):
         return self._game.get_record_history()
