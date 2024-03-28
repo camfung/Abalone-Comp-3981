@@ -11,8 +11,7 @@ class AgentJoey(AbaloneAgent):
     A sample agent created by Joey (A01320740) to calculate Evaluation Function.
     """
 
-    @classmethod
-    def evaluation(cls, state):
+    def evaluation(self, state):
         """
         Base Evaluation Function for Agent which calls all other evaluation functions.
         :param state: GameState
@@ -20,16 +19,19 @@ class AgentJoey(AbaloneAgent):
         """
         # Get Board State and Marble Positions on Board
         board = state.get_board()
-        black_positions, white_positions = cls.find_positions_of_pieces(board)
+        black_positions, white_positions = self.find_positions_of_pieces(board)
 
         # List of Weights on Heuristic Functions
-        weights = [50, 5, 5, 5]
+        if self._current_move < 6:
+            weights = [100, 2, 5, 5]
+        else:
+            weights = [100, 5, 2, 5]
 
         # Call Reward Functions to Calculate Toward Reward
-        total_reward = cls.number_of_pieces(state, weights[0])
-        total_reward += cls.grouped_together(board, black_positions, white_positions, weights[1])
-        total_reward += cls.center_of_board(black_positions, white_positions, weights[2])
-        total_reward += cls.anchored_pieces(board, black_positions, white_positions, weights[3])
+        total_reward = self.number_of_pieces(state, weights[0])
+        total_reward += self.grouped_together(board, black_positions, white_positions, weights[1])
+        total_reward += self.center_of_board(black_positions, white_positions, weights[2])
+        total_reward += self.anchored_pieces(board, black_positions, white_positions, weights[3])
 
         return total_reward
 
@@ -141,7 +143,7 @@ class AgentJoey(AbaloneAgent):
             dist_y = abs(center_board[1] - pos_y)
             black_distance = max(dist_x, dist_y)
 
-            total_reward -= black_distance
+            total_reward -= black_distance ** 2
 
         # Calculate White's Reward
         for white_position in white_positions:
@@ -152,7 +154,7 @@ class AgentJoey(AbaloneAgent):
             dist_y = abs(center_board[1] - pos_y)
             white_distance = max(dist_x, dist_y)
 
-            total_reward += white_distance
+            total_reward += white_distance ** 2
 
         return total_reward * weight
 

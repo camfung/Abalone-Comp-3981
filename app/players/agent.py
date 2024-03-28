@@ -59,7 +59,7 @@ class AbaloneAgent(Player):
         best_state = None
         max_range = self._move_limit - self._current_move
         if self._color == Marble.WHITE:
-            for distance in range(1, max_range, 1):
+            for distance in range(1, max_range + 1, 1):
                 self._transposition_table = {}
                 v, v_state = self.white_move(game_manager.get_current_game_state(),
                                              -math.inf, math.inf, distance, timer)
@@ -72,7 +72,7 @@ class AbaloneAgent(Player):
                 best_state = copy.deepcopy(v_state)
 
         elif self._color == Marble.BLACK:
-            for distance in range(1, max_range, 1):
+            for distance in range(1, max_range + 1, 1):
                 self._transposition_table = {}
                 v, v_state = self.black_move(game_manager.get_current_game_state(),
                                              -math.inf, math.inf, distance, timer)
