@@ -181,6 +181,16 @@ class PygameUI(UI):
         for element in self.drawable_elements:
             element.draw(self.screen, game_manager)
 
+            if self.hud.white_balls < 15 or self.hud.black_balls < 9:
+                winner = "White" if self.hud.white_balls > self.hud.black_balls else "Black"
+                game_over_text = pygame.font.Font(None, 100).render(f"{winner} wins!", True, (255, 0, 0))
+                text_rect = game_over_text.get_rect(center=(self.SCREEN_WIDTH // 3, 500))
+
+                background_rect = pygame.Rect(text_rect.left - 10, text_rect.top - 10, text_rect.width + 20,
+                                              text_rect.height + 20)
+                pygame.draw.rect(self.screen, (0, 0, 0), background_rect)
+                self.screen.blit(game_over_text, text_rect)
+
         pygame.display.flip()
 
     def reset_board(self, thread):
