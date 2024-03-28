@@ -160,7 +160,7 @@ class AgentElsa(AbaloneAgent):
 
     def push_pieces(self, moves, board):
         best_move = None
-        opponent_marbles = []
+        opponent_marbles = set()
 
         if self.color == Marble.BLACK:
             opponent_colour = Marble.WHITE
@@ -169,17 +169,15 @@ class AgentElsa(AbaloneAgent):
 
         for row_index, row in enumerate(board):
             for col_index, col in enumerate(row):
-                if board[row_index][col_index] == opponent_colour:
-                    pos_tuple = (row_index, col_index)
-                    opponent_marbles.append(pos_tuple)
+                if col == opponent_colour:
+                    opponent_marbles.add((row_index, col_index))
 
         for move in moves:
-            for pos in opponent_marbles:
-                if move.get_pos_f()[0] == pos:
-                    best_move = move
+            if move.get_pos_f()[0] in opponent_marbles:
+                best_move = move
+                break
 
-        if best_move is not None:
-            return best_move
+        return best_move
 
     @classmethod
     def evaluation(cls, state):
