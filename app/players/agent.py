@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import copy
 import datetime
 import math
@@ -12,10 +13,11 @@ from app.gameplay.timer import Timer
 from app.players.player import Player
 
 
-class AbaloneAgent(Player):
+class AbaloneAgent(Player, ABC):
     """
     A concrete implementation of the Player class representing an AI agent player.
     """
+
     def __init__(self, time_limit: int, move_limit: int, color: Marble):
         super().__init__(time_limit, move_limit, color)
         self._transposition_table = {}
@@ -55,11 +57,12 @@ class AbaloneAgent(Player):
         self._current_move += 1
         game_manager.commit_move(player, move, timestamp)
 
-    def calc_move(self, game_manager: GameManager, timer: Timer) -> Move:
+    def calc_move(self, game_manager: GameManager, timer: Timer = None, depth=2) -> Move:
         best_state = None
+        farthest_distance = depth
         if self._color == Marble.WHITE:
             best_value = math.inf
-            for distance in range(1, 25, 1):
+            for distance in range(1, farthest_distance, 1):
                 self._transposition_table = {}
                 v, v_state = self.white_move(game_manager.get_current_game_state(),
                                              -math.inf, math.inf, distance, timer)
@@ -74,7 +77,7 @@ class AbaloneAgent(Player):
 
         elif self._color == Marble.BLACK:
             best_value = -math.inf
-            for distance in range(1, 25, 1):
+            for distance in range(1, farthest_distance, 1):
                 self._transposition_table = {}
                 v, v_state = self.black_move(game_manager.get_current_game_state(),
                                              -math.inf, math.inf, distance, timer)
@@ -87,12 +90,14 @@ class AbaloneAgent(Player):
                 if self.running_out_of_time(timer):
                     break
         else:
-            raise InvalidMarbleValue("Calculate Move can only be White or Black.")
+            raise InvalidMarbleValue(
+                "Calculate Move can only be White or Black.")
 
         return best_state.get_move() if best_state else None
 
     @staticmethod
     def terminal_test(state: GameState) -> bool:
+        return False
         white_balls, black_balls = state.get_ball_count()
 
         if white_balls <= 8:
@@ -102,13 +107,16 @@ class AbaloneAgent(Player):
 
         return False
 
-    def running_out_of_time(self, timer: Timer) -> bool:
+    def running_out_of_time(self, timer: Timer = None) -> bool:
         """
         Checks if Agent is running out of time.
         :param timer: Timer
         :return: Boolean
         """
-        time_limit = timer.get_timer_values()[4] if self.color == Marble.BLACK else timer.get_timer_values()[3]
+        if timer is None:
+            return False
+        time_limit = timer.get_timer_values(
+        )[4] if self.color == Marble.BLACK else timer.get_timer_values()[3]
         elapsed_time = timer.get_timer_values()[0]
         if time_limit - elapsed_time < 2:
             return True
@@ -125,6 +133,10 @@ class AbaloneAgent(Player):
         :return: Evaluation Value as an integer.
         """
         return 0
+
+    @abstractmethod
+    def evaluation(cls, state):
+        pass
 
     def black_move(self, state: GameState, alpha, beta, distance, timer):
         """
@@ -152,7 +164,8 @@ class AbaloneAgent(Player):
         # Check each possible state from current game state
         for child_state in state.convert_moves_to_game_states():
             # Get White's Best State
-            v, v_state = self.white_move(child_state, alpha, beta, distance - 1, timer)
+            v, v_state = self.white_move(
+                child_state, alpha, beta, distance - 1, timer)
 
             # Re-assign Best Value if White's Best State is better than the current Best State
             if v > best_value:
@@ -162,6 +175,7 @@ class AbaloneAgent(Player):
             # Prune Branch if White's Best State is better than current best White State
             if best_value > beta:
                 break
+            # to do might be a bug
             alpha = max(alpha, v)
 
         # Add Best State to Transposition Table
@@ -194,7 +208,8 @@ class AbaloneAgent(Player):
         # Check each possible state from current game state
         for child_state in state.convert_moves_to_game_states():
             # Get Best Black State
-            v, v_state = self.black_move(child_state, alpha, beta, distance - 1, timer)
+            v, v_state = self.black_move(
+                child_state, alpha, beta, distance - 1, timer)
 
             # Re-assign Best Value if Black's Best State is better than the current Best State
             if v < best_value:

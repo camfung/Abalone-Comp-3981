@@ -28,6 +28,10 @@ class GameState:
         self._moves = self.__generate_possible_moves()
         self._white_balls, self._black_balls = self.get_ball_count()
 
+    @property
+    def board(self):
+        return self._board
+
     def get_board(self):
         return self._board
 
@@ -213,7 +217,8 @@ class GameState:
 
         for move in self._moves:
             new_board_state = self.generate_new_board_state(move)
-            new_game_state = GameState(new_board_state, move, next_marble, self)
+            new_game_state = GameState(
+                new_board_state, move, next_marble, self)
             game_states.append(new_game_state)
 
         return game_states

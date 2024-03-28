@@ -93,6 +93,7 @@ def getBoardStateFromFile(input_file):
             row = (int_val - 74) * -1
             col = int(board_spot[1])
             r_marble = board_spot[2]
+            marble = ""
             if r_marble == "b":
                 marble = Marble.BLACK
             elif r_marble == "w":
@@ -176,8 +177,8 @@ def driveVis():
     visualizeTestAllMoves(moves, gameState)
 
 
-main()
-driveVis()
+# main()
+# driveVis()
 
 
 def testMove(move: Move):

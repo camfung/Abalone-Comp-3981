@@ -1,4 +1,3 @@
-
 from app.api.enums import *
 from app.api.records import RecordHistory
 from app.api.exceptions import InvalidMarbleValue
@@ -85,7 +84,7 @@ class Game:
     def get_possible_game_states(self):
         return self._current_game_state.convert_moves_to_game_states()
 
-    def set_move(self, player=None, move=None, timestamp=None):
+    def set_move(self, marble: Marble = None, move=None, timestamp=None):
         """
         Updates the game state with a new move.
 
@@ -94,7 +93,7 @@ class Game:
         - move: The Move object representing the move to be made.
         - timestamp: The timestamp when the move was made.
         """
-        if player is None and move is None and timestamp is None:
+        if marble is None and move is None and timestamp is None:
             self._current_game_state = self._current_game_state.get_previous_game_state()
             self._record_history.remove_last_record()
             return
@@ -115,7 +114,7 @@ class Game:
                                    next_marble,
                                    self._current_game_state)
         self._current_game_state = new_game_state
-        self._record_history.add_record(move, player, timestamp)
+        self._record_history.add_record(move, marble, timestamp)
 
     def get_ball_count(self):
         return self._current_game_state.get_ball_count()
