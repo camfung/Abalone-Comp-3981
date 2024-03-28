@@ -44,8 +44,18 @@ class AgentElsa(AbaloneAgent):
         - move: The Move object representing the move to be made.
         - time_stamp: The timestamp when the move was generated.
         """
+        moves = game_manager.get_current_game_state().get_possible_moves()
+        board = game_manager.get_current_game_state().get_board()
+
+
         # move_to_make = self.move_to_center(game_manager.get_current_game_state().get_possible_moves())
+        push_move = self.push_pieces(moves, board)
+
         move_to_make = self.move_away_edge(game_manager.get_current_game_state().get_possible_moves())
+
+        if push_move is not None:
+            move_to_make = push_move
+
         game_manager.commit_move(player, move_to_make, timestamp)
 
     @staticmethod
@@ -147,6 +157,29 @@ class AgentElsa(AbaloneAgent):
 
         print(str(f"best move is {best_move_str}"))
         return best_move
+
+    def push_pieces(self, moves, board):
+        best_move = None
+        opponent_marbles = []
+
+        if self.color == Marble.BLACK:
+            opponent_colour = Marble.WHITE
+        else:
+            opponent_colour = Marble.BLACK
+
+        for row_index, row in enumerate(board):
+            for col_index, col in enumerate(row):
+                if board[row_index][col_index] == opponent_colour:
+                    pos_tuple = (row_index, col_index)
+                    opponent_marbles.append(pos_tuple)
+
+        for move in moves:
+            for pos in opponent_marbles:
+                if move.get_pos_f()[0] == pos:
+                    best_move = move
+
+        if best_move is not None:
+            return best_move
 
     @classmethod
     def evaluation(cls, state):
