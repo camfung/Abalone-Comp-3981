@@ -11,15 +11,24 @@ class AgentJoey(AbaloneAgent):
     A sample agent created by Joey (A01320740) to calculate Evaluation Function.
     """
 
-    def evaluation(self, state):
+    def evaluation(self, state, calculating_player):
         """
         Base Evaluation Function for Agent which calls all other evaluation functions.
+        :param calculating_player: Marble that represents the player deciding move
         :param state: GameState
         :return: integer representing the current evaluation value.
         """
         # Get Board State and Marble Positions on Board
         board = state.get_board()
         black_positions, white_positions = self.find_positions_of_pieces(board)
+
+        # Get Multiplier
+        if calculating_player == Marble.BLACK:
+            black_multiplier = 1
+            white_multiplier = -1
+        else:
+            black_multiplier = -1
+            white_multiplier = 1
 
         # List of Weights on Heuristic Functions
         if self._current_move < 6:
@@ -28,10 +37,10 @@ class AgentJoey(AbaloneAgent):
             weights = [100, 5, 2, 5]
 
         # Call Reward Functions to Calculate Toward Reward
-        total_reward = self.number_of_pieces(state, weights[0])
-        total_reward += self.grouped_together(board, black_positions, white_positions, weights[1])
-        total_reward += self.center_of_board(black_positions, white_positions, weights[2])
-        total_reward += self.anchored_pieces(board, black_positions, white_positions, weights[3])
+        total_reward = self.number_of_pieces(state, weights[0], white_multiplier, black_multiplier)
+        total_reward += self.grouped_together(board, black_positions, white_positions, weights[1], white_multiplier, black_multiplier)
+        total_reward += self.center_of_board(black_positions, white_positions, weights[2], white_multiplier, black_multiplier)
+        total_reward += self.anchored_pieces(board, black_positions, white_positions, weights[3], white_multiplier, black_multiplier)
 
         return total_reward
 
@@ -58,10 +67,12 @@ class AgentJoey(AbaloneAgent):
         return black_positions, white_positions
 
     @classmethod
-    def number_of_pieces(cls, state, weight):
+    def number_of_pieces(cls, state, weight, white_multiplier, black_multiplier):
         """
         Heavily Reward Players for having more Pieces on the board.
 
+        :param black_multiplier: 1 or -1
+        :param white_multiplier: 1 or -1
         :param state: GameState
         :param weight: int representing the weight in evaluation
         :return: int value indicating total reward
@@ -69,18 +80,20 @@ class AgentJoey(AbaloneAgent):
         pieces = state.get_ball_count()
 
         # Add up all white's pieces
-        total_reward = (pieces[0] * -1)
+        total_reward = pieces[0] * white_multiplier
 
         # Add up all black's pieces
-        total_reward += pieces[1]
+        total_reward += pieces[1] * black_multiplier
 
         return total_reward * weight
 
     @classmethod
-    def grouped_together(cls, board, black_positions, white_positions, weight):
+    def grouped_together(cls, board, black_positions, white_positions, weight, white_multiplier, black_multiplier):
         """
         Reward Sides for Grouping Together.
 
+        :param black_multiplier: 1 or -1
+        :param white_multiplier: 1 or -1
         :param board: Array Representation of GameState Board
         :param black_positions: List of Tuples representing Black Positions
         :param white_positions: List of Tuples representing White Positions
@@ -100,7 +113,7 @@ class AgentJoey(AbaloneAgent):
                 for i in range(1, 3):
                     try:
                         if board[pos_x + (dir_x * i)][pos_y + (dir_y * i)] == Marble.BLACK:
-                            total_reward += i
+                            total_reward += i * black_multiplier
                     except IndexError:
                         continue
 
@@ -115,14 +128,14 @@ class AgentJoey(AbaloneAgent):
                 for i in range(1, 3):
                     try:
                         if board[pos_x + (dir_x * i)][pos_y + (dir_y * i)] == Marble.WHITE:
-                            total_reward -= i
+                            total_reward += i * white_multiplier
                     except IndexError:
                         continue
 
         return total_reward * weight
 
     @classmethod
-    def center_of_board(cls, black_positions, white_positions, weight):
+    def center_of_board(cls, black_positions, white_positions, weight, white_multiplier, black_multiplier):
         """
         Reward Players for having pieces at Center of Board
 
@@ -143,7 +156,7 @@ class AgentJoey(AbaloneAgent):
             dist_y = abs(center_board[1] - pos_y)
             black_distance = max(dist_x, dist_y)
 
-            total_reward -= black_distance ** 2
+            total_reward -= black_distance ** 2 * black_multiplier
 
         # Calculate White's Reward
         for white_position in white_positions:
@@ -154,12 +167,12 @@ class AgentJoey(AbaloneAgent):
             dist_y = abs(center_board[1] - pos_y)
             white_distance = max(dist_x, dist_y)
 
-            total_reward += white_distance ** 2
+            total_reward -= white_distance ** 2 * white_multiplier
 
         return total_reward * weight
 
     @classmethod
-    def anchored_pieces(cls, board, black_positions, white_positions, weight):
+    def anchored_pieces(cls, board, black_positions, white_positions, weight, white_multiplier, black_multiplier):
         """
         Punish Players for having single pieces close to being surrounded or is completely by opposing pieces
 
@@ -187,7 +200,7 @@ class AgentJoey(AbaloneAgent):
                     pieces_surrounded += 1
 
             if pieces_surrounded > 4:
-                total_reward -= pieces_surrounded
+                total_reward -= pieces_surrounded * black_multiplier
 
         # Calculate White's Punishment
         for white_position in white_positions:
@@ -205,6 +218,6 @@ class AgentJoey(AbaloneAgent):
                     pieces_surrounded += 1
 
             if pieces_surrounded > 4:
-                total_reward += pieces_surrounded
+                total_reward += pieces_surrounded * white_multiplier
 
         return total_reward * weight

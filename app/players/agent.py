@@ -60,7 +60,7 @@ class AbaloneAgent(Player):
 
         for distance in range(1, max_range + 1, 1):
             self._transposition_table = {}
-            v, v_state = self.max_move(game_manager.get_current_game_state(),
+            v, v_state = self.max_move(game_manager.get_current_game_state(), self.color,
                                        -math.inf, math.inf, distance, timer)
             print(f"{distance}: {v_state.get_move()}: {v}")
 
@@ -96,19 +96,21 @@ class AbaloneAgent(Player):
         else:
             return False
 
-    def evaluation(self, state):
+    def evaluation(self, state, calculating_player):
         """
         Evaluate the current state based on heuristics.
 
         Heuristics will be implemented in Part 3.
         :param state: GameState
+        :param calculating_player: Marble that represents the player deciding move
         :return: Evaluation Value as an integer.
         """
         return 0
 
-    def max_move(self, state: GameState, alpha, beta, distance, timer):
+    def max_move(self, state: GameState, calculating_player, alpha, beta, distance, timer):
         """
         Calculate Best Black Move.
+        :param calculating_player: Marble that represents the player deciding move
         :param state: GameState
         :param alpha: White's Best Value (Int)
         :param beta: Black's Best Value (Int)
@@ -118,7 +120,7 @@ class AbaloneAgent(Player):
         """
         # if Terminal Test state return Utility
         if self.terminal_test(state) or distance <= 0 or self.running_out_of_time(timer):
-            return self.evaluation(state), state
+            return self.evaluation(state, calculating_player), state
 
         # Check if Position is in Transposition Table
         v, v_state = self.board_value_in_transposition_table(state.get_board())
@@ -143,7 +145,7 @@ class AbaloneAgent(Player):
                 child_state = state.generate_new_game_state(next(possible_moves))
 
                 # Get White's Best State
-                v, v_state = self.min_move(child_state, alpha, beta, new_distance, timer)
+                v, v_state = self.min_move(child_state, calculating_player, alpha, beta, new_distance, timer)
 
                 # Re-assign Best Value if White's Best State is better than the current Best State
                 if v > best_value:
@@ -161,9 +163,10 @@ class AbaloneAgent(Player):
         self.add_board_hash_to_transposition_table(best_state, best_value)
         return best_value, best_state
 
-    def min_move(self, state: GameState, alpha, beta, distance, timer):
+    def min_move(self, state: GameState, calculating_player, alpha, beta, distance, timer):
         """
         Calculate Best White Move
+        :param calculating_player: Marble that represents the player deciding move
         :param state: GameState
         :param alpha: White's Best Value (Int)
         :param beta: Black's Best Value (Int)
@@ -173,7 +176,7 @@ class AbaloneAgent(Player):
         """
         # if Terminal Test state return Utility
         if self.terminal_test(state) or distance <= 0 or self.running_out_of_time(timer):
-            return self.evaluation(state), state
+            return self.evaluation(state, calculating_player), state
 
         # Check if Position is in Transposition Table
         v, v_state = self.board_value_in_transposition_table(state.get_board())
@@ -198,7 +201,7 @@ class AbaloneAgent(Player):
                 child_state = state.generate_new_game_state(next(possible_moves))
 
                 # Get Best Black State
-                v, v_state = self.max_move(child_state, alpha, beta, new_distance, timer)
+                v, v_state = self.max_move(child_state, calculating_player, alpha, beta, new_distance, timer)
 
                 # Re-assign Best Value if Black's Best State is better than the current Best State
                 if v < best_value:
