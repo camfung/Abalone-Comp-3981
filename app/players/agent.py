@@ -137,20 +137,27 @@ class AbaloneAgent(Player):
         else:
             new_distance = distance
 
+        possible_moves = state.get_next_possible_moves()
+
         # Check each possible state from current game state
-        for child_state in state.convert_moves_to_game_states():
-            # Get White's Best State
-            v, v_state = self.min_move(child_state, alpha, beta, new_distance, timer)
+        while True:
+            try:
+                child_state = state.generate_new_game_state(next(possible_moves))
 
-            # Re-assign Best Value if White's Best State is better than the current Best State
-            if v > best_value:
-                best_value = v
-                best_state = copy.deepcopy(v_state)
+                # Get White's Best State
+                v, v_state = self.min_move(child_state, alpha, beta, new_distance, timer)
 
-            # Prune Branch if White's Best State is better than current best White State
-            if best_value > beta:
+                # Re-assign Best Value if White's Best State is better than the current Best State
+                if v > best_value:
+                    best_value = v
+                    best_state = copy.deepcopy(v_state)
+
+                # Prune Branch if White's Best State is better than current best White State
+                if best_value > beta:
+                    break
+                alpha = max(alpha, best_value)
+            except StopIteration:
                 break
-            alpha = max(alpha, best_value)
 
         # Add Best State to Transposition Table
         self.add_board_hash_to_transposition_table(best_state, best_value)
@@ -185,20 +192,27 @@ class AbaloneAgent(Player):
         else:
             new_distance = distance
 
+        possible_moves = state.get_next_possible_moves()
+
         # Check each possible state from current game state
-        for child_state in state.convert_moves_to_game_states():
-            # Get Best Black State
-            v, v_state = self.max_move(child_state, alpha, beta, new_distance, timer)
+        while True:
+            try:
+                child_state = state.generate_new_game_state(next(possible_moves))
 
-            # Re-assign Best Value if Black's Best State is better than the current Best State
-            if v < best_value:
-                best_value = v
-                best_state = copy.deepcopy(v_state)
+                # Get Best Black State
+                v, v_state = self.max_move(child_state, alpha, beta, new_distance, timer)
 
-            # Prune Branch if Black's Best State is better than current best Black State
-            if best_value < alpha:
+                # Re-assign Best Value if Black's Best State is better than the current Best State
+                if v < best_value:
+                    best_value = v
+                    best_state = copy.deepcopy(v_state)
+
+                # Prune Branch if Black's Best State is better than current best Black State
+                if best_value < alpha:
+                    break
+                beta = min(beta, best_value)
+            except StopIteration:
                 break
-            beta = min(beta, best_value)
 
         # Add Best State to Transposition Table
         self.add_board_hash_to_transposition_table(best_state, best_value)
