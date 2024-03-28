@@ -30,6 +30,11 @@ class AbaloneAgent(Player):
         Returns:
         A tuple containing the chosen Move object and the time taken to generate the move.
         """
+
+        # AI will not generate move if game is over
+        if game_manager._app.player[0].num_balls < 9 or game_manager._app.player[1].num_balls < 9:
+            return
+
         initial_time = datetime.datetime.now()
 
         # Decide if the move is going to be random or calculated.
