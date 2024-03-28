@@ -23,7 +23,7 @@ class AgentJoey(AbaloneAgent):
         black_positions, white_positions = cls.find_positions_of_pieces(board)
 
         # List of Weights on Heuristic Functions
-        weights = [50, 2, 5, 100]
+        weights = [50, 5, 5, 5]
 
         # Call Reward Functions to Calculate Toward Reward
         total_reward = cls.number_of_pieces(state, weights[0])
@@ -96,8 +96,11 @@ class AgentJoey(AbaloneAgent):
                 dir_y = direction.value[1]
 
                 for i in range(1, 3):
-                    if board[pos_x + (dir_x * i)][pos_y + (dir_y * i)] == Marble.BLACK:
-                        total_reward += i
+                    try:
+                        if board[pos_x + (dir_x * i)][pos_y + (dir_y * i)] == Marble.BLACK:
+                            total_reward += i
+                    except IndexError:
+                        continue
 
         # Calculate White's Reward
         for white_position in white_positions:
@@ -108,8 +111,11 @@ class AgentJoey(AbaloneAgent):
                 dir_y = direction.value[1]
 
                 for i in range(1, 3):
-                    if board[pos_x + (dir_x * i)][pos_y + (dir_y * i)] == Marble.WHITE:
-                        total_reward -= i
+                    try:
+                        if board[pos_x + (dir_x * i)][pos_y + (dir_y * i)] == Marble.WHITE:
+                            total_reward -= i
+                    except IndexError:
+                        continue
 
         return total_reward * weight
 
