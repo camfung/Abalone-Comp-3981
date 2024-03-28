@@ -111,6 +111,7 @@ class Game:
         new_board_state = self._current_game_state.generate_new_board_state(
             move)
         new_game_state = GameState(new_board_state,
+                                   move,
                                    next_marble,
                                    self._current_game_state)
         self._current_game_state = new_game_state
