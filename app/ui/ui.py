@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 import sys
 import pygame
-from app.api.enums import GameType, Marble
+from app.api.enums import GameType, Marble, AgentType
 import pygame_menu
 from app.api.enums import Formation
 from app.ui.board import Board
@@ -74,7 +74,7 @@ class PygameUI(UI):
 
         def undo_move_cb(): return self._app.notify(self, "UndoLastMove")
 
-        def pause_game_cb(): return self._app.notify(self, "PauseGame")
+        def pause_game_cb(): return self._app.notify(self, "PauseTimer")
 
         def update_score_cb(): return self._app.notify(self, "GetScore")
 
@@ -220,8 +220,9 @@ class PygameUI(UI):
             'I Play As: ', [('Black', Marble.BLACK), ('White', Marble.WHITE)])  # Adding selector for player color
 
         agent_level = menu.add.dropselect('Agent:     ', [
-            ('Random moves', 1), ('Cameron', 2), ('Joey', 3), ('Elsa', 4), ('Callum', 5)], default=0,
-            onchange=self.update_play_button)
+            ('Random moves', AgentType.ABALONE_AGENT), ('Cameron', AgentType.AGENT_CAMERON),
+            ('Joey', AgentType.AGENT_JOEY), ('Elsa', AgentType.AGENT_ELSA), ('Callum', AgentType.AGENT_CALLUM)],
+                                          default=0, onchange=self.update_play_button)
         formation = menu.add.dropselect('Formation: ', [
             (f.name, f) for f in Formation], default=0, onchange=self.update_play_button)
 

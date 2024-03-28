@@ -1,13 +1,17 @@
 import threading
 import time
 
-from app.api.enums import GameType, Marble
+from app.api.enums import GameType, Marble, AgentType
 from app.gameplay.move import Move
 
 from app.communication.game_manager import GameManager
 
 from app.players.agent import AbaloneAgent
 from app.players.human import HumanPlayer
+from app.players.test_agents.callum import AgentCallum
+from app.players.test_agents.cameron import AgentCameron
+from app.players.test_agents.elsa import AgentElsa
+from app.players.test_agents.joey import AgentJoey
 
 from app.ui.ui import PygameUI
 from app.gameplay.timer import Timer
@@ -34,7 +38,7 @@ class App:
 
     def notify(self, sender, event, **kwargs):
         thread = threading.Thread(
-            target=self.notify, args=(self, "AiMakeMove"))
+            target=self.notify, args=(self, "ThreadedAiMakeMove"))
         """
         Handles notifications sent from different parts of the application,
         acting upon various events like starting the game, making moves, undoing moves, and querying game state.
@@ -64,10 +68,12 @@ class App:
 
             black_time_limit = kwargs["config"]["black_time_limit"]
             white_time_limit = kwargs["config"]["white_time_limit"]
+            agent_level = kwargs["config"]["agent_level"][0][1]
+
             self.timer._white_turn_time_limit = white_time_limit
             self.timer._black_turn_time_limit = black_time_limit
             self.players = self.initialize_players(
-                game_type, player_color, move_limit, black_time_limit, white_time_limit)
+                game_type, player_color, move_limit, black_time_limit, white_time_limit, agent_level)
 
             self.game_manager.start_game(formation)
             self.gui.update(self.game_manager)
@@ -81,18 +87,24 @@ class App:
             No specific parameters are required for this event 
             as the AI's decision-making process is internal and based on the current game state.
             """
+            thread.start()
+
+        if event == "ThreadedAiMakeMove":
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else \
                 self.players[1]
             if isinstance(player, AbaloneAgent):
                 # trigger the agent to make a move
-                move, time_stamp = player.generate_move(self.game_manager)
-                player.make_move(self.game_manager,
-                                 player.color, move, time_stamp=time_stamp)
-                self.gui.start_button_clicked = True
+                move, time_stamp = player.generate_move(self.game_manager, self.timer)
+                if self.timer._game_started:
+                    player.make_move(self.game_manager,
+                                    player.color, move, timestamp=time_stamp)
+                    self.gui.start_button_clicked = True
             if thread.is_alive():
                 thread.join()
-            self.timer.current_turn_start_time = time.time()
-            self.timer._elapsed_time = time.time()
+            if not self.timer.paused:
+                self.timer.current_turn_start_time = time.time()
+                self.timer._elapsed_time = time.time()
+            self.timer.paused = False
             self.gui.waiting_for_player_input = True
 
         if event == "PlayerMakeMove":
@@ -120,7 +132,7 @@ class App:
                 move=move, player=move.marble, timestamp=time_stamp)
             self.timer.current_turn_start_time = time.time()
             self.timer._elapsed_time = time.time()
-            thread.start()
+            self.notify(self, "AiMakeMove")
         if event == "IsMarblePlayerToMove":
             """
             Checks if the marble at a given position belongs to the current player to move.
@@ -156,9 +168,24 @@ class App:
         if event == "UpdateTimer":
             self.timer.update_timer(self.game_manager)
 
+        if event == "ReduceAggregateTime":
+            if kwargs["player"] == Marble.BLACK:
+                self.timer._black_total_aggregate_time -= kwargs["time"]
+                if self.timer._black_total_aggregate_time < 0:
+                    self.timer._black_total_aggregate_time = 0
+            elif kwargs["player"] == Marble.WHITE:
+                self.timer._white_total_aggregate_time -= kwargs["time"]
+                if self.timer._white_total_aggregate_time < 0:
+                    self.timer._white_total_aggregate_time = 0
+
+        if event == "PauseTimer":
+            self.gui.waiting_for_player_input = False
+            self.timer.pause_timer()
+
         ##Add pause timer thing here
 
-    def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit: int, white_time_limit: int):
+    def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit: int,
+                           white_time_limit: int, agent_level: AgentType):
         """
         Initializes players based on the selected game type and player colors.
 
@@ -172,11 +199,36 @@ class App:
         """
         if game_type == GameType.AGENT_VS_AGENT:
             return [AbaloneAgent(black_time_limit, move_limit, Marble.BLACK), AbaloneAgent(white_time_limit, move_limit, Marble.WHITE)]
+
         elif game_type == GameType.PLAYER_VS_AGENT:
             if player_color == Marble.BLACK:
-                return [HumanPlayer(black_time_limit, move_limit, Marble.BLACK), AbaloneAgent(white_time_limit, move_limit, Marble.WHITE)]
+                human_player = HumanPlayer(black_time_limit, move_limit, Marble.BLACK)
+
+                if agent_level == AgentType.ABALONE_AGENT:
+                    return [human_player, AbaloneAgent(white_time_limit, move_limit, Marble.WHITE)]
+                elif agent_level == AgentType.AGENT_CAMERON:
+                    return [human_player, AgentCameron(white_time_limit, move_limit, Marble.WHITE)]
+                elif agent_level == AgentType.AGENT_CALLUM:
+                    return [human_player, AgentCallum(white_time_limit, move_limit, Marble.WHITE)]
+                elif agent_level == AgentType.AGENT_JOEY:
+                    return [human_player, AgentJoey(white_time_limit, move_limit, Marble.WHITE)]
+                elif agent_level == AgentType.AGENT_ELSA:
+                    return [human_player, AgentElsa(white_time_limit, move_limit, Marble.WHITE)]
+
             else:
-                return [AbaloneAgent(black_time_limit, move_limit, Marble.BLACK), HumanPlayer(white_time_limit, move_limit, Marble.WHITE)]
+                human_player = HumanPlayer(white_time_limit, move_limit, Marble.WHITE)
+
+                if agent_level == AgentType.ABALONE_AGENT:
+                    return [AbaloneAgent(black_time_limit, move_limit, Marble.BLACK), human_player]
+                elif agent_level == AgentType.AGENT_CAMERON:
+                    return [AgentCameron(black_time_limit, move_limit, Marble.BLACK), human_player]
+                elif agent_level == AgentType.AGENT_CALLUM:
+                    return [AgentCallum(black_time_limit, move_limit, Marble.BLACK), human_player]
+                elif agent_level == AgentType.AGENT_JOEY:
+                    return [AgentJoey(black_time_limit, move_limit, Marble.BLACK), human_player]
+                elif agent_level == AgentType.AGENT_ELSA:
+                    return [AgentElsa(black_time_limit, move_limit, Marble.BLACK), human_player]
+
         elif game_type == GameType.PLAYER_VS_PLAYER:
             return [HumanPlayer(black_time_limit, move_limit, Marble.BLACK), HumanPlayer(white_time_limit, move_limit, Marble.WHITE)]
 

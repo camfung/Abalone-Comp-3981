@@ -1,4 +1,3 @@
-
 from enum import *
 
 
@@ -47,9 +46,9 @@ class MoveType(Enum):
     """
     Move Type Enumeration for type of move made by Player
     """
-    SINGLE = auto()
     INLINE = auto()
     SIDE_STEP = auto()
+    SINGLE = auto()
 
 
 class UIState(Enum):
@@ -85,3 +84,21 @@ class PlayerInputEvents(Enum):
     AWAITING_FIRST_MARBLE = auto()
     AWAITING_SECOND_MARBLE = auto()
     AWAITING_DIRECTION = auto()
+
+
+class AgentType(Enum):
+    """
+    Enum for selecting which Agent to play as.
+
+    Attributes:
+        ABALONE_AGENT: Default abalone agent that currently outputs random moves.
+        AGENT_CALLUM: Callum's heuristic
+        AGENT_CAMERON: Cameron's heuristic
+        AGENT_ELSA: Elsa's heuristic
+        AGENT_JOEY: Joey's heuristic
+    """
+    ABALONE_AGENT = auto()
+    AGENT_CALLUM = auto()
+    AGENT_CAMERON = auto()
+    AGENT_ELSA = auto()
+    AGENT_JOEY = auto()

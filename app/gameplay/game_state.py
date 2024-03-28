@@ -12,7 +12,7 @@ class GameState:
     including the board configuration and the current player's turn.
     """
 
-    def __init__(self, board, marble=Marble.BLACK, prev_game_state=None):
+    def __init__(self, board, move=None, marble=Marble.BLACK, prev_game_state=None):
         """
         Initializes a new game state.
 
@@ -22,6 +22,7 @@ class GameState:
         - prev_game_state: The previous game state, if any.
         """
         self._board = board
+        self._move = move
         self._current_move_color = marble
         self._prev_game_state = prev_game_state
         self._moves = self.__generate_possible_moves()
@@ -38,6 +39,9 @@ class GameState:
 
     def get_possible_moves(self):
         return self._moves
+
+    def get_move(self):
+        return self._move
 
     def get_ball_count(self):
         white_count = 0
@@ -110,11 +114,14 @@ class GameState:
             if row_index == 0 or row_index == len(self._board) - 1:
                 continue
             for col_index, space in enumerate(row):
+                temp_lines = []
                 if space is not self._current_move_color:
                     continue
                 if space == self._current_move_color:
                     # getting the single marble lines
                     lines.append(
+                        ((row_index, col_index), (row_index, col_index)))
+                    temp_lines.append(
                         ((row_index, col_index), (row_index, col_index)))
                     # getting the group lines
                 for direction in [Direction.UP_LEFT, Direction.UP_RIGHT, Direction.RIGHT]:
@@ -123,10 +130,13 @@ class GameState:
                     if neighbor1 is not None and self.get_marble(neighbor1) == self._current_move_color:
                         # adding 2 marbles
                         lines.append(((row_index, col_index), neighbor1))
+                        temp_lines.append(((row_index, col_index), neighbor1))
                         neighbor2 = self.get_neighbor(neighbor1, direction)
                         if neighbor2 is not None and self.get_marble(neighbor2) == self._current_move_color:
                             # adding 3 marbles
                             lines.append(
+                                ((row_index, col_index), neighbor2, neighbor1))
+                            temp_lines.append(
                                 ((row_index, col_index), neighbor2, neighbor1))
 
         return lines
@@ -158,6 +168,7 @@ class GameState:
                     moves.append(move)
 
         # Return the list of all valid moves
+        moves.sort(key=lambda x: x.get_move_type().value, reverse=False)
         return moves
 
     def convert_moves_to_board_states(self):
@@ -202,7 +213,7 @@ class GameState:
 
         for move in self._moves:
             new_board_state = self.generate_new_board_state(move)
-            new_game_state = GameState(new_board_state, next_marble, self)
+            new_game_state = GameState(new_board_state, move, next_marble, self)
             game_states.append(new_game_state)
 
         return game_states
@@ -400,6 +411,13 @@ class GameState:
         # if 3 long check the middle one
         if move.get_num_balls_moved() == 3 and self.get_marble(move.get_pos_i()[2]) != self._current_move_color:
             return False
+        # check if the final position is on the board
+        if not self._check_pos_inbounds(move.get_pos_f()[0]):
+            return False
+        # check if the final positions are empty
+        if self.get_marble(move.get_pos_f()[0]) != Marble.NONE:
+            return False
+        return True
 
     def is_valid_sidestep_move(self, move: Move):
         # check if the move is a side step
@@ -413,13 +431,15 @@ class GameState:
         # check that the line is 2 or 3 marbles long
         if move.get_pos_i()[0] == move.get_pos_i()[1]:
             return False
+        # check if all the final balls are on the board
         # # check that the line is straight
-        # if move.get_pos_i()[0][0] == move.get_pos_i()[1][0] and move.get_pos_i()[0][1] == move.get_pos_i()[1][1]:
+        # if move.get_pos_i()[0][0] == move.get_pos_i()[1][0] and move.get_pos_i()[0][1] == movem.get_pos_i()[1][1]:
         #     return False
 
         # check that all the marbles are the player to moves color
         if self.get_marble(move.get_pos_i()[0]) != self._current_move_color or self.get_marble(move.get_pos_i()[1]) != self._current_move_color:
             return False
+
         # check the middle one
         if move.get_num_balls_moved() == 3 and self.get_marble(move.get_pos_i()[2]) != self._current_move_color:
             return False
@@ -428,8 +448,21 @@ class GameState:
         for pos in move.get_pos_f():
             if pos[0] < 1 or pos[1] < 1:
                 continue
-            if self._board[pos[0]][pos[1]] != Marble.NONE:
+            if self._board[pos[0]][pos[1]] != None and self._board[pos[0]][pos[1]] != Marble.NONE:
                 return False
+
+        # check that the final positions are all on the board
+        final_pos = move.get_pos_f()
+        # figure out if the move is a 2 or 3 marble move
+        # final ball (0,0) means that the move is a 2 marble move
+        if move._num_balls_moved < 3:
+            # check if the final position is on the board
+            if not self._check_pos_inbounds(final_pos[0]) or not self._check_pos_inbounds(final_pos[1]):
+                return False
+        else:
+            if not self._check_pos_inbounds(final_pos[0]) or not self._check_pos_inbounds(final_pos[1]) or not self._check_pos_inbounds(final_pos[2]):
+                return False
+
         return True
 
     def _inline_marbles_nums(self, line: List[tuple]):
@@ -480,6 +513,8 @@ class GameState:
                 checking_own = False
             if not checking_own and self.get_marble(pos) == self._current_move_color:
                 return False
+            if self.get_marble(pos) == Marble.NONE:
+                break
         # check if the caboose is the current player
         if self.get_marble(caboose) != self._current_move_color:
             return False
@@ -516,15 +551,6 @@ class GameState:
             return self.is_valid_inline_move(move)
         else:
             return self.is_valid_single_move(move)
-
-    def is_valid_single_move(self, move: Move):
-        # check if the final position is empty
-        for pos in move.get_pos_f():
-            if pos[0] < 1 or pos[1] < 1:
-                continue
-            if self._board[pos[0]][pos[1]] != Marble.NONE:
-                return False
-        return True
 
     def __check_single_move(self, **kwargs):
         # Check if the next space is an empty space
@@ -608,13 +634,17 @@ class GameState:
         Returns:
         bool: True if the position is within the board's bounds; False otherwise.
         """
-        if pos[0] < 1 or pos[0] >= len(self._board) - 1:
+        if self._board[pos[0]][pos[1]] == None:
             return False
+        else:
+            return True
+        # if pos[0] < 1 or pos[0] >= len(self._board) - 1:
+        #     return False
 
-        if pos[1] < 1 or pos[1] >= len(self._board[0]) - 1:
-            return False
+        # if pos[1] < 1 or pos[1] >= len(self._board[0]) - 1:
+        #     return False
 
-        return True
+        # return True
 
     def __check_inbounds(self, first_ball_i, last_ball_i, row):
         """

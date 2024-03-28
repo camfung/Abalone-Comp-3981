@@ -4,6 +4,7 @@ import time
 
 from app.gameplay.game import Game
 from app.api.exceptions import DuplicateSingletons
+from app.players.human import HumanPlayer
 
 
 class GameManager:
@@ -66,12 +67,13 @@ class GameManager:
         """
         Undoes the last move made in the game, reverting the game state to its previous state and notifying observers.
         """
+
         if len(self._move_history) != 0:
+            move = self._game.get_record_history().remove_last_record()
             self._game.set_game_state(self._move_history.pop())
-            self._game.get_record_history().remove_last_record()
-            self.notify()
-        else:
-            pass
+            self._app.notify(self, "ReduceAggregateTime", time=move._time_taken, player=move._player_turn)
+
+            self._app.notify(self, "PauseTimer")
 
     def reset_board(self):
         runs = len(self._move_history)
@@ -131,3 +133,6 @@ class GameManager:
 
     def get_record_history(self):
         return self._game.get_record_history()
+
+    def get_possible_game_states(self):
+        return self._game.get_possible_game_states()
