@@ -7,6 +7,7 @@ from app.gameplay.move import Move
 from app.communication.game_manager import GameManager
 
 from app.players.agent import AbaloneAgent
+from app.players.test_agents.random_agent import RandomAgent
 from app.players.human import HumanPlayer
 from app.players.test_agents.callum import AgentCallum
 from app.players.test_agents.cameron import AgentCameron
@@ -206,6 +207,8 @@ class App:
 
                 if agent_level == AgentType.ABALONE_AGENT:
                     return [human_player, AbaloneAgent(white_time_limit, move_limit, Marble.WHITE)]
+                elif agent_level == AgentType.RANDOM_AGENT:
+                    return [human_player, RandomAgent(white_time_limit, move_limit, Marble.WHITE)]
                 elif agent_level == AgentType.AGENT_CAMERON:
                     return [human_player, AgentCameron(white_time_limit, move_limit, Marble.WHITE)]
                 elif agent_level == AgentType.AGENT_CALLUM:

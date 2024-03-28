@@ -98,6 +98,7 @@ class AgentType(Enum):
         AGENT_JOEY: Joey's heuristic
     """
     ABALONE_AGENT = auto()
+    RANDOM_AGENT = auto()
     AGENT_CALLUM = auto()
     AGENT_CAMERON = auto()
     AGENT_ELSA = auto()
