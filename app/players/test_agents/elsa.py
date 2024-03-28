@@ -1,17 +1,11 @@
-import timer as timer
-
 from app.players.agent import AbaloneAgent
 
 import datetime
 import random
-import sys
 import time
-from app.api.exceptions import InvalidMarbleValue
 from app.communication.game_manager import GameManager
 from app.api.enums import Marble, Direction
-from app.gameplay.game_state import GameState
 from app.gameplay.move import Move
-from app.players.player import Player
 
 
 class AgentElsa(AbaloneAgent):
@@ -47,11 +41,9 @@ class AgentElsa(AbaloneAgent):
         moves = game_manager.get_current_game_state().get_possible_moves()
         board = game_manager.get_current_game_state().get_board()
 
-
-        # move_to_make = self.move_to_center(game_manager.get_current_game_state().get_possible_moves())
         push_move = self.push_pieces(moves, board)
-
-        move_to_make = self.move_away_edge(game_manager.get_current_game_state().get_possible_moves())
+        move_to_make = self.move_to_center(game_manager.get_current_game_state().get_possible_moves())
+        # move_to_make = self.move_away_edge(game_manager.get_current_game_state().get_possible_moves())
 
         if push_move is not None:
             move_to_make = push_move
@@ -113,49 +105,39 @@ class AgentElsa(AbaloneAgent):
             avg_black_dist = 0
 
     def move_to_center(self, moves):
-        best_move_pos = (10, 10)  # Pick a position off the board
-        best_move_str = ""
         best_move = None
+        best_distance_to_center = float('inf')
 
         for move in moves:
-            if self.calc_single_middle_dist(move.get_pos_f()[0]) < self.calc_single_middle_dist(best_move_pos):
-                best_move_pos = move.get_pos_f()[0]
-                best_move_str = str(move)
-                best_move = move
-                print(f"current best move is {move.get_pos_i()} {move.get_pos_f()} {best_move_pos} {best_move_str} "
-                      f"{move.get_marble()}")
+            pos = move.get_pos_f()[0]
+            distance_to_center = self.calc_single_middle_dist(pos)
 
-        print(str(f"best move is {best_move_str} {best_move_str}"))
+            if distance_to_center < best_distance_to_center:
+                best_move = move
+                best_distance_to_center = distance_to_center
+
         return best_move
 
     def move_away_edge(self, moves):
-        best_move_pos = (10, 10)  # Pick a position off the board
-        best_move_str = ""
         best_move = None
-        best_horizontal_move = None
+        best_distance_to_edge = float('inf')
 
         for move in moves:
+            pos = move.get_pos_f()[1]
+            direction = move.get_direction()
 
-            if self.calc_single_edge_dist(move.get_pos_f()[1]) <= self.calc_single_edge_dist(best_move_pos):
-                if move.get_direction() != Direction.LEFT and move.get_direction() != Direction.RIGHT:
-                    dist_to_edge = self.calc_single_edge_dist(best_move_pos)
-                    best_move_pos = move.get_pos_f()[1]
-                    best_move_str = str(move)
+            if (direction == Direction.LEFT or direction == Direction.RIGHT) and pos[1] < best_distance_to_edge:
+                best_move = move
+                best_distance_to_edge = pos[1]
+            elif direction != Direction.LEFT and direction != Direction.RIGHT:
+                distance_to_edge = self.calc_single_edge_dist(pos)
+                if distance_to_edge < best_distance_to_edge:
                     best_move = move
-                    print(f"current best move is {best_move_str} dist to edge {dist_to_edge} {move.get_direction()}")
-                else:
-                    best_horizontal_move = move
-            else:
-                continue
+                    best_distance_to_edge = distance_to_edge
 
-        if best_horizontal_move is not None:
-            best_move = best_horizontal_move
-            print("go sideways")
-
-        if best_move is None: #Prevent returning none for now
+        if best_move is None:
             return random.choice(moves)
 
-        print(str(f"best move is {best_move_str}"))
         return best_move
 
     def push_pieces(self, moves, board):
