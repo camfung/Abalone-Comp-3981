@@ -54,7 +54,7 @@ class AbaloneAgent(Player):
         - time_stamp: The timestamp when the move was generated.
         """
         # AI will not generate move if game is over
-        if game_manager._app.players[0].num_balls < 15 or game_manager._app.players[1].num_balls < 9:
+        if game_manager._app.players[0].num_balls < 9 or game_manager._app.players[1].num_balls < 9:
             return
 
         self._current_move += 1

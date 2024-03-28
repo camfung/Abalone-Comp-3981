@@ -56,6 +56,9 @@ class Timer:
 
     def update_timer(self, game_manager):
         if self._game_started:
+            if game_manager._app.players[0].num_balls < 9 or game_manager._app.players[1].num_balls < 9:
+                self.pause_timer()
+
             if game_manager.current_player_to_move == Marble.BLACK:
                 if self._black_start_turn:
                     self.current_turn_start_time = time.time() - (self._elapsed_time - self.current_turn_start_time)
