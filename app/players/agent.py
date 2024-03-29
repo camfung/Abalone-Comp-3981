@@ -112,7 +112,7 @@ class AbaloneAgent(Player):
         """
         return 0
 
-    def max_move(self, state: GameState, calculating_player, alpha, beta, distance, timer):
+    def max_move(self, state: GameState, calculating_player: Marble, alpha, beta, distance, timer):
         """
         Calculate Best Black Move.
         :param calculating_player: Marble that represents the player deciding move
@@ -169,7 +169,7 @@ class AbaloneAgent(Player):
         self.add_board_hash_to_transposition_table(best_state, best_value)
         return best_value, best_state
 
-    def min_move(self, state: GameState, calculating_player, alpha, beta, distance, timer):
+    def min_move(self, state: GameState, calculating_player: Marble, alpha, beta, distance, timer):
         """
         Calculate Best White Move
         :param calculating_player: Marble that represents the player deciding move

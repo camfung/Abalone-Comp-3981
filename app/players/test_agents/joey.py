@@ -32,9 +32,9 @@ class AgentJoey(AbaloneAgent):
 
         # List of Weights on Heuristic Functions
         if self._current_move < 6:
-            weights = [100, 2, 5, 5]
+            weights = [100, 2, 5]
         else:
-            weights = [100, 5, 2, 5]
+            weights = [100, 5, 2]
 
         # Call Reward Functions to Calculate Toward Reward
         total_reward = self.number_of_pieces(state, weights[0], white_multiplier, black_multiplier)
@@ -42,8 +42,6 @@ class AgentJoey(AbaloneAgent):
                                               white_multiplier, black_multiplier)
         total_reward += self.center_of_board(black_positions, white_positions, weights[2],
                                              white_multiplier, black_multiplier)
-        # total_reward += self.anchored_pieces(board, black_positions, white_positions, weights[3],
-        #                                     white_multiplier, black_multiplier)
 
         return total_reward
 
@@ -176,53 +174,3 @@ class AgentJoey(AbaloneAgent):
 
         return total_reward * weight
 
-    @classmethod
-    def anchored_pieces(cls, board, black_positions, white_positions, weight, white_multiplier, black_multiplier):
-        """
-        Punish Players for having single pieces close to being surrounded or is completely by opposing pieces
-
-        :param board: Array Representation of GameState Board
-        :param black_positions: List of Tuples representing Black Positions
-        :param white_positions: List of Tuples representing White Positions
-        :param weight: int representing the weight in evaluation
-        :return: int value indicating total reward
-        """
-        total_reward = 0
-
-        # Calculate Black's Punishment
-        for black_position in black_positions:
-            pos_x = black_position[0]
-            pos_y = black_position[1]
-
-            pieces_surrounded = 0
-
-            # Check for All 6 Directions
-            for direction in Direction:
-                dir_x = direction.value[0]
-                dir_y = direction.value[1]
-
-                if board[pos_x + dir_x][pos_y + dir_y] == Marble.WHITE:
-                    pieces_surrounded += 1
-
-            if pieces_surrounded > 4:
-                total_reward -= pieces_surrounded * black_multiplier
-
-        # Calculate White's Punishment
-        for white_position in white_positions:
-            pos_x = white_position[0]
-            pos_y = white_position[1]
-
-            pieces_surrounded = 0
-
-            # Check for All 6 Directions
-            for direction in Direction:
-                dir_x = direction.value[0]
-                dir_y = direction.value[1]
-
-                if board[pos_x + dir_x][pos_y + dir_y] == Marble.BLACK:
-                    pieces_surrounded += 1
-
-            if pieces_surrounded > 4:
-                total_reward += pieces_surrounded * white_multiplier
-
-        return total_reward * weight
