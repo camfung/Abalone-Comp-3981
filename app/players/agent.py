@@ -33,7 +33,7 @@ class AbaloneAgent(Player):
 
         # Decide if the move is going to be random or calculated.
         if self._current_move <= 0 and self._color == Marble.BLACK:
-            move = random.choice(game_manager.get_possible_moves())
+            move = (random.choice(game_manager.get_possible_game_states())).get_move()
         else:
             move = self.calc_move(game_manager, timer)
 
@@ -62,12 +62,12 @@ class AbaloneAgent(Player):
             self._transposition_table = {}
             v, v_state = self.max_move(game_manager.get_current_game_state(), self.color,
                                        -math.inf, math.inf, distance, timer)
-            print(f"{distance}: {v_state.get_move()}: {v}")
 
             # If Running Out Of Time
             if self.running_out_of_time(timer):
                 break
 
+            print(f"\n{distance}: {v_state.get_move()}: {v}\n")
             best_state = copy.deepcopy(v_state)
 
         return best_state.get_move() if best_state is not None else None
@@ -154,6 +154,7 @@ class AbaloneAgent(Player):
 
                 # Prune Branch if White's Best State is better than current best White State
                 if best_value > beta:
+                    print(f"Pruned Max's {state.get_move()}: {best_value}")
                     break
                 alpha = max(alpha, best_value)
             except StopIteration:
@@ -210,6 +211,7 @@ class AbaloneAgent(Player):
 
                 # Prune Branch if Black's Best State is better than current best Black State
                 if best_value < alpha:
+                    print(f"Pruned Min's {state.get_move()}: {best_value}")
                     break
                 beta = min(beta, best_value)
             except StopIteration:

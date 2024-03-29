@@ -38,9 +38,12 @@ class AgentJoey(AbaloneAgent):
 
         # Call Reward Functions to Calculate Toward Reward
         total_reward = self.number_of_pieces(state, weights[0], white_multiplier, black_multiplier)
-        total_reward += self.grouped_together(board, black_positions, white_positions, weights[1], white_multiplier, black_multiplier)
-        total_reward += self.center_of_board(black_positions, white_positions, weights[2], white_multiplier, black_multiplier)
-        total_reward += self.anchored_pieces(board, black_positions, white_positions, weights[3], white_multiplier, black_multiplier)
+        total_reward += self.grouped_together(board, black_positions, white_positions, weights[1],
+                                              white_multiplier, black_multiplier)
+        total_reward += self.center_of_board(black_positions, white_positions, weights[2],
+                                             white_multiplier, black_multiplier)
+        # total_reward += self.anchored_pieces(board, black_positions, white_positions, weights[3],
+        #                                     white_multiplier, black_multiplier)
 
         return total_reward
 
@@ -139,6 +142,8 @@ class AgentJoey(AbaloneAgent):
         """
         Reward Players for having pieces at Center of Board
 
+        :param black_multiplier: 1 or -1
+        :param white_multiplier: 1 or -1
         :param black_positions: List of Tuples representing Black Positions
         :param white_positions: List of Tuples representing White Positions
         :param weight: int representing the weight in evaluation
