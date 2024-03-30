@@ -15,6 +15,7 @@ class AbaloneAgent(Player):
     """
     A concrete implementation of the Player class representing an AI agent player.
     """
+
     def __init__(self, time_limit: int, move_limit: int, color: Marble):
         super().__init__(time_limit, move_limit, color)
         self._transposition_table = {}
@@ -94,7 +95,8 @@ class AbaloneAgent(Player):
         :param timer: Timer
         :return: Boolean
         """
-        time_limit = timer.get_timer_values()[4] if self.color == Marble.BLACK else timer.get_timer_values()[3]
+        time_limit = timer.get_timer_values(
+        )[4] if self.color == Marble.BLACK else timer.get_timer_values()[3]
         elapsed_time = timer.get_timer_values()[0]
         if time_limit - elapsed_time < 1:
             return True
@@ -145,10 +147,12 @@ class AbaloneAgent(Player):
         # Check each possible state from current game state
         while True:
             try:
-                child_state = state.generate_new_game_state(next(possible_moves))
+                child_state = state.generate_new_game_state(
+                    next(possible_moves))
 
                 # Get White's Best State
-                v, v_state = self.min_move(child_state, alpha, beta, new_distance, timer)
+                v, v_state = self.min_move(
+                    child_state, alpha, beta, new_distance, timer)
 
                 # Re-assign Best Value if White's Best State is better than the current Best State
                 if v > best_value:
@@ -200,10 +204,12 @@ class AbaloneAgent(Player):
         # Check each possible state from current game state
         while True:
             try:
-                child_state = state.generate_new_game_state(next(possible_moves))
+                child_state = state.generate_new_game_state(
+                    next(possible_moves))
 
                 # Get Best Black State
-                v, v_state = self.max_move(child_state, alpha, beta, new_distance, timer)
+                v, v_state = self.max_move(
+                    child_state, alpha, beta, new_distance, timer)
 
                 # Re-assign Best Value if Black's Best State is better than the current Best State
                 if v < best_value:
