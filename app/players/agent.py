@@ -59,12 +59,12 @@ class AbaloneAgent(Player, ABC):
 
     def calc_move(self, game_manager: GameManager, timer: Timer = None, depth=2) -> Move:
         best_state = None
-        max_range = self._move_limit - self._current_move
+        # max_range = self._move_limit - self._current_move
 
-        for distance in range(1, max_range + 1, 1):
+        for distance in range(1, depth, 1):
             self._transposition_table = {}
-            v, v_state = self.max_move(game_manager.get_current_game_state(),
-                                       -math.inf, math.inf, distance, timer)
+            v, v_state = self.black_move(game_manager.get_current_game_state(),
+                                         -math.inf, math.inf, distance, timer)
             print(f"{distance}: {v_state.get_move()}: {v}")
 
             # If Running Out Of Time
@@ -188,7 +188,7 @@ class AbaloneAgent(Player, ABC):
         # Check each possible state from current game state
         for child_state in state.convert_moves_to_game_states():
             # Get Best Black State
-            v, v_state = self.max_move(
+            v, v_state = self.black_move(
                 child_state, alpha, beta, new_distance, timer)
 
             # Re-assign Best Value if Black's Best State is better than the current Best State

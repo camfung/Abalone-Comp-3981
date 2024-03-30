@@ -19,7 +19,7 @@ gameManager = GameManager(None, gameState)
 player = AgentCameron(100, 100, Marble.BLACK)
 
 move = player.calc_move(gameManager, None, 2)
-print(move)
+print(move, "test")
 
 gameManager.commit_move(Marble.BLACK, move, time.time())
 print(gameManager.get_current_game_state())
