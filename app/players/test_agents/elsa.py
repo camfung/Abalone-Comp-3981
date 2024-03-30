@@ -38,12 +38,13 @@ class AgentElsa(AbaloneAgent):
         - move: The Move object representing the move to be made.
         - time_stamp: The timestamp when the move was generated.
         """
-        moves = game_manager.get_current_game_state().get_possible_moves()
+        self.evaluation(game_manager.get_current_game_state())
+        moves = game_manager.get_current_game_state().generate_possible_moves()
         board = game_manager.get_current_game_state().get_board()
 
         push_move = self.push_pieces(moves, board)
-        move_to_make = self.move_to_center(game_manager.get_current_game_state().get_possible_moves())
-        # move_to_make = self.move_away_edge(game_manager.get_current_game_state().get_possible_moves())
+        move_to_make = self.move_to_center(game_manager.get_current_game_state().generate_possible_moves())
+        # move_to_make = self.move_away_edge(game_manager.get_current_game_state().generate_possible_moves())
 
         if push_move is not None:
             move_to_make = push_move
@@ -72,12 +73,13 @@ class AgentElsa(AbaloneAgent):
         return abs(x - edge_x) + abs(y - edge_y)
 
     @staticmethod
-    def calc_center_distance(board):
+    def calc_center_distance(state):
         """
-        Calculates the distance from the center of the board
-        :param board:
-        :return:
+        Calculates the distance from the center of the board and returns an evaluation.
+        :param state: Gamestate
+        :return: Double
         """
+        board = state.get_board()
         mid_index = (5, 5)
 
         white_dist = 0
@@ -103,6 +105,8 @@ class AgentElsa(AbaloneAgent):
             avg_black_dist = black_dist / black_count
         else:
             avg_black_dist = 0
+
+        return avg_white_dist - avg_black_dist
 
     def move_to_center(self, moves):
         best_move = None
@@ -167,4 +171,5 @@ class AgentElsa(AbaloneAgent):
         # How close to edge is opponent's pieces?
         # How clustered are the pieces?
         # Weight and features
-        pass
+        center_distance = cls.calc_center_distance(state)
+        print(center_distance)
