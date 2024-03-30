@@ -133,7 +133,7 @@ class Game:
         self._current_game_state = new_game_state
 
     def get_possible_moves(self):
-        return self._current_game_state.get_possible_moves()
+        return self._current_game_state.generate_possible_moves()
 
     def __str__(self):
         game_state_str = str(self._current_game_state)
