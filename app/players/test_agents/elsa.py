@@ -108,6 +108,56 @@ class AgentElsa(AbaloneAgent):
 
         return avg_white_dist - avg_black_dist
 
+    @staticmethod
+    def calc_edge_distance(state):
+        """
+        Calculates the average distance of each player's marbles from the edge of the board and returns an evaluation.
+        :param state: Gamestate
+        :return: Double
+        """
+
+        def calc_single_edge_dist(coord):
+            x, y = coord[0], coord[1]
+
+            edge_x = 1 if x <= 5 else 9
+
+            if y < 6:
+                edge_y = 1 if x < 6 else 2 if x == 6 else 3 if x == 7 else 4 if x == 8 else 5
+            else:
+                edge_y = 9 if x > 4 else 8 if x == 4 else 7 if x == 3 else 6 if x == 2 else 1
+
+            return abs(x - edge_x) + abs(y - edge_y)
+
+        board = state.get_board()
+        white_edge_dist = 0
+        black_edge_dist = 0
+        white_count = 0
+        black_count = 0
+
+        for row_index, row in enumerate(board):
+            for col_index, col in enumerate(row):
+                if col == Marble.BLACK:
+                    black_edge_dist += calc_single_edge_dist((row_index, col_index))
+                    black_count += 1
+                    print(f"Black edge dist is {black_edge_dist}")
+                elif col == Marble.WHITE:
+                    white_edge_dist += calc_single_edge_dist((row_index, col_index))
+                    white_count += 1
+                    print(f"Black edge dist is {white_edge_dist}")
+
+        if white_count != 0:
+            avg_white_edge_dist = white_edge_dist / white_count
+        else:
+            avg_white_edge_dist = 0
+
+        if black_count != 0:
+            avg_black_edge_dist = black_edge_dist / black_count
+        else:
+            avg_black_edge_dist = 0
+
+        print(f"White edge dist {avg_white_edge_dist} Black edge dist {avg_black_edge_dist}")
+        return avg_black_edge_dist - avg_white_edge_dist
+
     def move_to_center(self, moves):
         best_move = None
         best_distance_to_center = float('inf')
@@ -172,4 +222,5 @@ class AgentElsa(AbaloneAgent):
         # How clustered are the pieces?
         # Weight and features
         center_distance = cls.calc_center_distance(state)
-        print(center_distance)
+        edge_distance = cls.calc_edge_distance(state)
+        print(f"Center distance is {center_distance} Edge distance is {edge_distance}")
