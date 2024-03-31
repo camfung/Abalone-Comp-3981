@@ -99,9 +99,6 @@ class AgentElsa(AbaloneAgent):
         else:
             avg_black_edge_dist = 0
 
-        print(f"white + {avg_white_edge_dist}")
-        print(f"black + {avg_black_edge_dist}")
-
         return avg_white_edge_dist - avg_black_edge_dist
 
     @classmethod
