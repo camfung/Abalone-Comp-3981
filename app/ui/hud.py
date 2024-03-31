@@ -205,9 +205,10 @@ class HUD(Drawable, EventHandler):
 class RecordMenu(Drawable, EventHandler):
     record_menu = None
 
-    def __init__(self, gui):
+    def __init__(self, gui, pause_game_cb):
         self.ui_instance = gui
         self.theme = self.ui_instance.theme
+        self.pause_game_cb = pause_game_cb
 
     def handle_event(self, event):
         if self.record_menu is not None:
@@ -220,6 +221,10 @@ class RecordMenu(Drawable, EventHandler):
         :return: Boolean
         """
         return isinstance(self.ui_instance._app.players[0], AbaloneAgent)
+
+    def show_full_history(self):
+        self.pause_game_cb()
+        self.ui_instance.display_move_history()
 
     def draw(self, surface, game_manager):
         # Created here so that it updates
@@ -261,7 +266,7 @@ class RecordMenu(Drawable, EventHandler):
 
         if record_len > 15:
             record_menu.add.button('Show Full History',
-                                   self.ui_instance.display_move_history)
+                                   self.show_full_history)
             start_index = record_len - math.ceil(record_len / 2)
 
         for i in range(start_index - 1, record_len, 2):
