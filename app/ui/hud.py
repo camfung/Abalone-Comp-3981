@@ -205,10 +205,10 @@ class HUD(Drawable, EventHandler):
 class RecordMenu(Drawable, EventHandler):
     record_menu = None
 
-    def __init__(self, gui):
+    def __init__(self, gui, moves_left_cb):
         self.ui_instance = gui
         self.theme = self.ui_instance.theme
-
+        self.moves_left_cb = moves_left_cb
     def handle_event(self, event):
         if self.record_menu is not None:
             self.record_menu.update([event])
@@ -222,9 +222,29 @@ class RecordMenu(Drawable, EventHandler):
         return isinstance(self.ui_instance._app.players[0], AbaloneAgent)
 
     def draw(self, surface, game_manager):
+        records = self.ui_instance._app.notify(self, "getRecordHistory")
+
+        start_index = 1
+
+        record_len = records.get_records_length()
+
+        if record_len > 15:
+            start_index = record_len - math.ceil(record_len / 2)
+            if record_len % 2 == 1:
+                move_left_size = record_len - start_index - 1
+            else:
+                move_left_size = record_len - start_index
+        else:
+            if record_len % 2 == 1:
+                move_left_size = record_len - 1
+            else:
+                move_left_size = record_len
         # Created here so that it updates
         record_menu = pygame_menu.Menu(
             "Move History", 450, 800, theme=self.theme, position=(100, 100, True))
+
+        record_menu.add.label(f"Moves left: {self.moves_left_cb()}", align=pygame_menu.locals.ALIGN_CENTER, selectable=False).translate(0, -(300-13*move_left_size))
+
         next_agent_move = record_menu.add.table(table_id='next_agent_move',
                                                 font_size=12, font_color="Black")
         next_agent_move.default_cell_padding = 5
@@ -252,12 +272,6 @@ class RecordMenu(Drawable, EventHandler):
         # white_table.default_row_background_color = 'white'
         # white_table.add_row(['White Moves'],
         #                     cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
-
-        records = self.ui_instance._app.notify(self, "getRecordHistory")
-
-        start_index = 1
-
-        record_len = records.get_records_length()
 
         if record_len > 15:
             record_menu.add.button('Show Full History',

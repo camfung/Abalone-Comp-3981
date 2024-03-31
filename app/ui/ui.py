@@ -96,8 +96,12 @@ class PygameUI(UI):
             reset_timer_cb,
             get_timer_values_cb
         )
+
+        def get_moves_left_cb():
+            return self._app.players[0].moves_left()
+
         hud = HUD(self, callbacks)
-        record_menu = RecordMenu(self)
+        record_menu = RecordMenu(self, get_moves_left_cb)
 
         def execute_move_cb(first_marble, second_marble, direction):
             return self._app.notify(self, "PlayerMakeMove", first_marble=first_marble,
