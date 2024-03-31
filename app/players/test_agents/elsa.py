@@ -65,12 +65,12 @@ class AgentElsa(AbaloneAgent):
         def calc_single_edge_dist(coord):
             x, y = coord[0], coord[1]
 
-            edge_x = 1 if x <= 5 else 9
+            edge_y = 1 if y <= 5 else 9
 
-            if y < 6:
-                edge_y = 1 if x < 6 else 2 if x == 6 else 3 if x == 7 else 4 if x == 8 else 5
+            if x < 6:
+                edge_x = 1 if y < 6 else 2 if y == 6 else 3 if y == 7 else 4 if y == 8 else 5
             else:
-                edge_y = 9 if x > 4 else 8 if x == 4 else 7 if x == 3 else 6 if x == 2 else 1
+                edge_x = 9 if y > 4 else 8 if y == 4 else 7 if y == 3 else 6 if y == 2 else 1
 
             return abs(x - edge_x) + abs(y - edge_y)
 
@@ -99,7 +99,10 @@ class AgentElsa(AbaloneAgent):
         else:
             avg_black_edge_dist = 0
 
-        return avg_black_edge_dist - avg_white_edge_dist
+        print(f"white + {avg_white_edge_dist}")
+        print(f"black + {avg_black_edge_dist}")
+
+        return avg_white_edge_dist - avg_black_edge_dist
 
     @classmethod
     def evaluation(cls, state):
