@@ -183,6 +183,18 @@ class PygameUI(UI):
 
         pygame.display.flip()
 
+    def draw_game_victory(self):
+        winner = "White" if self.hud.white_balls > self.hud.black_balls else "Black"
+        game_over_text = pygame.font.Font(None, 100).render(
+            f"{winner} wins!", True, (255, 0, 0))
+        text_rect = game_over_text.get_rect(
+            center=(self.SCREEN_WIDTH // 3, 500))
+
+        background_rect = pygame.Rect(text_rect.left - 10, text_rect.top - 10, text_rect.width + 20,
+                                      text_rect.height + 20)
+        pygame.draw.rect(self.screen, (0, 0, 0), background_rect)
+        self.screen.blit(game_over_text, text_rect)
+
     def reset_board(self, thread):
         self._app.reset_board()
         thread.join()
@@ -219,10 +231,12 @@ class PygameUI(UI):
         player_color = menu.add.selector(
             'I Play As: ', [('Black', Marble.BLACK), ('White', Marble.WHITE)])  # Adding selector for player color
 
-        agent_level = menu.add.dropselect('Agent:     ', [
-            ('Default', AgentType.ABALONE_AGENT), ('Random Moves', AgentType.RANDOM_AGENT),
-            ('Cameron', AgentType.AGENT_CAMERON), ('Joey', AgentType.AGENT_JOEY),
-            ('Elsa', AgentType.AGENT_ELSA), ('Callum', AgentType.AGENT_CALLUM)],
+        agent_level = menu.add.dropselect('Agent:     ', [('Cameron', AgentType.AGENT_CAMERON),
+                                                          ('Default', AgentType.ABALONE_AGENT), (
+                                                              'Random Moves', AgentType.RANDOM_AGENT),
+                                                          ('Joey',
+                                                           AgentType.AGENT_JOEY),
+                                                          ('Elsa', AgentType.AGENT_ELSA), ('Callum', AgentType.AGENT_CALLUM)],
                                           default=0, onchange=self.update_play_button)
         formation = menu.add.dropselect('Formation: ', [
             (f.name, f) for f in Formation], default=0, onchange=self.update_play_button)

@@ -1,3 +1,4 @@
+import datetime
 import threading
 import time
 
@@ -95,10 +96,11 @@ class App:
                 self.players[1]
             if isinstance(player, AbaloneAgent):
                 # trigger the agent to make a move
-                move, time_stamp = player.generate_move(self.game_manager, self.timer)
+                move, time_stamp = player.generate_move(
+                    self.game_manager, self.timer)
                 if self.timer._game_started:
                     player.make_move(self.game_manager,
-                                    player.color, move, timestamp=time_stamp)
+                                     player.color, move, timestamp=time_stamp)
                     self.gui.start_button_clicked = True
             if thread.is_alive():
                 thread.join()
@@ -129,8 +131,11 @@ class App:
             # if is valid make move and prompt AI to make move
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else \
                 self.players[1]
+            start = datetime.datetime.now()
             self.game_manager.commit_move(
                 move=move, player=move.marble, timestamp=time_stamp)
+            end = datetime.datetime.now()
+            print("commit move:", end - start)
             self.timer.current_turn_start_time = time.time()
             self.timer._elapsed_time = time.time()
             self.notify(self, "AiMakeMove")
@@ -183,7 +188,7 @@ class App:
             self.gui.waiting_for_player_input = False
             self.timer.pause_timer()
 
-        ##Add pause timer thing here
+        # Add pause timer thing here
 
     def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit: int,
                            white_time_limit: int, agent_level: AgentType):
@@ -203,10 +208,11 @@ class App:
 
         elif game_type == GameType.PLAYER_VS_AGENT:
             if player_color == Marble.BLACK:
-                human_player = HumanPlayer(black_time_limit, move_limit, Marble.BLACK)
+                human_player = HumanPlayer(
+                    black_time_limit, move_limit, Marble.BLACK)
 
                 if agent_level == AgentType.ABALONE_AGENT:
-                    return [human_player, AbaloneAgent(white_time_limit, move_limit, Marble.WHITE)]
+                    return [human_player, RandomAgent(white_time_limit, move_limit, Marble.WHITE)]
                 elif agent_level == AgentType.RANDOM_AGENT:
                     return [human_player, RandomAgent(white_time_limit, move_limit, Marble.WHITE)]
                 elif agent_level == AgentType.AGENT_CAMERON:
@@ -219,7 +225,8 @@ class App:
                     return [human_player, AgentElsa(white_time_limit, move_limit, Marble.WHITE)]
 
             else:
-                human_player = HumanPlayer(white_time_limit, move_limit, Marble.WHITE)
+                human_player = HumanPlayer(
+                    white_time_limit, move_limit, Marble.WHITE)
 
                 if agent_level == AgentType.ABALONE_AGENT:
                     return [AbaloneAgent(black_time_limit, move_limit, Marble.BLACK), human_player]

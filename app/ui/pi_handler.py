@@ -1,4 +1,5 @@
 
+import datetime
 from app.api.enums import *
 
 
@@ -94,6 +95,8 @@ class PlayerInputHandler:
             self.second_marble = None
             self.state = PlayerInputEvents.AWAITING_SECOND_MARBLE
         else:
+            now = datetime.datetime.now()
+
             direction = self.calculate_direction(
                 self.second_marble, marble_position)
             if direction == None:
@@ -101,8 +104,13 @@ class PlayerInputHandler:
             if self.is_valid_direction(self.second_marble, marble_position):
                 if self.first_marble == None or self.second_marble == None:
                     return
+                start_execution = datetime.datetime.now()
                 self.execute_move(self.first_marble,
                                   self.second_marble, direction)
+
+                end = datetime.datetime.now()
+                print("Time taken: ", end - now)
+                print("Time taken to execute move: ", end - start_execution)
                 self.reset_state()
             else:
                 # not a valid direction

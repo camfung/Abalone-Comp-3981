@@ -16,14 +16,26 @@ class AgentCameron(AbaloneAgent):
         return marbles
 
     def calculate_manhattan_distance_to_center(self, marbles):
+        distance_map = [
+            [None, None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, 4, 4, 4, 4, 4, None],
+            [None, None, None, None, 4, 3, 3, 3, 3, 4, None],
+            [None, None, None, 4, 3, 2, 2, 2, 3, 4, None],
+            [None, None, 4, 3, 2, 1, 1, 2, 3, 4, None],
+            [None, 4, 2, 2, 1, 0, 1, 2, 3, 4, None],
+            [None, 4, 3, 2, 1, 1, 2, 3, 4, None, None],
+            [None, 4, 3, 2, 2, 2, 3, 4, None, None, None],
+            [None, 4, 3, 2, 2, 3, 4, None, None, None, None],
+            [None, 4, 4, 4, 4, 4, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None]
+        ]
         center_position = (5, 5)  # E5 in the given board representation
         white_distance_sum = 0
         black_distance_sum = 0
 
         for position, color in marbles.items():
             # Calculate Manhattan distance for each marble to the center
-            distance = abs(position[0] - center_position[0]) + \
-                abs(position[1] - center_position[1])
+            distance = distance_map[position[0]][position[1]]
 
             # Aggregate distances based on color
             if color == Marble.WHITE:
@@ -32,7 +44,7 @@ class AgentCameron(AbaloneAgent):
                 black_distance_sum += distance
 
         # Return the difference in total distances
-        return black_distance_sum - white_distance_sum
+        return white_distance_sum - black_distance_sum
 
     def calculate_cohesion(self, board_dict):
         # Neighbor offsets for even and odd rows
@@ -68,7 +80,7 @@ class AgentCameron(AbaloneAgent):
         return 0
 
     def evaluation(self, state: GameState):
-        board_dict = self.extract_marbles(state.board)
+        board_dict = self.extract_marbles(state._board)
         for (row, col), marble in board_dict.items():
             if marble == Marble.WHITE:
                 board_dict[(row, col)] = Marble.NONE
@@ -77,9 +89,9 @@ class AgentCameron(AbaloneAgent):
             board_dict)
 
         score = distance_to_center
-        print("========================================================")
-        print("score", score)
-        print(state)
-        print()
+        # print("========================================================")
+        # print("score", score)
+        # print(state)
+        # print()
 
         return score

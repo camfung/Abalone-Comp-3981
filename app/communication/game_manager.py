@@ -63,8 +63,8 @@ class GameManager:
         - move: The move being made.
         - timestamp: The time at which the move was made.
         """
-        self._move_history.append(copy.deepcopy(
-            self._game.get_current_game_state()))
+        self._move_history.append(
+            self._game.get_current_game_state())
         self._game.set_move(player, move, timestamp)
         self.notify()
 
