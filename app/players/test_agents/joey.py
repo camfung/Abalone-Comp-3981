@@ -11,10 +11,9 @@ class AgentJoey(AbaloneAgent):
     A sample agent created by Joey (A01320740) to calculate Evaluation Function.
     """
 
-    def evaluation(self, state, calculating_player):
+    def evaluation(self, state):
         """
         Base Evaluation Function for Agent which calls all other evaluation functions.
-        :param calculating_player: Marble that represents the player deciding move
         :param state: GameState
         :return: integer representing the current evaluation value.
         """
@@ -23,7 +22,7 @@ class AgentJoey(AbaloneAgent):
         black_positions, white_positions = self.find_positions_of_pieces(board)
 
         # Get Multiplier
-        if calculating_player == Marble.BLACK:
+        if self.color == Marble.BLACK:
             black_multiplier = 1
             white_multiplier = -1
         else:
@@ -34,7 +33,7 @@ class AgentJoey(AbaloneAgent):
         if self._current_move < 6:
             weights = [100, 2, 5]
         else:
-            weights = [100, 5, 2]
+            weights = [1000, 5, 2]
 
         # Call Reward Functions to Calculate Toward Reward
         total_reward = self.number_of_pieces(state, weights[0], white_multiplier, black_multiplier)
