@@ -31,9 +31,9 @@ class AgentJoey(AbaloneAgent):
 
         # List of Weights on Heuristic Functions
         if self._current_move < 6:
-            weights = [100, 2, 5]
+            weights = [100, 2, 10]
         else:
-            weights = [1000, 5, 2]
+            weights = [1000, 10, 2]
 
         # Call Reward Functions to Calculate Toward Reward
         total_reward = self.number_of_pieces(state, weights[0], white_multiplier, black_multiplier)
