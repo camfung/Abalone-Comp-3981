@@ -110,7 +110,7 @@ class GameManager:
         return self._game.get_current_game_state()
 
     def get_possible_moves(self):
-        return self._game.get_current_game_state().get_possible_moves()
+        return self._game.get_current_game_state().generate_possible_moves()
 
     def get_board(self):
         return self._game.get_current_game_state().get_board()

@@ -181,6 +181,10 @@ class PygameUI(UI):
         for element in self.drawable_elements:
             element.draw(self.screen, game_manager)
 
+        if self.hud.white_balls < 9 or self.hud.black_balls < 9:
+            self.draw_game_victory()
+            self._app.notify(self, "PauseTimer")
+
         pygame.display.flip()
 
     def draw_game_victory(self):
