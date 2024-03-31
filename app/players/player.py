@@ -34,6 +34,9 @@ class Player(ABC):
     def move_limit(self) -> int:
         return self._move_limit
 
+    def moves_left(self):
+        return self._move_limit - self._current_move
+
     @property
     def current_move(self) -> int:
         return self._current_move

@@ -129,7 +129,7 @@ class App:
             # if is valid make move and prompt AI to make move
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else \
                 self.players[1]
-            self.game_manager.commit_move(
+            player.make_move(game_manager= self.game_manager,
                 move=move, player=move.marble, timestamp=time_stamp)
             self.timer.current_turn_start_time = time.time()
             self.timer._elapsed_time = time.time()
@@ -183,7 +183,7 @@ class App:
             self.gui.waiting_for_player_input = False
             self.timer.pause_timer()
 
-        ##Add pause timer thing here
+
 
     def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit: int,
                            white_time_limit: int, agent_level: AgentType):
