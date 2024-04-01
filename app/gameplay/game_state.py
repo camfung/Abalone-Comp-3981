@@ -58,6 +58,14 @@ class GameState:
                     white_count += 1
         return white_count, black_count
 
+    @property
+    def white_balls(self):
+        return self._white_balls
+
+    @property
+    def black_balls(self):
+        return self._black_balls
+
     def line_to_edge(self, from_space: tuple, direction: Direction):
         # check if from_space is on the board
         if (from_space[0] < 1 or from_space[0] >= len(self._board) - 1

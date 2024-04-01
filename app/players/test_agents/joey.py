@@ -77,13 +77,14 @@ class AgentJoey(AbaloneAgent):
         :param weight: int representing the weight in evaluation
         :return: int value indicating total reward
         """
-        pieces = state.get_ball_count()
+        white_balls = state.white_balls
+        black_balls = state.black_balls
 
         # Add up all white's pieces
-        total_reward = pieces[0] * white_multiplier
+        total_reward = white_balls * white_multiplier
 
         # Add up all black's pieces
-        total_reward += pieces[1] * black_multiplier
+        total_reward += black_balls * black_multiplier
 
         return total_reward * weight
 
