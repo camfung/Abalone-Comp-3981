@@ -68,11 +68,12 @@ class AbaloneAgent(Player):
             self._transposition_table = {}
             v, v_state = self.max_move(game_manager.get_current_game_state(),
                                        -math.inf, math.inf, distance, timer)
-            print(f"{distance}: {v_state.get_move()}: {v}")
 
             # If Running Out Of Time
             if self.running_out_of_time(timer):
                 break
+
+            print(f"{distance}: {v_state.get_move()}: {v}")
 
             best_state = copy.deepcopy(v_state)
 
