@@ -33,7 +33,7 @@ class AbaloneAgent(Player):
         initial_time = datetime.datetime.now()
 
         # Decide if the move is going to be random or calculated.
-        if self._current_move <= 0 and self._color == Marble.BLACK:
+        if self._current_move <= 0:
             move = random.choice(game_manager.get_possible_moves())
         else:
             move = self.calc_move(game_manager, timer)
@@ -63,7 +63,6 @@ class AbaloneAgent(Player):
             self._transposition_table = {}
             v, v_state = self.max_move(game_manager.get_current_game_state(),
                                            -math.inf, math.inf, distance, timer)
-            print(f"{distance}: {v_state.get_move()}: {v}")
 
             # If Running Out Of Time
             if self.running_out_of_time(timer):
