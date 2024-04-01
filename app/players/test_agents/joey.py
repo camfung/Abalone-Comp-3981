@@ -116,7 +116,7 @@ class AgentJoey(AbaloneAgent):
                         if board[pos_x + (dir_x * i)][pos_y + (dir_y * i)] == Marble.BLACK:
                             total_reward += i * black_multiplier
                     except IndexError:
-                        continue
+                        break
 
         # Calculate White's Reward
         for white_position in white_positions:
@@ -131,7 +131,7 @@ class AgentJoey(AbaloneAgent):
                         if board[pos_x + (dir_x * i)][pos_y + (dir_y * i)] == Marble.WHITE:
                             total_reward += i * white_multiplier
                     except IndexError:
-                        continue
+                        break
 
         return total_reward * weight
 
