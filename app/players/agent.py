@@ -150,10 +150,6 @@ class AbaloneAgent(Player):
 
         possible_moves = state.get_next_possible_moves()
 
-        print("-------------------------------")
-        print(f"Searching {distance}: {state.get_move()}")
-        print("-------------------------------")
-
         # Check each possible state from current game state
         while True:
             try:
@@ -214,10 +210,6 @@ class AbaloneAgent(Player):
             new_distance = distance
 
         possible_moves = state.get_next_possible_moves()
-
-        print("-------------------------------")
-        print(f"Searching {distance}: {state.get_move()}")
-        print("-------------------------------")
 
         # Check each possible state from current game state
         while True:
