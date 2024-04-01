@@ -101,14 +101,20 @@ class AgentElsa(AbaloneAgent):
 
         return avg_white_edge_dist - avg_black_edge_dist
 
+    @staticmethod
+    def calc_num_balls(state):
+        white_count, black_count = state.get_ball_count()
+        return black_count - white_count
+
     @classmethod
     def evaluation(cls, state):
         center_distance = cls.calc_center_distance(state)
         edge_distance = cls.calc_edge_distance(state)
+        num_balls = cls.calc_num_balls(state)
 
-        weight = [25, 75]
+        weight = [25, 75, 100]
 
-        return (center_distance * weight[0]) + (edge_distance * weight[1])
+        return (center_distance * weight[0]) + (edge_distance * weight[1] + (num_balls * weight[2]))
 
 
 
