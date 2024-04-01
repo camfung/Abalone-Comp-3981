@@ -34,7 +34,7 @@ class AbaloneAgent(Player):
         initial_time = datetime.datetime.now()
 
         # Decide if the move is going to be random or calculated.
-        if self._current_move <= 0:
+        if self._current_move <= 0 and self.color == Marble.BLACK:
             move = random.choice(game_manager.get_possible_moves())
         else:
             move = self.calc_move(game_manager, timer)
