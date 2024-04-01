@@ -85,11 +85,14 @@ class AbaloneAgent(Player):
 
     @staticmethod
     def terminal_test(state: GameState) -> bool:
-        white_balls, black_balls = state.get_ball_count()
-
-        if white_balls <= 8:
+        """
+        Checks if the endgame condition is met.
+        :param state: GameState
+        :return: boolean indicating end game condition met
+        """
+        if state.white_balls <= 8:
             return True
-        if black_balls <= 8:
+        if state.black_balls <= 8:
             return True
 
         return False
@@ -100,8 +103,7 @@ class AbaloneAgent(Player):
         :param timer: Timer
         :return: Boolean
         """
-        time_limit = timer.get_timer_values(
-        )[4] if self.color == Marble.BLACK else timer.get_timer_values()[3]
+        time_limit = timer.get_timer_values()[4] if self.color == Marble.BLACK else timer.get_timer_values()[3]
         elapsed_time = timer.get_timer_values()[0]
         if time_limit - elapsed_time < 1:
             return True
@@ -118,7 +120,7 @@ class AbaloneAgent(Player):
         """
         return 0
 
-    def max_move(self, state: GameState, alpha, beta, distance, timer):
+    def max_move(self, state: GameState, alpha, beta, distance: int, timer: Timer):
         """
         Calculate Best Black Move.
         :param state: GameState
@@ -135,7 +137,6 @@ class AbaloneAgent(Player):
         # Check if Position is in Transposition Table
         v, v_state = self.board_value_in_transposition_table(state.get_board())
         if (v, v_state) != (None, None):
-            print(f"Printed Transposition {state.get_move()}")
             return v, state
 
         # Assign Lowest Value
@@ -179,7 +180,7 @@ class AbaloneAgent(Player):
         self.add_board_hash_to_transposition_table(best_state, best_value)
         return best_value, best_state
 
-    def min_move(self, state: GameState, alpha, beta, distance, timer):
+    def min_move(self, state: GameState, alpha, beta, distance: int, timer: Timer):
         """
         Calculate Best White Move
         :param state: GameState
@@ -196,7 +197,6 @@ class AbaloneAgent(Player):
         # Check if Position is in Transposition Table
         v, v_state = self.board_value_in_transposition_table(state.get_board())
         if (v, v_state) != (None, None):
-            print(f"Printed Transposition {state.get_move()}")
             return v, state
 
         # Assign Highest Value
