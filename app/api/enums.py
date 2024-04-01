@@ -1,4 +1,3 @@
-
 from enum import *
 
 
@@ -25,12 +24,12 @@ class Direction(Enum):
     """
     Direction Enumeration for Move Directions
     """
-    UP_LEFT = auto()
-    UP_RIGHT = auto()
-    RIGHT = auto()
-    DOWN_RIGHT = auto()
-    DOWN_LEFT = auto()
-    LEFT = auto()
+    UP_LEFT = (-1, 0)
+    UP_RIGHT = (-1, 1)
+    RIGHT = (0, 1)
+    DOWN_RIGHT = (1, 0)
+    DOWN_LEFT = (1, -1)
+    LEFT = (0, -1)
 
 
 class MarbleSelection(Enum):
@@ -47,9 +46,9 @@ class MoveType(Enum):
     """
     Move Type Enumeration for type of move made by Player
     """
-    SINGLE = auto()
     INLINE = auto()
     SIDE_STEP = auto()
+    SINGLE = auto()
 
 
 class UIState(Enum):
@@ -85,3 +84,22 @@ class PlayerInputEvents(Enum):
     AWAITING_FIRST_MARBLE = auto()
     AWAITING_SECOND_MARBLE = auto()
     AWAITING_DIRECTION = auto()
+
+
+class AgentType(Enum):
+    """
+    Enum for selecting which Agent to play as.
+
+    Attributes:
+        ABALONE_AGENT: Default abalone agent that currently outputs random moves.
+        AGENT_CALLUM: Callum's heuristic
+        AGENT_CAMERON: Cameron's heuristic
+        AGENT_ELSA: Elsa's heuristic
+        AGENT_JOEY: Joey's heuristic
+    """
+    ABALONE_AGENT = auto()
+    RANDOM_AGENT = auto()
+    AGENT_CALLUM = auto()
+    AGENT_CAMERON = auto()
+    AGENT_ELSA = auto()
+    AGENT_JOEY = auto()

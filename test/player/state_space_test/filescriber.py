@@ -1,4 +1,5 @@
 
+import re
 from app.api.exceptions import InvalidMarbleValue
 from app.gameplay.game_state import GameState
 from app.api.enums import Marble
@@ -22,7 +23,8 @@ class FileScriber:
             r_board_config = input_f.readline().strip()
             board_spots = r_board_config.split(",")
 
-            blank_board_path = Path('./app/formations/blank_board.csv').resolve()
+            blank_board_path = Path(
+                './app/formations/blank_board.csv').resolve()
 
             file = open(blank_board_path, 'r')
             csv_reader = csv.reader(file, delimiter=',')
@@ -104,7 +106,8 @@ class FileScriber:
         marble_order = {'b': 0, 'w': 1}  # Define the order of marble colors
 
         # Extract information from the item
-        row = ord(item[0]) - ord('A')  # Convert row letter to index (assuming A=0, B=1, ...)
+        # Convert row letter to index (assuming A=0, B=1, ...)
+        row = ord(item[0]) - ord('A')
         col = int(item[1])  # Extract column number
         color = item[-1]  # Extract marble color
 
@@ -114,9 +117,12 @@ class FileScriber:
     @staticmethod
     def sort_line(line):
         line = line[:-1]
-        sorted_line = ",".join(sorted(line.split(','), key=FileScriber.custom_key))
+        sorted_line = ",".join(
+            sorted(line.split(','), key=FileScriber.custom_key))
         return sorted_line
 
+
 file = input("Input the name of the input file: ")
-num = file[4]
-FileScriber.export_state_space_to_text_files(file, f"output{num}.move", f"output{num}.board")
+num = int(re.search(r'\d+', file).group())
+FileScriber.export_state_space_to_text_files(
+    file, f"Test{num}.move", f"Test{num}.board")

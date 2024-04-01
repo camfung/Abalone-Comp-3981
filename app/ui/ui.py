@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 import sys
 import pygame
-from app.api.enums import GameType, Marble
+from app.api.enums import GameType, Marble, AgentType
 import pygame_menu
 from app.api.enums import Formation
 from app.ui.board import Board
@@ -74,7 +74,7 @@ class PygameUI(UI):
 
         def undo_move_cb(): return self._app.notify(self, "UndoLastMove")
 
-        def pause_game_cb(): return self._app.notify(self, "PauseGame")
+        def pause_game_cb(): return self._app.notify(self, "PauseTimer")
 
         def update_score_cb(): return self._app.notify(self, "GetScore")
 
@@ -97,7 +97,7 @@ class PygameUI(UI):
             get_timer_values_cb
         )
         hud = HUD(self, callbacks)
-        record_menu = RecordMenu(self)
+        record_menu = RecordMenu(self, pause_game_cb)
 
         def execute_move_cb(first_marble, second_marble, direction):
             return self._app.notify(self, "PlayerMakeMove", first_marble=first_marble,
@@ -181,7 +181,21 @@ class PygameUI(UI):
         for element in self.drawable_elements:
             element.draw(self.screen, game_manager)
 
+        if self.hud.white_balls < 9 or self.hud.black_balls < 9:
+            self.draw_game_victory()
+            self._app.notify(self, "PauseTimer")
+
         pygame.display.flip()
+
+    def draw_game_victory(self):
+        winner = "White" if self.hud.white_balls > self.hud.black_balls else "Black"
+        game_over_text = pygame.font.Font(None, 100).render(f"{winner} wins!", True, (255, 0, 0))
+        text_rect = game_over_text.get_rect(center=(self.SCREEN_WIDTH // 3, 500))
+
+        background_rect = pygame.Rect(text_rect.left - 10, text_rect.top - 10, text_rect.width + 20,
+                                      text_rect.height + 20)
+        pygame.draw.rect(self.screen, (0, 0, 0), background_rect)
+        self.screen.blit(game_over_text, text_rect)
 
     def reset_board(self, thread):
         self._app.reset_board()
@@ -220,8 +234,10 @@ class PygameUI(UI):
             'I Play As: ', [('Black', Marble.BLACK), ('White', Marble.WHITE)])  # Adding selector for player color
 
         agent_level = menu.add.dropselect('Agent:     ', [
-            ('Random moves', 1), ('Cameron', 2), ('Joey', 3), ('Elsa', 4), ('Callum', 5)], default=0,
-            onchange=self.update_play_button)
+            ('Default', AgentType.ABALONE_AGENT), ('Random Moves', AgentType.RANDOM_AGENT),
+            ('Cameron', AgentType.AGENT_CAMERON), ('Joey', AgentType.AGENT_JOEY),
+            ('Elsa', AgentType.AGENT_ELSA), ('Callum', AgentType.AGENT_CALLUM)],
+                                          default=0, onchange=self.update_play_button)
         formation = menu.add.dropselect('Formation: ', [
             (f.name, f) for f in Formation], default=0, onchange=self.update_play_button)
 

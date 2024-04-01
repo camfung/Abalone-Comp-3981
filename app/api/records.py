@@ -98,7 +98,7 @@ class RecordHistory:
         :return:
         """
         if len(self._records) != 0:
-            self._records.pop()
+            return self._records.pop()
 
     def export_records(self):
         """
