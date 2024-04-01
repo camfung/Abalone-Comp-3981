@@ -66,6 +66,9 @@ class AbaloneAgent(Player):
 
         for distance in range(1, max_range + 1, 1):
             self._transposition_table = {}
+            print("-----------------------------------")
+            print(f"Starting Search Distance {distance}")
+            print("-----------------------------------")
             v, v_state = self.max_move(game_manager.get_current_game_state(),
                                        -math.inf, math.inf, distance, timer)
 
@@ -74,6 +77,7 @@ class AbaloneAgent(Player):
                 break
 
             print(f"{distance}: {v_state.get_move()}: {v}")
+            print(v_state)
 
             best_state = copy.deepcopy(v_state)
 
@@ -131,7 +135,8 @@ class AbaloneAgent(Player):
         # Check if Position is in Transposition Table
         v, v_state = self.board_value_in_transposition_table(state.get_board())
         if (v, v_state) != (None, None):
-            return v, v_state
+            print(f"Printed Transposition {state.get_move()}")
+            return v, state
 
         # Assign Lowest Value
         best_value = -math.inf
@@ -145,15 +150,17 @@ class AbaloneAgent(Player):
 
         possible_moves = state.get_next_possible_moves()
 
+        print("-------------------------------")
+        print(f"Searching {distance}: {state.get_move()}")
+        print("-------------------------------")
+
         # Check each possible state from current game state
         while True:
             try:
-                child_state = state.generate_new_game_state(
-                    next(possible_moves))
+                child_state = state.generate_new_game_state(next(possible_moves))
 
                 # Get White's Best State
-                v, v_state = self.min_move(
-                    child_state, alpha, beta, new_distance, timer)
+                v, v_state = self.min_move(child_state, alpha, beta, new_distance, timer)
 
                 # Re-assign Best Value if White's Best State is better than the current Best State
                 if v > best_value:
@@ -161,11 +168,16 @@ class AbaloneAgent(Player):
                     best_state = copy.deepcopy(v_state)
 
                 # Prune Branch if White's Best State is better than current best White State
-                if best_value > beta:
+                if best_value >= beta or self.running_out_of_time(timer):
                     break
+
                 alpha = max(alpha, best_value)
             except StopIteration:
                 break
+
+        print("-------------------------------")
+        print(f"Returned Max {distance}: {best_state.get_move()}")
+        print("-------------------------------")
 
         # Add Best State to Transposition Table
         self.add_board_hash_to_transposition_table(best_state, best_value)
@@ -188,7 +200,8 @@ class AbaloneAgent(Player):
         # Check if Position is in Transposition Table
         v, v_state = self.board_value_in_transposition_table(state.get_board())
         if (v, v_state) != (None, None):
-            return v, v_state
+            print(f"Printed Transposition {state.get_move()}")
+            return v, state
 
         # Assign Highest Value
         best_value = math.inf
@@ -202,15 +215,17 @@ class AbaloneAgent(Player):
 
         possible_moves = state.get_next_possible_moves()
 
+        print("-------------------------------")
+        print(f"Searching {distance}: {state.get_move()}")
+        print("-------------------------------")
+
         # Check each possible state from current game state
         while True:
             try:
-                child_state = state.generate_new_game_state(
-                    next(possible_moves))
+                child_state = state.generate_new_game_state(next(possible_moves))
 
                 # Get Best Black State
-                v, v_state = self.max_move(
-                    child_state, alpha, beta, new_distance, timer)
+                v, v_state = self.max_move(child_state, alpha, beta, new_distance, timer)
 
                 # Re-assign Best Value if Black's Best State is better than the current Best State
                 if v < best_value:
@@ -218,11 +233,15 @@ class AbaloneAgent(Player):
                     best_state = copy.deepcopy(v_state)
 
                 # Prune Branch if Black's Best State is better than current best Black State
-                if best_value < alpha:
+                if best_value <= alpha or self.running_out_of_time(timer):
                     break
                 beta = min(beta, best_value)
             except StopIteration:
                 break
+
+        print("-------------------------------")
+        print(f"Returned Min {distance}: {best_state.get_move()}")
+        print("-------------------------------")
 
         # Add Best State to Transposition Table
         self.add_board_hash_to_transposition_table(best_state, best_value)

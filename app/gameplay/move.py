@@ -54,13 +54,20 @@ class Move:
         middle_ball_i = copy.deepcopy(m_ball_i)
 
         try:
-            position = ((first_ball_i[0] + direction.value[0], first_ball_i[1] + direction.value[1]),
-                        (last_ball_i[0] + direction.value[0], last_ball_i[1] + direction.value[1]),
-                        (middle_ball_i[0] + direction.value[0], middle_ball_i[1] + direction.value[1])
-            )
+            position = (
+                (first_ball_i[0] + direction.value[0], first_ball_i[1] + direction.value[1]),
+                (last_ball_i[0] + direction.value[0], last_ball_i[1] + direction.value[1]),
+                (middle_ball_i[0] + direction.value[0], middle_ball_i[1] + direction.value[1])
+                        )
             return position
         except TypeError:
-            raise InvalidDirection("Direction passed to Move is None")
+            position = (
+                (first_ball_i[0] + direction.value[0], first_ball_i[1] + direction.value[1]),
+                (last_ball_i[0] + direction.value[0], last_ball_i[1] + direction.value[1]),
+                (None, None)
+            )
+
+        return position
 
     @staticmethod
     def __calc_selection_type(first_ball_i, last_ball_i):
