@@ -79,3 +79,10 @@ class Timer:
     def set_current_turn_start_time(self):
         self.current_turn_start_time = time.time()
 
+
+    def get_white_aggregate_time(self):
+        return self._white_total_aggregate_time
+
+    def get_black_aggregate_time(self):
+        return self._black_total_aggregate_time
+

@@ -235,6 +235,27 @@ class App:
         elif game_type == GameType.PLAYER_VS_PLAYER:
             return [HumanPlayer(black_time_limit, move_limit, Marble.BLACK), HumanPlayer(white_time_limit, move_limit, Marble.WHITE)]
 
+    def is_game_over(self):
+        """
+        Checks if the game is over by having 8 balls, or no moves left.
+        :return: True if the game is over, False otherwise
+        """
+        if self.players[0].moves_left() == 0 and self.players[1].moves_left() == 0:
+            return True
+        elif self.players[0].num_balls < 9 or self.players[1].num_balls < 9:
+            return True
+        return False
+
+    def player_win_by_time(self):
+        """
+        Checks who one based off of time.
+        :return: Black or White
+        """
+        if self.timer.get_white_aggregate_time() > self.timer.get_black_aggregate_time():
+            return "Black"
+        else:
+            return "White"
+
     def run(self):
         """
         Starts the application by displaying the main menu and initializing the game loop.
