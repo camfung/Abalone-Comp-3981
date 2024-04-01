@@ -129,7 +129,7 @@ class App:
             # if is valid make move and prompt AI to make move
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else \
                 self.players[1]
-            self.game_manager.commit_move(
+            player.make_move(game_manager= self.game_manager,
                 move=move, player=move.marble, timestamp=time_stamp)
             self.timer.current_turn_start_time = time.time()
             self.timer._elapsed_time = time.time()
@@ -183,7 +183,7 @@ class App:
             self.gui.waiting_for_player_input = False
             self.timer.pause_timer()
 
-        ##Add pause timer thing here
+
 
     def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit: int,
                            white_time_limit: int, agent_level: AgentType):
@@ -234,6 +234,27 @@ class App:
 
         elif game_type == GameType.PLAYER_VS_PLAYER:
             return [HumanPlayer(black_time_limit, move_limit, Marble.BLACK), HumanPlayer(white_time_limit, move_limit, Marble.WHITE)]
+
+    def is_game_over(self):
+        """
+        Checks if the game is over by having 8 balls, or no moves left.
+        :return: True if the game is over, False otherwise
+        """
+        if self.players[0].moves_left() == 0 and self.players[1].moves_left() == 0:
+            return True
+        elif self.players[0].num_balls < 9 or self.players[1].num_balls < 9:
+            return True
+        return False
+
+    def player_win_by_time(self):
+        """
+        Checks who one based off of time.
+        :return: Black or White
+        """
+        if self.timer.get_white_aggregate_time() > self.timer.get_black_aggregate_time():
+            return "Black"
+        else:
+            return "White"
 
     def run(self):
         """

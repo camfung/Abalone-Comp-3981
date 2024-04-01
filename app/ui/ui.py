@@ -96,8 +96,12 @@ class PygameUI(UI):
             reset_timer_cb,
             get_timer_values_cb
         )
+
+        def get_moves_left_cb():
+            return self._app.players[0].moves_left()
+
         hud = HUD(self, callbacks)
-        record_menu = RecordMenu(self)
+        record_menu = RecordMenu(self, get_moves_left_cb, pause_game_cb)
 
         def execute_move_cb(first_marble, second_marble, direction):
             return self._app.notify(self, "PlayerMakeMove", first_marble=first_marble,
@@ -181,14 +185,20 @@ class PygameUI(UI):
         for element in self.drawable_elements:
             element.draw(self.screen, game_manager)
 
-        if self.hud.white_balls < 9 or self.hud.black_balls < 9:
+        if self._app.is_game_over():
             self.draw_game_victory()
             self._app.notify(self, "PauseTimer")
+
 
         pygame.display.flip()
 
     def draw_game_victory(self):
-        winner = "White" if self.hud.white_balls > self.hud.black_balls else "Black"
+        if self.hud.white_balls > self.hud.black_balls:
+            winner = "White"
+        elif self.hud.white_balls < self.hud.black_balls:
+            winner = "Black"
+        else:
+            winner = self._app.player_win_by_time()
         game_over_text = pygame.font.Font(None, 100).render(f"{winner} wins!", True, (255, 0, 0))
         text_rect = game_over_text.get_rect(center=(self.SCREEN_WIDTH // 3, 500))
 
