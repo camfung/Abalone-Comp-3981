@@ -137,3 +137,7 @@ class GameManager:
 
     def get_possible_game_states(self):
         return self._game.get_possible_game_states()
+
+    @property
+    def app(self):
+        return self._app
