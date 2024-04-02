@@ -25,7 +25,6 @@ class AgentCallum(AbaloneAgent):
 
         board = state._board
         bunch = self.evaluate_bunching(board)
-        defensive = self.defensive_strength(board)
         distance_edge = self.distance_from_edge(board)
         white_balls, black_balls = state.get_ball_count()
 
@@ -36,7 +35,7 @@ class AgentCallum(AbaloneAgent):
             self.balls = black_balls
             self.opponent_balls = white_balls
 
-        return bunch + distance_edge + 180 * (self.balls - self.opponent_balls) + defensive
+        return bunch + distance_edge + 180 * (self.balls - self.opponent_balls)
 
 
     def evaluate_bunching(self, board):
@@ -73,18 +72,4 @@ class AgentCallum(AbaloneAgent):
                     distances += distance
 
         return distances
-
-    def defensive_strength(self, board):
-        strength = 0
-        for row in range(len(board)):
-            for col in range(len(board[row])):
-                if board[row][col] == self.color:
-                    # Check neighboring positions for opponent's presence
-                    for d_row, d_col in [(1, 0), (0, 1), (-1, 0), (0, -1), (-1, -1), (1, 1)]:
-                        new_row, new_col = row + d_row, col + d_col
-                        if 0 <= new_row < len(board) and 0 <= new_col < len(board[row]):
-                            if board[new_row][new_col] != self.color and board[new_row][new_col] != None and board[new_row][new_col] != Marble.NONE:
-                                # If opponent is nearby, increase defensive strength
-                                strength += 1
-        return strength
 
