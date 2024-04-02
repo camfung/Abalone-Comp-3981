@@ -156,7 +156,7 @@ class AbaloneAgent(Player):
                 # Re-assign Best Value if White's Best State is better than the current Best State
                 if v > best_value:
                     best_value = v
-                    best_state = copy.deepcopy(child_state)
+                    best_state = child_state
 
                 # Prune Branch if White's Best State is better than current best White State
                 if best_value >= beta or self.running_out_of_time(timer):
@@ -213,7 +213,7 @@ class AbaloneAgent(Player):
                 # Re-assign Best Value if Black's Best State is better than the current Best State
                 if v < best_value:
                     best_value = v
-                    best_state = copy.deepcopy(child_state)
+                    best_state = child_state
 
                 # Prune Branch if Black's Best State is better than current best Black State
                 if best_value <= alpha or self.running_out_of_time(timer):
