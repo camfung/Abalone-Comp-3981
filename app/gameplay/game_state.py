@@ -58,6 +58,14 @@ class GameState:
                     white_count += 1
         return white_count, black_count
 
+    @property
+    def white_balls(self):
+        return self._white_balls
+
+    @property
+    def black_balls(self):
+        return self._black_balls
+
     def line_to_edge(self, from_space: tuple, direction: Direction):
         # check if from_space is on the board
         if (from_space[0] < 1 or from_space[0] >= len(self._board) - 1
@@ -449,7 +457,7 @@ class GameState:
             return False
         # check if all the final balls are on the board
         # # check that the line is straight
-        # if move.get_pos_i()[0][0] == move.get_pos_i()[1][0] and move.get_pos_i()[0][1] == movem.get_pos_i()[1][1]:
+        # if move.get_pos_i()[0][0] == move.get_pos_i()[1][0] and move.get_pos_i()[0][1] == move.get_pos_i()[1][1]:
         #     return False
 
         # check that all the marbles are the player to moves color
@@ -463,16 +471,20 @@ class GameState:
 
         # check that the final position is empty including the middle one
         for pos in move.get_pos_f():
-            if pos[0] < 1 or pos[1] < 1:
+            # Don't worry about checking the middle one if a middle ball doesn't exist (2 ball move).
+            if pos[0] is None and pos[1] is None:
                 continue
-            if self._board[pos[0]][pos[1]] is not None and self._board[pos[0]][pos[1]] is not Marble.NONE:
+
+            # Check if Space is occupied by a ball
+            if self._board[pos[0]][pos[1]] is Marble.BLACK or self._board[pos[0]][pos[1]] is Marble.WHITE:
                 return False
 
         # check that the final positions are all on the board
         final_pos = move.get_pos_f()
+
         # figure out if the move is a 2 or 3 marble move
         # final ball (0,0) means that the move is a 2 marble move
-        if move._num_balls_moved < 3:
+        if move.get_num_balls_moved() < 3:
             # check if the final position is on the board
             if not self._check_pos_inbounds(final_pos[0]) or not self._check_pos_inbounds(final_pos[1]):
                 return False
@@ -653,15 +665,7 @@ class GameState:
         """
         if self._board[pos[0]][pos[1]] is None:
             return False
-        else:
-            return True
-        # if pos[0] < 1 or pos[0] >= len(self._board) - 1:
-        #     return False
-
-        # if pos[1] < 1 or pos[1] >= len(self._board[0]) - 1:
-        #     return False
-
-        # return True
+        return True
 
     def __check_inbounds(self, first_ball_i, last_ball_i, row):
         """
