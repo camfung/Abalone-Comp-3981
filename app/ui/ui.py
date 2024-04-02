@@ -189,7 +189,6 @@ class PygameUI(UI):
             self.draw_game_victory()
             self._app.notify(self, "PauseTimer")
 
-
         pygame.display.flip()
 
     def draw_game_victory(self):
@@ -199,8 +198,10 @@ class PygameUI(UI):
             winner = "Black"
         else:
             winner = self._app.player_win_by_time()
-        game_over_text = pygame.font.Font(None, 100).render(f"{winner} wins!", True, (255, 0, 0))
-        text_rect = game_over_text.get_rect(center=(self.SCREEN_WIDTH // 3, 500))
+        game_over_text = pygame.font.Font(None, 100).render(
+            f"{winner} wins!", True, (255, 0, 0))
+        text_rect = game_over_text.get_rect(
+            center=(self.SCREEN_WIDTH // 3, 500))
 
         background_rect = pygame.Rect(text_rect.left - 10, text_rect.top - 10, text_rect.width + 20,
                                       text_rect.height + 20)
@@ -244,10 +245,10 @@ class PygameUI(UI):
             'I Play As: ', [('Black', Marble.BLACK), ('White', Marble.WHITE)])  # Adding selector for player color
 
         agent_level = menu.add.dropselect('Agent:     ', [
-            ('Default', AgentType.ABALONE_AGENT), ('Random Moves', AgentType.RANDOM_AGENT),
-            ('Cameron', AgentType.AGENT_CAMERON), ('Joey', AgentType.AGENT_JOEY),
+            ('Joey', AgentType.AGENT_JOEY), ('Random Moves', AgentType.RANDOM_AGENT),
+            ('Cameron', AgentType.AGENT_CAMERON),
             ('Elsa', AgentType.AGENT_ELSA), ('Callum', AgentType.AGENT_CALLUM)],
-                                          default=0, onchange=self.update_play_button)
+            default=0, onchange=self.update_play_button)
         formation = menu.add.dropselect('Formation: ', [
             (f.name, f) for f in Formation], default=0, onchange=self.update_play_button)
 
