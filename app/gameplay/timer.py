@@ -25,6 +25,9 @@ class Timer:
         self.paused = False
 
     def start_timer(self):
+        if not self.paused:
+            self.current_turn_start_time = time.time()
+            self._elapsed_time = time.time()
         self._game_started = True
         self._black_check_time = True
         self._white_check_time = True
@@ -49,6 +52,12 @@ class Timer:
 
     def pause_timer(self):
         self.paused = True
+        self._game_started = False
+        self._black_start_turn = True
+        self._white_start_turn = True
+
+    def undo_move(self):
+        self.paused = False
         self._game_started = False
         self._black_start_turn = True
         self._white_start_turn = True

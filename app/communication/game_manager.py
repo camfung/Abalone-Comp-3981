@@ -74,7 +74,7 @@ class GameManager:
             self._app.notify(self, "ReduceAggregateTime",
                              time=move._time_taken, player=move._player_turn)
 
-            self._app.notify(self, "PauseTimer")
+            self._app.notify(self, "UndoMoveTimer")
 
     def reset_board(self):
         runs = len(self._move_history)

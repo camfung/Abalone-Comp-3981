@@ -183,6 +183,10 @@ class App:
             self.gui.waiting_for_player_input = False
             self.timer.pause_timer()
 
+        if event == "UndoMoveTimer":
+            self.gui.waiting_for_player_input = False
+            self.timer.undo_move()
+
 
 
     def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit: int,
