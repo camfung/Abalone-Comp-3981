@@ -66,20 +66,12 @@ class AbaloneAgent(Player):
 
         for distance in range(1, max_range + 1, 1):
             self._transposition_table = {}
-            if distance > 1:
-                print("-----------------------------------")
-                print(f"Starting Search Distance {distance}")
-                print("-----------------------------------")
             v, v_state = self.max_move(game_manager.get_current_game_state(),
                                        -math.inf, math.inf, distance, timer)
 
             # If Running Out Of Time
             if self.running_out_of_time(timer):
                 break
-
-            if distance > 1:
-                print(f"{distance}: {v_state.get_move()}: {v}")
-                print(v_state)
 
             best_state = copy.deepcopy(v_state)
 
