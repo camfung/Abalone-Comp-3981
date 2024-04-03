@@ -38,7 +38,7 @@ class App:
         self.game_manager.join_room(self.gui)
 
     def notify(self, sender, event, **kwargs):
-        thread = threading.Thread(
+        self.thread = threading.Thread(
             target=self.notify, args=(self, "ThreadedAiMakeMove"))
         """
         Handles notifications sent from different parts of the application,
@@ -88,7 +88,7 @@ class App:
             No specific parameters are required for this event 
             as the AI's decision-making process is internal and based on the current game state.
             """
-            thread.start()
+            self.thread.start()
 
         if event == "ThreadedAiMakeMove":
             player = self.players[0] if self.players[0].color == self.game_manager.current_player_to_move else \
@@ -100,8 +100,8 @@ class App:
                     player.make_move(self.game_manager,
                                     player.color, move, timestamp=time_stamp)
                     self.gui.start_button_clicked = True
-            if thread.is_alive():
-                thread.join()
+            if self.thread.is_alive():
+                self.thread.join()
             if not self.timer.paused:
                 self.timer.current_turn_start_time = time.time()
                 self.timer._elapsed_time = time.time()
@@ -133,6 +133,7 @@ class App:
                 move=move, player=move.marble, timestamp=time_stamp)
             self.timer.current_turn_start_time = time.time()
             self.timer._elapsed_time = time.time()
+            self.gui.waiting_for_player_input = False
             self.notify(self, "AiMakeMove")
         if event == "IsMarblePlayerToMove":
             """
