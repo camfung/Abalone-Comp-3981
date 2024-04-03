@@ -133,6 +133,7 @@ class App:
                 move=move, player=move.marble, timestamp=time_stamp)
             self.timer.current_turn_start_time = time.time()
             self.timer._elapsed_time = time.time()
+            self.gui.waiting_for_player_input = False
             self.notify(self, "AiMakeMove")
         if event == "IsMarblePlayerToMove":
             """

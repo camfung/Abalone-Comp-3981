@@ -108,6 +108,8 @@ class AbaloneAgent(Player):
         elapsed_time = timer.get_timer_values()[0]
         if time_limit - elapsed_time < 1:
             return True
+        elif not timer._game_started:
+            return True
         else:
             return False
 
