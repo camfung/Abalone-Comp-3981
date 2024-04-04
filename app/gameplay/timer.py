@@ -62,15 +62,13 @@ class Timer:
         self._black_start_turn = True
         self._white_start_turn = True
 
-
     def update_timer(self, game_manager):
         if self._game_started:
-            if game_manager._app.players[0].num_balls < 9 or game_manager._app.players[1].num_balls < 9:
-                self.pause_timer()
 
             if game_manager.current_player_to_move == Marble.BLACK:
                 if self._black_start_turn:
-                    self.current_turn_start_time = time.time() - (self._elapsed_time - self.current_turn_start_time)
+                    self.current_turn_start_time = time.time() - (self._elapsed_time -
+                                                                  self.current_turn_start_time)
                     self._start_time_black = time.time() - self._black_total_aggregate_time
                     self._black_start_turn = False
                     self._white_start_turn = True
@@ -78,7 +76,8 @@ class Timer:
 
             elif game_manager.current_player_to_move == Marble.WHITE:
                 if self._white_start_turn:
-                    self.current_turn_start_time = time.time() - (self._elapsed_time - self.current_turn_start_time)
+                    self.current_turn_start_time = time.time() - (self._elapsed_time -
+                                                                  self.current_turn_start_time)
                     self._start_time_white = time.time() - self._white_total_aggregate_time
                     self._white_start_turn = False
                     self._black_start_turn = True
@@ -88,10 +87,8 @@ class Timer:
     def set_current_turn_start_time(self):
         self.current_turn_start_time = time.time()
 
-
     def get_white_aggregate_time(self):
         return self._white_total_aggregate_time
 
     def get_black_aggregate_time(self):
         return self._black_total_aggregate_time
-

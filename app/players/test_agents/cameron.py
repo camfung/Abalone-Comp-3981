@@ -79,16 +79,16 @@ class AgentCameron(AbaloneAgent):
                 for direction in Direction:
                     neighbor = self.get_neighbor(pos, direction)
                     if neighbor in board_dict and board_dict[neighbor] == Marble.WHITE:
-                        print("current", pos, "neighbor", neighbor)
+                        # print("current", pos, "neighbor", neighbor)
                         white_cohesion += 1
-                    print(white_cohesion)
+                    # print(white_cohesion)
             else:
                 for direction in Direction:
                     neighbor = self.get_neighbor(pos, direction)
-                    print("current", pos, "neighbor", neighbor)
+                    # print("current", pos, "neighbor", neighbor)
                     if neighbor in board_dict and board_dict[neighbor] == Marble.BLACK:
                         black_cohesion += 1
-                    print(black_cohesion)
+                    # print(black_cohesion)
 
         # Cohesion difference: WHITE's cohesion minus BLACK's cohesion
         if self.color == Marble.BLACK:
@@ -103,7 +103,7 @@ class AgentCameron(AbaloneAgent):
         for (row, col), marble in board_dict.items():
             if marble == Marble.WHITE:
                 board_dict[(row, col)] = Marble.NONE
-        marble_cohesion = self.calculate_cohesion(board_dict, state._board)
+        marble_cohesion = self.calculate_cohesion(board_dict)
         distance_to_center = self.calculate_manhattan_distance_to_center(
             board_dict)
 
