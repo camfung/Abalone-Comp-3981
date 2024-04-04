@@ -49,21 +49,26 @@ class Move:
         Returns:
         Tuple containing the final positions of the first and last balls.
         """
-        first_ball_i = copy.deepcopy(f_ball_i)
-        last_ball_i = copy.deepcopy(l_ball_i)
-        middle_ball_i = copy.deepcopy(m_ball_i)
+        first_ball_i = f_ball_i
+        last_ball_i = l_ball_i
+        middle_ball_i = m_ball_i
 
         try:
             position = (
-                (first_ball_i[0] + direction.value[0], first_ball_i[1] + direction.value[1]),
-                (last_ball_i[0] + direction.value[0], last_ball_i[1] + direction.value[1]),
-                (middle_ball_i[0] + direction.value[0], middle_ball_i[1] + direction.value[1])
-                        )
+                (first_ball_i[0] + direction.value[0],
+                 first_ball_i[1] + direction.value[1]),
+                (last_ball_i[0] + direction.value[0],
+                 last_ball_i[1] + direction.value[1]),
+                (middle_ball_i[0] + direction.value[0],
+                 middle_ball_i[1] + direction.value[1])
+            )
             return position
         except TypeError:
             position = (
-                (first_ball_i[0] + direction.value[0], first_ball_i[1] + direction.value[1]),
-                (last_ball_i[0] + direction.value[0], last_ball_i[1] + direction.value[1]),
+                (first_ball_i[0] + direction.value[0],
+                 first_ball_i[1] + direction.value[1]),
+                (last_ball_i[0] + direction.value[0],
+                 last_ball_i[1] + direction.value[1]),
                 (None, None)
             )
 

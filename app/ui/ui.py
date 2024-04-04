@@ -254,10 +254,10 @@ class PygameUI(UI):
 
         # Adding time limit and move limit selectors for both Black and White players
         black_time_limit = menu.add.text_input(
-            'Black Time Limit (Seconds): ', default=30, input_type=pygame_menu.locals.INPUT_INT, maxchar=4)
+            'Black Time Limit (Seconds): ', default=5, input_type=pygame_menu.locals.INPUT_INT, maxchar=4)
 
         white_time_limit = menu.add.text_input(
-            'White Time Limit (Seconds): ', default=30, input_type=pygame_menu.locals.INPUT_INT, maxchar=4)
+            'White Time Limit (Seconds): ', default=5, input_type=pygame_menu.locals.INPUT_INT, maxchar=4)
 
         move_limit = menu.add.text_input(
             'Move Limit: ', default=20, input_type=pygame_menu.locals.INPUT_INT, maxchar=3)

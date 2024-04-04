@@ -25,7 +25,8 @@ class GameState:
         self._move = move
         self._current_move_color = marble
         self._prev_game_state = prev_game_state
-        self._white_balls, self._black_balls = self.get_ball_count()
+        self._white_balls = 14
+        self._black_balls = 14
 
     def get_board(self):
         return self._board
@@ -48,15 +49,7 @@ class GameState:
         Get Ball Count of Board
         :return: white_ball_count (int), black_ball_count (int)
         """
-        white_count = 0
-        black_count = 0
-        for row in self._board:
-            for col in row:
-                if col == Marble.BLACK:
-                    black_count += 1
-                elif col == Marble.WHITE:
-                    white_count += 1
-        return white_count, black_count
+        return self._white_balls, self._black_balls
 
     @property
     def white_balls(self):
@@ -239,7 +232,8 @@ class GameState:
 
         for move in self.generate_possible_moves():
             new_board_state = self.generate_new_board_state(move)
-            new_game_state = GameState(new_board_state, move, next_marble, self)
+            new_game_state = GameState(
+                new_board_state, move, next_marble, self)
             game_states.append(new_game_state)
 
         return game_states
@@ -252,7 +246,7 @@ class GameState:
         :return: a Marble 2D array representing the new board state
         """
         # Copy the Existing Board Value into the output variable
-        new_board = copy.deepcopy(self._board)
+        new_board = [row[:] for row in self._board]
 
         # Fetch Initial Ball Positions
         first_ball_i_x = move.get_pos_i()[0][0]
@@ -267,8 +261,8 @@ class GameState:
         last_ball_f_y = move.get_pos_f()[1][1]
 
         # Fetch Middle Ball Positions
-        remain_ball_i_x = copy.deepcopy(first_ball_i_x)
-        remain_ball_i_y = copy.deepcopy(first_ball_i_y)
+        remain_ball_i_x = first_ball_i_x
+        remain_ball_i_y = first_ball_i_y
 
         if abs(first_ball_i_x - last_ball_i_x) > 1:
             remain_ball_i_x = (first_ball_i_x + last_ball_i_x) // 2
@@ -337,16 +331,14 @@ class GameState:
             -1 if first_ball_f_y < first_ball_i_y else 0)
 
         # Declare Variables for Initial and Final Ball Positions
-        sub_ball_i_x = copy.deepcopy(
-            last_ball_i_x) if move_x < 0 else copy.deepcopy(first_ball_i_x)
-        sub_ball_i_y = copy.deepcopy(
-            last_ball_i_y) if move_y > 0 else copy.deepcopy(first_ball_i_y)
-        sub_ball_f_x = copy.deepcopy(sub_ball_i_x) + move_x
-        sub_ball_f_y = copy.deepcopy(sub_ball_i_y) + move_y
+        sub_ball_i_x = last_ball_i_x if move_x < 0 else first_ball_i_x
+        sub_ball_i_y = last_ball_i_y if move_y > 0 else first_ball_i_y
+        sub_ball_f_x = sub_ball_i_x + move_x
+        sub_ball_f_y = sub_ball_i_y + move_y
 
         # Save Original Ball Positions to keep track when Tracing Backwards
-        org_ball_x = copy.deepcopy(sub_ball_i_x)
-        org_ball_y = copy.deepcopy(sub_ball_i_y)
+        org_ball_x = sub_ball_i_x
+        org_ball_y = sub_ball_i_y
 
         # Safety Lock Prevents Spaces from being shifted if there are no opposing pieces being pushed
         safety_lock = False
@@ -369,12 +361,17 @@ class GameState:
                (abs(sub_ball_i_y - org_ball_y) > 0 and move_y != 0
                 or sub_ball_i_y == org_ball_y and move_y == 0)
                and not safety_lock):
-            marble_color = copy.deepcopy(new_board[sub_ball_i_x][sub_ball_i_y])
+            marble_color = new_board[sub_ball_i_x][sub_ball_i_y]
             new_board[sub_ball_i_x][sub_ball_i_y] = Marble.NONE
 
             # If the Marble is Off the Board, Delete it. Otherwise, Move Marble to Space
             if self._board[sub_ball_f_x][sub_ball_f_y] is not None:
                 new_board[sub_ball_f_x][sub_ball_f_y] = marble_color
+            else:
+                if self._board[sub_ball_i_x][sub_ball_i_y] == Marble.BLACK:
+                    self._black_balls -= 1
+                else:
+                    self._white_balls -= 1
 
             sub_ball_i_x -= move_x
             sub_ball_f_x -= move_x
@@ -581,78 +578,6 @@ class GameState:
         else:
             return self.is_valid_single_move(move)
 
-    def __check_single_move(self, **kwargs):
-        # Check if the next space is an empty space
-        if self._board[kwargs["ball_f_x"]][kwargs["ball_f_y"]] == Marble.NONE:
-            return True
-        return False
-
-    def __check_sidestep_move(self, **kwargs):
-        first_ball_f_x, first_ball_f_y, \
-            remain_ball_f_x, remain_ball_f_y, \
-            last_ball_f_x, last_ball_f_y, \
-            num_balls_moved = map(int, kwargs.values())
-
-        first_ball_empty = self._board[first_ball_f_x][first_ball_f_y] == Marble.NONE
-
-        if num_balls_moved > 2:
-            remain_ball_empty = self._board[remain_ball_f_x][remain_ball_f_y] == Marble.NONE
-        else:
-            remain_ball_empty = True
-
-        last_ball_empty = self._board[last_ball_f_x][last_ball_f_y] == Marble.NONE
-
-        # Check if the next space is an empty space
-        if first_ball_empty and remain_ball_empty and last_ball_empty:
-            return True
-
-        return False
-
-    def __check_inline_move(self, **kwargs):
-        first_ball_i_x, first_ball_i_y, \
-            last_ball_i_x, last_ball_i_y, \
-            first_ball_f_x, first_ball_f_y, \
-            last_ball_f_x, last_ball_f_y, \
-            num_balls_moved = map(int, kwargs.values())
-
-        # Declare Multipliers to Search for Subsequent Balls
-        move_x = 1 if first_ball_f_x > first_ball_i_x else (
-            -1 if first_ball_f_x < first_ball_i_x else 0)
-        move_y = 1 if first_ball_f_y > first_ball_i_y else (
-            -1 if first_ball_f_y < first_ball_i_y else 0)
-
-        sub_ball_f_x = (copy.deepcopy(last_ball_f_x) if move_x <
-                        0 else copy.deepcopy(first_ball_f_x))
-        sub_ball_f_y = (copy.deepcopy(last_ball_f_y) if move_y >
-                        0 else copy.deepcopy(first_ball_f_y))
-
-        # Check if it is possible to push a piece
-        # (Pusher outnumbers the Opponent's pieces)
-        for i in range(0, num_balls_moved):
-            # Check if Pushing Piece is edge of board and is on first cycle
-            # (Break from Loop if True because it is your piece that is going out of bounds)
-            if self._board[sub_ball_f_x][sub_ball_f_y] is None and i == 0:
-                break
-
-            # Check if Pushing Piece is edge of board
-            # (return True because it is enemy piece that is going out of bounds)
-            if self._board[sub_ball_f_x][sub_ball_f_y] is None:
-                return True
-
-            # Check if Edge Piece is overriding own piece (Break from Loop if True)
-            if self._board[sub_ball_f_x][sub_ball_f_y] == self._current_move_color:
-                break
-
-            # Check if Space is Empty Space on the board (Return True)
-            if self._board[sub_ball_f_x][sub_ball_f_y] == Marble.NONE:
-                return True
-
-            # Increment to next Cycle
-            sub_ball_f_x += move_x
-            sub_ball_f_y += move_y
-
-        return False
-
     def _check_pos_inbounds(self, pos):
         """
         Checks if a marble is within the bounds of the board.
@@ -665,26 +590,6 @@ class GameState:
         """
         if self._board[pos[0]][pos[1]] is None:
             return False
-        return True
-
-    def __check_inbounds(self, first_ball_i, last_ball_i, row):
-        """
-        Checks if the positions for a potential move are within the bounds of the board.
-
-        Parameters:
-        - first_ball_i: A tuple representing the initial position (row, column) of the first ball in the move.
-        - last_ball_i: A tuple representing the initial position (row, column) of the last ball in the move.
-        - row: The row data from the board, used to determine the bounds.
-
-        Returns:
-        bool: True if both the initial and final positions are within the board's bounds; False otherwise.
-        """
-        if first_ball_i[0] >= len(self._board) - 1 or first_ball_i[1] >= len(row) - 1:
-            return False
-
-        if last_ball_i[0] >= len(self._board) - 1 or last_ball_i[1] >= len(row) - 1:
-            return False
-
         return True
 
     def __str__(self):
