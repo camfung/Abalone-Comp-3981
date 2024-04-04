@@ -1,3 +1,5 @@
+import math
+
 from app.api.enums import Marble, Direction
 from app.players.agent import AbaloneAgent
 
@@ -17,10 +19,6 @@ class AgentJoey(AbaloneAgent):
         :param state: GameState
         :return: integer representing the current evaluation value.
         """
-        # Get Board State and Marble Positions on Board
-        board = state.get_board()
-        black_positions, white_positions = self.find_positions_of_pieces(board)
-
         # Get Multiplier
         if self.color == Marble.BLACK:
             black_multiplier = 1
@@ -29,9 +27,18 @@ class AgentJoey(AbaloneAgent):
             black_multiplier = -1
             white_multiplier = 1
 
+        # Get Board State and Marble Positions on Board
+        board = state.get_board()
+        black_positions, white_positions = self.find_positions_of_pieces(board)
+
+        # Win Condition
+        win_value = self.win_condition(state, white_multiplier, black_multiplier)
+        if win_value is not None:
+            return win_value
+
         # List of Weights on Heuristic Functions
-        if self._current_move < 6:
-            weights = [100, 2, 10]
+        if self._current_move < 4:
+            weights = [1000, 2, 10]
         else:
             weights = [1000, 10, 2]
 
@@ -43,6 +50,22 @@ class AgentJoey(AbaloneAgent):
                                              white_multiplier, black_multiplier)
 
         return total_reward
+
+    def win_condition(self, state, white_multiplier, black_multiplier):
+        """
+        Returns Infinity if a player wins by playing the move.
+        :param black_multiplier: 1 or -1
+        :param white_multiplier: 1 or -1
+        :param state: GameState
+        :return: float
+        """
+        white_balls = state.white_balls
+        black_balls = state.black_balls
+        if white_balls <= 8:
+            return math.inf * black_multiplier
+        elif black_balls <= 8:
+            return math.inf * white_multiplier
+        return None
 
     @classmethod
     def find_positions_of_pieces(cls, board):
@@ -115,6 +138,8 @@ class AgentJoey(AbaloneAgent):
                     try:
                         if board[pos_x + (dir_x * i)][pos_y + (dir_y * i)] == Marble.BLACK:
                             total_reward += i * black_multiplier
+                        else:
+                            break
                     except IndexError:
                         break
 
@@ -130,6 +155,8 @@ class AgentJoey(AbaloneAgent):
                     try:
                         if board[pos_x + (dir_x * i)][pos_y + (dir_y * i)] == Marble.WHITE:
                             total_reward += i * white_multiplier
+                        else:
+                            break
                     except IndexError:
                         break
 
@@ -159,7 +186,7 @@ class AgentJoey(AbaloneAgent):
             dist_y = abs(center_board[1] - pos_y)
             black_distance = max(dist_x, dist_y)
 
-            total_reward -= black_distance ** 2 * black_multiplier
+            total_reward -= (black_distance ** 2) * black_multiplier
 
         # Calculate White's Reward
         for white_position in white_positions:
@@ -170,7 +197,7 @@ class AgentJoey(AbaloneAgent):
             dist_y = abs(center_board[1] - pos_y)
             white_distance = max(dist_x, dist_y)
 
-            total_reward -= white_distance ** 2 * white_multiplier
+            total_reward -= (white_distance ** 2) * white_multiplier
 
         return total_reward * weight
 

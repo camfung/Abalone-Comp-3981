@@ -75,6 +75,10 @@ class AbaloneAgent(Player):
 
             best_state = copy.deepcopy(v_state)
 
+            # Return move immediately if it wins agent the game
+            if v == math.inf:
+                break
+
         return best_state.get_move() if best_state is not None else None
 
     @staticmethod
