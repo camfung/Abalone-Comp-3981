@@ -121,24 +121,24 @@ def convert_to_string(coords):
     return ','.join(result)
 
 
-def main():
-    gameState = getBoardStateFromFile(
-        "test/player/state_space_test/Input/Test2.input")
+# def main():
+#     gameState = getBoardStateFromFile(
+#         "test/player/state_space_test/Input/Test2.input")
 
-    # gameState = Game(Formation.DEFAULT).get_current_game_state()
+#     # gameState = Game(Formation.DEFAULT).get_current_game_state()
 
-    # print(gameState)
-    # a = gameState.generate_own_marble_lines()
-    # for line in a:
-    #     print(convert_to_string(line))
-    # move = Move((9, 5), (7, 5), Direction.UP_LEFT, Marble.BLACK)
-    # a = gameState.validate_move(move)
-    # print(a)
-    moves = gameState.get_possible_moves()
-    for move in moves:
-        print(move.move_notation_str())
-    print(len(moves))
-    input("enter to exit")
+#     # print(gameState)
+#     # a = gameState.generate_own_marble_lines()
+#     # for line in a:
+#     #     print(convert_to_string(line))
+#     # move = Move((9, 5), (7, 5), Direction.UP_LEFT, Marble.BLACK)
+#     # a = gameState.validate_move(move)
+#     # print(a)
+#     moves = gameState.get_possible_moves()
+#     for move in moves:
+#         print(move.move_notation_str())
+#     print(len(moves))
+#     input("enter to exit")
 
     # a = gameState.line_to_edge((6, 3), Direction.UP_LEFT)
     # print(a)
@@ -176,8 +176,8 @@ def driveVis():
     visualizeTestAllMoves(moves, gameState)
 
 
-main()
-driveVis()
+# main()
+# driveVis()
 
 
 def testMove(move: Move):
