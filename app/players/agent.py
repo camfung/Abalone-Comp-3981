@@ -77,12 +77,7 @@ class AbaloneAgent(Player):
         num_processes = multiprocessing.cpu_count()
         pool = multiprocessing.Pool(num_processes)
 
-        possible_states = game_manager.get_possible_game_states()
-        subtree_size = len(possible_states) // num_processes
-        subtrees = [possible_states[i * subtree_size:(i + 1) * subtree_size] for i in range(num_processes)]
-
-        # Append the remaining elements to the last sublist
-        subtrees[-1].extend(possible_states[num_processes * subtree_size:])
+        subtrees = [game_manager.get_possible_game_states() for _ in range(num_processes)]
 
         for distance in range(1, max_range + 1, 1):
             results = pool.starmap(self.evaluate_subtree,
