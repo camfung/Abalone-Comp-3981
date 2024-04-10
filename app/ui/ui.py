@@ -1,9 +1,14 @@
 
 from abc import ABC, abstractmethod
 import sys
-import pygame
+
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame
 from app.api.enums import GameType, Marble, AgentType
-import pygame_menu
+
+with contextlib.redirect_stdout(None):
+    import pygame_menu
 from app.api.enums import Formation
 from app.ui.board import Board
 from app.ui.hud import HUD, RecordMenu

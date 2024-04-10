@@ -1,4 +1,7 @@
-import pygame
+
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame
 from app.api.enums import Marble
 from app.ui.pi_handler import PlayerInputHandler
 

@@ -1,5 +1,9 @@
+
 from abc import ABC, abstractmethod
-import pygame
+
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame
 
 
 class EventHandler(ABC):
