@@ -58,7 +58,7 @@ class PygameUI(UI):
     button_highlight_color = (255, 255, 0)
     text_color = (255, 255, 255)
 
-    def __init__(self, app) -> None:
+    def __init__(self, app, theme, screen) -> None:
         """
         Initializes the PygameUI with an application reference, sets up the screen,
         and initializes UI components like the HUD and game board.
@@ -67,11 +67,10 @@ class PygameUI(UI):
         - app: A reference to the main application object, used for callback notifications.
         """
         super().__init__()
-        iconSurface = pygame.image.load('app/images/icon.png')
-        pygame.display.set_icon(iconSurface)
-        self.theme = pygame_menu.themes.THEME_DARK
-        self.screen = pygame.display.set_mode(
-            (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        # iconSurface = pygame.image.load('app/images/icon.png')
+        # pygame.display.set_icon(iconSurface)
+        self.theme = theme
+        self.screen = screen
         self._app = app
         self.start_button_clicked = False
 
@@ -169,7 +168,7 @@ class PygameUI(UI):
         """
         Initializes Pygame and displays the main menu of the game.
         """
-        pygame.init()
+        # pygame.init()
         self.main_menu()
 
     def update(self, game_manager):

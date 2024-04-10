@@ -176,8 +176,8 @@ def driveVis():
     visualizeTestAllMoves(moves, gameState)
 
 
-main()
-driveVis()
+# main()
+# driveVis()
 
 
 def testMove(move: Move):

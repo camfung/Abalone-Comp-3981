@@ -26,13 +26,13 @@ class App:
     It handles events and notifications across these components to manage game flow and state.
     """
 
-    def __init__(self):
+    def __init__(self, theme, screen):
         """
         Initializes the application, setting up the game manager, UI, and player list.
         It also registers the UI with the game manager for updates.
         """
         self.game_manager = GameManager(self)
-        self.gui = PygameUI(self)
+        self.gui = PygameUI(self, theme, screen)
         self.players = []
         self.timer = Timer()
 
