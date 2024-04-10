@@ -74,52 +74,48 @@ class AbaloneAgent(Player):
 
         while depth <= max_depth:
             # Check if time limit has been reached
-            if time.time() - start_time >= self.time_limit - 1:
+            if self.running_out_of_time(start_time):
                 break
 
             pool = multiprocessing.Pool(num_processes)
-            batch_results = pool.starmap(self.evaluate_subtree, [(current_game_state, distance)
+            batch_results = pool.starmap(self.evaluate_subtree, [(current_game_state, distance, start_time)
                                                                  for distance in range(1, depth + 1, 1)])
             pool.close()
 
             # Check if time limit has been reached
-            if time.time() - start_time >= self.time_limit - 1:
+            if self.running_out_of_time(start_time):
                 pool.terminate()
                 break
             else:
                 pool.join()
 
             valid_results = [result for result in batch_results if result is not None]
-            if len(valid_results) != 0:
-                results = []
-                results.extend(valid_results)
+            results.extend(valid_results)
 
-            if valid_results:
-                v, best_state = self.combine_results(results)
+            v, best_state = self.combine_results(results)
 
-                # Return move immediately if it wins agent the game
-                if v == math.inf:
-                    break
+            # Return move immediately if it wins agent the game
+            if v == math.inf:
+                break
 
-                print(f"Depth {depth} Finished")
+            print(f"Depth {depth} Finished")
             depth += 1
 
         return best_state.get_move() if best_state is not None else None
 
-    def evaluate_subtree(self, game_state: GameState, depth: int):
-        print("Started Evaluating Chunk")
+    def evaluate_subtree(self, game_state: GameState, depth: int, start_time):
         transposition_table = {}
-        start_time = time.time()
 
-        v, result = self.max_move(game_state, -math.inf, math.inf, depth, transposition_table)
+        v, v_state = self.max_move(game_state, -math.inf, math.inf, depth, transposition_table, start_time)
 
-        return depth, v, result if time.time() - start_time < self.time_limit - 1 else None
+        return (v, v_state) if not self.running_out_of_time(start_time) else None
 
     @staticmethod
     def combine_results(depth_results):
+        print(depth_results)
         best_v, best_v_state = -math.inf, None
         for result in depth_results:
-            depth, v, v_state = result
+            v, v_state = result
             if v > best_v:
                 best_v, best_v_state = v, v_state
             if best_v == math.inf:
@@ -152,9 +148,15 @@ class AbaloneAgent(Player):
         """
         pass
 
-    def max_move(self, state: GameState, alpha, beta, distance: int, transposition_table):
+    def running_out_of_time(self, start_time):
+        if time.time() - start_time > self.time_limit - 1:
+            return True
+        return False
+
+    def max_move(self, state: GameState, alpha, beta, distance: int, transposition_table, start_time):
         """
         Calculate Best Black Move.
+        :param start_time: Time
         :param transposition_table:
         :param state: GameState
         :param alpha: White's Best Value (Int)
@@ -163,7 +165,7 @@ class AbaloneAgent(Player):
         :return: Tuple of Best Value and Best State for Black
         """
         # if Terminal Test state return Utility
-        if self.terminal_test(state) or distance <= 0:
+        if self.terminal_test(state) or distance <= 0 or self.running_out_of_time(start_time):
             return self.evaluation(state), state
 
         # Check if Position is in Transposition Table
@@ -176,10 +178,13 @@ class AbaloneAgent(Player):
         best_state = None
 
         # Decrement Distance if the move is your color
+        new_distance = distance - 1
+        """
         if self._color == state.get_current_move_color():
             new_distance = distance - 1
         else:
             new_distance = distance
+        """
 
         possible_moves = state.get_next_possible_moves()
 
@@ -189,7 +194,7 @@ class AbaloneAgent(Player):
                 child_state = state.generate_new_game_state(next(possible_moves))
 
                 # Get White's Best State
-                v, v_state = self.min_move(child_state, alpha, beta, new_distance, transposition_table)
+                v, v_state = self.min_move(child_state, alpha, beta, new_distance, transposition_table, start_time)
 
                 # Re-assign Best Value if White's Best State is better than the current Best State
                 if v > best_value:
@@ -197,7 +202,7 @@ class AbaloneAgent(Player):
                     best_state = child_state
 
                 # Prune Branch if White's Best State is better than current best White State
-                if best_value >= beta:
+                if best_value >= beta or self.running_out_of_time(start_time):
                     break
 
                 alpha = max(alpha, best_value)
@@ -208,9 +213,10 @@ class AbaloneAgent(Player):
         self.add_board_hash_to_transposition_table(best_state, best_value, transposition_table)
         return best_value, best_state
 
-    def min_move(self, state: GameState, alpha, beta, distance: int, transposition_table):
+    def min_move(self, state: GameState, alpha, beta, distance: int, transposition_table, start_time):
         """
         Calculate Best White Move
+        :param start_time: Time
         :param transposition_table:
         :param state: GameState
         :param alpha: White's Best Value (Int)
@@ -219,7 +225,7 @@ class AbaloneAgent(Player):
         :return: Tuple of Best Value and Best State for White
         """
         # if Terminal Test state return Utility
-        if self.terminal_test(state) or distance <= 0:
+        if self.terminal_test(state) or distance <= 0 or self.running_out_of_time(start_time):
             return self.evaluation(state), state
 
         # Check if Position is in Transposition Table
@@ -232,10 +238,13 @@ class AbaloneAgent(Player):
         best_state = None
 
         # Decrement Distance if the move is your color
+        new_distance = distance - 1
+        """
         if self._color == state.get_current_move_color():
             new_distance = distance - 1
         else:
             new_distance = distance
+        """
 
         possible_moves = state.get_next_possible_moves()
 
@@ -246,7 +255,7 @@ class AbaloneAgent(Player):
                 child_state = state.generate_new_game_state(move)
 
                 # Get Best Black State
-                v, v_state = self.max_move(child_state, alpha, beta, new_distance, transposition_table)
+                v, v_state = self.max_move(child_state, alpha, beta, new_distance, transposition_table, start_time)
 
                 # Re-assign Best Value if Black's Best State is better than the current Best State
                 if v < best_value:
@@ -254,7 +263,7 @@ class AbaloneAgent(Player):
                     best_state = child_state
 
                 # Prune Branch if Black's Best State is better than current best Black State
-                if best_value <= alpha:
+                if best_value <= alpha or self.running_out_of_time(start_time):
                     break
                 beta = min(beta, best_value)
             except StopIteration:
