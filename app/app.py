@@ -188,8 +188,6 @@ class App:
             self.gui.waiting_for_player_input = False
             self.timer.undo_move()
 
-
-
     def initialize_players(self, game_type: GameType, player_color: Marble, move_limit: int, black_time_limit: int,
                            white_time_limit: int, agent_level: AgentType):
         """
