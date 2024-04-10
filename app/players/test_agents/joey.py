@@ -42,11 +42,8 @@ class AgentJoey(AbaloneAgent):
         if self._current_move < 4:
             weights = [1000, 2, 10]
         # Mid-game
-        elif self._current_move < math.ceil(self.move_limit() * 0.75):
-            weights = [1000, 10, 2]
-        # End-game
         else:
-            weights = [10000, 20, 1]
+            weights = [1000, 10, 2]
 
         # Call Reward Functions to Calculate Toward Reward
         total_reward = self.number_of_pieces(state, weights[0], white_multiplier, black_multiplier)
