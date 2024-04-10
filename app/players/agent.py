@@ -64,7 +64,7 @@ class AbaloneAgent(Player):
 
     def calc_move(self, game_manager: GameManager) -> Move:
         start_time = time.time()
-        best_state = None
+        best_move = None
         depth = 1
         max_depth = self._move_limit - self._current_move
         results = []
@@ -78,8 +78,9 @@ class AbaloneAgent(Player):
                 break
 
             pool = multiprocessing.Pool(num_processes)
-            batch_results = pool.starmap(self.evaluate_subtree, [(current_game_state, distance, start_time)
-                                                                 for distance in range(1, depth + 1, 1)])
+            batch_results = pool.starmap(self.evaluate_subtree, [(game_state, distance, start_time)
+                                                                 for distance in range(1, depth + 1, 1)
+                                                                 for game_state in current_game_state.convert_moves_to_game_states()])
             pool.close()
 
             # Check if time limit has been reached
@@ -90,9 +91,8 @@ class AbaloneAgent(Player):
                 pool.join()
 
             valid_results = [result for result in batch_results if result is not None]
-            results.extend(valid_results)
 
-            v, best_state = self.combine_results(results)
+            v, best_move = self.combine_results(valid_results)
 
             # Return move immediately if it wins agent the game
             if v == math.inf:
@@ -101,26 +101,26 @@ class AbaloneAgent(Player):
             print(f"Depth {depth} Finished")
             depth += 1
 
-        return best_state.get_move() if best_state is not None else None
+        return best_move if best_move is not None else None
 
     def evaluate_subtree(self, game_state: GameState, depth: int, start_time):
         transposition_table = {}
 
-        v, v_state = self.max_move(game_state, -math.inf, math.inf, depth, transposition_table, start_time)
+        v, v_state = self.min_move(game_state, -math.inf, math.inf, depth, transposition_table, start_time)
 
-        return (v, v_state) if not self.running_out_of_time(start_time) else None
+        return (v, game_state.get_move()) if not self.running_out_of_time(start_time) else None
 
     @staticmethod
     def combine_results(depth_results):
-        best_v, best_v_state = -math.inf, None
+        best_v, best_v_move = -math.inf, None
         for result in depth_results:
-            v, v_state = result
+            v, v_move = result
             if v > best_v:
-                best_v, best_v_state = v, v_state
+                best_v, best_v_move = v, v_move
             if best_v == math.inf:
                 break
 
-        return best_v, best_v_state
+        return best_v, best_v_move
 
     @staticmethod
     def terminal_test(state: GameState) -> bool:
