@@ -178,12 +178,6 @@ class AbaloneAgent(Player):
 
         # Decrement Distance if the move is your color
         new_distance = distance - 1
-        """
-        if self._color == state.get_current_move_color():
-            new_distance = distance - 1
-        else:
-            new_distance = distance
-        """
 
         possible_moves = state.get_next_possible_moves()
 
@@ -238,12 +232,6 @@ class AbaloneAgent(Player):
 
         # Decrement Distance if the move is your color
         new_distance = distance - 1
-        """
-        if self._color == state.get_current_move_color():
-            new_distance = distance - 1
-        else:
-            new_distance = distance
-        """
 
         possible_moves = state.get_next_possible_moves()
 
