@@ -39,7 +39,7 @@ class AgentJoey(AbaloneAgent):
 
         # List of Weights on Heuristic Functions
         # Opening
-        if self._current_move < 4:
+        if self._current_move < math.ceil(self.move_limit() * 0.25):
             weights = [1000, 2, 10]
         # Mid-game
         elif self._current_move < math.ceil(self.move_limit() * 0.75):
