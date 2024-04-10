@@ -112,7 +112,6 @@ class AbaloneAgent(Player):
 
     @staticmethod
     def combine_results(depth_results):
-        print(depth_results)
         best_v, best_v_state = -math.inf, None
         for result in depth_results:
             v, v_state = result
