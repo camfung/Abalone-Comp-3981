@@ -67,7 +67,6 @@ class AbaloneAgent(Player):
         best_move = None
         depth = 1
         max_depth = self._move_limit - self._current_move
-        results = []
 
         num_processes = multiprocessing.cpu_count()
         current_game_state = game_manager.get_current_game_state()
