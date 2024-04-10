@@ -1,8 +1,11 @@
+
 import math
 import threading
 import time
 
-import pygame_menu
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame_menu
 
 from app.api.enums import Marble
 from app.players.agent import AbaloneAgent

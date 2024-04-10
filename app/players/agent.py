@@ -1,3 +1,4 @@
+
 import abc
 import datetime
 import math
@@ -20,18 +21,6 @@ class AbaloneAgent(Player):
 
     def __init__(self, time_limit: int, move_limit: int, color: Marble):
         super().__init__(time_limit, move_limit, color)
-        self.subtrees = None
-        self.terminated = False
-        self.result_ready_event = multiprocessing.Event()
-
-    def internal_timer(self):
-        time_left = self.time_limit - 1
-        while time_left > 0:
-            time_left -= 1
-            time.sleep(1)
-        print("Running out of time. Terminating all processes.")
-        self.terminated = True
-        self.result_ready_event.set()
 
     def generate_move(self, game_manager: GameManager, timer: Timer):
         """
@@ -56,30 +45,6 @@ class AbaloneAgent(Player):
         time_delta = final_time - initial_time
         return move, time_delta.total_seconds()
 
-    @staticmethod
-    def split_list(lst, num_splits):
-        """
-        Splits a list into a given number of approximately equal-sized parts.
-
-        Args:
-        lst (list): The list to be split.
-        num_splits (int): The number of parts to split the list into.
-
-        Returns:
-        list of lists: A list containing 'num_splits' sublists.
-        """
-        # Calculate the length of each part
-        part_size = len(lst) // num_splits
-        remainder = len(lst) % num_splits
-
-        # Calculate the end indices for each part
-        end_indices = [part_size * (i + 1) + min(i, remainder) for i in range(num_splits)]
-
-        # Use list comprehension to split the list
-        split_list_result = [lst[start:end_indices[i]] for i, start in enumerate([0] + end_indices[:-1])]
-
-        return split_list_result
-
     def make_move(self, game_manager: GameManager, player: Marble, move: Move, timestamp: float) -> None:
         """
         Commits a move made by the AI agent to the game manager, simulating a delay before making the move.
@@ -98,75 +63,68 @@ class AbaloneAgent(Player):
         game_manager.commit_move(player, move, timestamp)
 
     def calc_move(self, game_manager: GameManager) -> Move:
-        self.terminated = False
+        start_time = time.time()
         best_state = None
-        max_range = self._move_limit - self._current_move
+        depth = 1
+        max_depth = self._move_limit - self._current_move
+        results = []
 
-        num_processes = multiprocessing.cpu_count()
+        num_processes = multiprocessing.cpu_count() - 1
+        current_game_state = game_manager.get_current_game_state()
 
-        self.subtrees = self.split_list(game_manager.get_possible_game_states(), num_processes)
+        while depth <= max_depth:
+            # Check if time limit has been reached
+            if time.time() - start_time >= self.time_limit - 1:
+                break
 
-        pool = multiprocessing.Pool(num_processes)
-        timer_thread = multiprocessing.Process(target=self.internal_timer)
-        timer_thread.start()
+            pool = multiprocessing.Pool(num_processes)
+            batch_results = pool.starmap(self.evaluate_subtree, [(current_game_state, distance)
+                                                                 for distance in range(1, depth + 1, 1)])
+            pool.close()
 
-        for distance in range(0, max_range + 1, 1):
-            print(f"Distance: {distance}")
-            results = pool.map(self.evaluate_subtree, [(subtree, distance) for subtree in self.subtrees])
-
-            self.result_ready_event.wait()
-
-            print("Something happened.")
-
-            if self.terminated:
+            # Check if time limit has been reached
+            if time.time() - start_time >= self.time_limit - 1:
                 pool.terminate()
+                break
+            else:
                 pool.join()
-                break
 
-            pool.join()
+            valid_results = [result for result in batch_results if result is not None]
+            if len(valid_results) != 0:
+                results = []
+                results.extend(valid_results)
 
-            print(f"\nFinished Distance {distance}")
-            print(results)
+            if valid_results:
+                v, best_state = self.combine_results(results)
 
-            v, best_state = self.combine_results(results)
-            print(f"Current Best Move: [{v}, {str(best_state.get_move())}]")
+                # Return move immediately if it wins agent the game
+                if v == math.inf:
+                    break
 
-            # Return move immediately if it wins agent the game
-            if v == math.inf:
-                break
-
-        self.terminated = False
+                print(f"Depth {depth} Finished")
+            depth += 1
 
         return best_state.get_move() if best_state is not None else None
 
-    def evaluate_subtree(self, sub_tree_list, depth: int):
+    def evaluate_subtree(self, game_state: GameState, depth: int):
         print("Started Evaluating Chunk")
         transposition_table = {}
+        start_time = time.time()
 
-        results = []
-        for sub_tree in sub_tree_list:
-            v, v_state = self.min_move(sub_tree, -math.inf, math.inf, depth, transposition_table)
-            results.append((v, v_state))
-            print(f"Evaluate Subtree: [{v}, {str(v_state.get_move())}]")
+        v, result = self.max_move(game_state, -math.inf, math.inf, depth, transposition_table)
 
-        print("Finished Evaluating Subtrees.")
-        best_result = self.combine_results(results)
-        self.result_ready_event.set()
-        print("Finished Combining the Subtree result. Wrapping up now.")
-        return best_result
+        return depth, v, result if time.time() - start_time < self.time_limit - 1 else None
 
     @staticmethod
-    def combine_results(results):
-        print("Combining Results...")
+    def combine_results(depth_results):
         best_v, best_v_state = -math.inf, None
-        for result in results:
-            v, v_state = result
+        for result in depth_results:
+            depth, v, v_state = result
             if v > best_v:
                 best_v, best_v_state = v, v_state
             if best_v == math.inf:
                 break
 
-        print(f"Finished Combining Results: [{best_v}, {str(best_v_state.get_move())}]")
         return best_v, best_v_state
 
     @staticmethod
