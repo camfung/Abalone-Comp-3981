@@ -1,6 +1,7 @@
 import math
 
 from app.api.enums import Marble, Direction
+from app.gameplay.game_state import GameState
 from app.players.agent import AbaloneAgent
 
 """
@@ -53,7 +54,8 @@ class AgentJoey(AbaloneAgent):
 
         return total_reward
 
-    def win_condition(self, state, white_multiplier, black_multiplier):
+    @staticmethod
+    def win_condition(state: GameState, white_multiplier, black_multiplier):
         """
         Returns Infinity if a player wins by playing the move.
         :param black_multiplier: 1 or -1
