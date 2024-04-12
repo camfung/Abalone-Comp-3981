@@ -7,8 +7,6 @@ from app.api.enums import Marble
 class Timer:
 
     def __init__(self):
-        self._white_check_time = None
-        self._black_check_time = None
         self._black_total_aggregate_time = 0
         self._white_total_aggregate_time = 0
 
@@ -97,8 +95,4 @@ class Timer:
 
     def get_black_aggregate_time(self):
         return self._black_total_aggregate_time
-
-    @property
-    def game_started(self):
-        return self._game_started
 
