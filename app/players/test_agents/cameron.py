@@ -103,7 +103,7 @@ class AgentCameron(AbaloneAgent):
         for (row, col), marble in board_dict.items():
             if marble == Marble.WHITE:
                 board_dict[(row, col)] = Marble.NONE
-        marble_cohesion = self.calculate_cohesion(board_dict, state._board)
+        marble_cohesion = self.calculate_cohesion(board_dict)
         distance_to_center = self.calculate_manhattan_distance_to_center(
             board_dict)
 

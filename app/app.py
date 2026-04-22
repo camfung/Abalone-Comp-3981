@@ -39,8 +39,6 @@ class App:
         self.game_manager.join_room(self.gui)
 
     def notify(self, sender, event, **kwargs):
-        thread = threading.Thread(
-            target=self.notify, args=(self, "ThreadedAiMakeMove"))
         """
         Handles notifications sent from different parts of the application,
         acting upon various events like starting the game, making moves, undoing moves, and querying game state.
@@ -83,12 +81,8 @@ class App:
             # if the first player to move is an agent make the move
             self.gui.run_game()
         if event == "AiMakeMove":
-            """
-            Triggers the AI agent to calculate and make a move. This event is called when it's the AI's turn to play.
-
-            No specific parameters are required for this event 
-            as the AI's decision-making process is internal and based on the current game state.
-            """
+            thread = threading.Thread(
+                target=self.notify, args=(self, "ThreadedAiMakeMove"))
             thread.start()
 
         if event == "ThreadedAiMakeMove":
@@ -101,8 +95,6 @@ class App:
                     player.make_move(self.game_manager,
                                     player.color, move, timestamp=time_stamp)
                     self.gui.start_button_clicked = True
-            if thread.is_alive():
-                thread.join()
             if not self.timer.paused:
                 self.timer.current_turn_start_time = time.time()
                 self.timer._elapsed_time = time.time()
@@ -227,6 +219,8 @@ class App:
 
                 if agent_level == AgentType.ABALONE_AGENT:
                     return [AbaloneAgent(black_time_limit, move_limit, Marble.BLACK), human_player]
+                elif agent_level == AgentType.RANDOM_AGENT:
+                    return [RandomAgent(black_time_limit, move_limit, Marble.BLACK), human_player]
                 elif agent_level == AgentType.AGENT_CAMERON:
                     return [AgentCameron(black_time_limit, move_limit, Marble.BLACK), human_player]
                 elif agent_level == AgentType.AGENT_CALLUM:

@@ -19,6 +19,10 @@ if %errorlevel% neq 0 (
     )
 )
 
+:: Clean previous dist output
+if exist dist\Abalone_Game     rmdir /s /q dist\Abalone_Game
+if exist dist\Abalone_Game.exe del /q dist\Abalone_Game.exe
+
 :: Build executable
 echo [1/2] Building executable with PyInstaller...
 %PYTHON% -m PyInstaller installer\Abalone_Game.spec ^

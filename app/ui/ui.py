@@ -12,6 +12,7 @@ with contextlib.redirect_stdout(None):
 from app.api.enums import Formation
 from app.ui.board import Board
 from app.ui.hud import HUD, RecordMenu
+from app.resource_path import resource_path
 
 
 class UI(ABC):
@@ -67,7 +68,7 @@ class PygameUI(UI):
         - app: A reference to the main application object, used for callback notifications.
         """
         super().__init__()
-        iconSurface = pygame.image.load('app/images/icon.png')
+        iconSurface = pygame.image.load(resource_path('app/images/icon.png'))
         pygame.display.set_icon(iconSurface)
         self.theme = pygame_menu.themes.THEME_DARK
         self.screen = pygame.display.set_mode(

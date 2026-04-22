@@ -114,7 +114,7 @@ class AgentElsa(AbaloneAgent):
 
         weight = [25, 75, 100]
 
-        return (center_distance * weight[0]) + (edge_distance * weight[1] + (num_balls * weight[2]))
+        return (center_distance * weight[0]) + (edge_distance * weight[1]) + (num_balls * weight[2])
 
 
 
