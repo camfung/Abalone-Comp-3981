@@ -5,68 +5,46 @@
 - Callum Goss (A01328294)
 - Joseph Driedger (A01320740)
 
-## How to Run the Game on the BCIT Lab Computer
-1. **Run Python on Apps Anywhere**
-2. **Unzip the zip file**
-3. **Navigate to the /dist folder and run Abalone_Group2.exe**
-   - Ignore the security warnings that pop up and click "run anyways"
+## Running the Game (pre-built)
 
-## How to Run the State Space Generator on the BCIT Lab Computer
-1. **Run Python on Apps Anywhere**
-2. **Download and Unzip the zip file**
-3. **Navigate to \test\player\state_space_test\dist folder and run filescriber.exe**
-- Ignore the security warnings that pop up and run anyways
-4. **Ensure the input file is in the same directory.  The program will prompt you to enter the name of the input file.  The output files will be in the same directory.**
+1. Unzip the zip file
+2. Open the `Abalone_Game` folder
+3. Run `Abalone_Game.exe`
+   - If a Windows security warning appears, click **More info → Run anyway**
 
-## How to Run on any computer
+## Building from Source
 
-Follow these steps to set up and run the program:
+### Prerequisites
 
-1. **Create a Virtual Environment:**
-    - Run the following command to create a virtual environment:
-        ```bash
-        python -m venv venv
-        ```
+- Python 3.11
+- [Inno Setup 6](https://jrsoftware.org/isinfo.php) *(optional — only needed to produce a `.exe` installer)*
 
-2. **Activate the Virtual Environment:**
-    - On Windows:
-        ```bash
-        .\venv\Scripts\activate.bat
-        ```
-    - On Unix:
-        - Provide execute permissions to the activate script:
-            ```bash
-            chmod u+x venv/bin/activate
-            ```
-        - Activate the virtual environment:
-            ```bash
-            source venv/bin/activate
-            ```
+### Install dependencies
 
-3. **Install Dependencies:**
-    - Run the following command to install the required dependencies:
-        ```bash
-        pip install -r requirements.txt
-        pip install pyinstaller
-        ```
+```bat
+pip install -r requirements.txt
+pip install pyinstaller
+```
 
-4. **Export Python Driver to Executable File:**
-    - Execute the program using the following command:
-        ```
-        pyinstaller --onefile driver.py --name Abalone_Group2 --noconsole
-        ```
+### Build
 
-5. **Copy assets to correct**
-    - Create a new folder called app inside ./dist
-    - Copy the following folders into ./dist/app
-        - formations
-        - gameplay
-        - images
+Run from the project root:
 
-6. **Run the program and Have Fun.**
-    - Open the dist directory
-    - Open Abalone_Group2.exe
-  
+```bat
+installer\build.bat
+```
+
+This produces:
+- `dist\Abalone_Game\` — standalone folder (zip this to share the game)
+- `dist\installer\Abalone_Game_Setup.exe` — Windows installer *(if Inno Setup is installed)*
+
+### Run from source (no build)
+
+```bat
+python -m venv venv
+.\venv\Scripts\activate.bat
+pip install -r requirements.txt
+python driver.py
+```
+
 ![Screenshot](docs/diagram.png)
-
-
