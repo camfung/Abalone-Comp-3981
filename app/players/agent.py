@@ -104,8 +104,9 @@ class AbaloneAgent(Player):
 
     def evaluate_subtree(self, game_state: GameState, depth: int, start_time):
         transposition_table = {}
+        killer_moves = {}
 
-        v, v_state = self.min_move(game_state, -math.inf, math.inf, depth, transposition_table, start_time)
+        v, v_state = self.min_move(game_state, -math.inf, math.inf, depth, transposition_table, start_time, killer_moves)
 
         return (v, game_state.get_move()) if not self.running_out_of_time(start_time) else None
 
@@ -151,113 +152,117 @@ class AbaloneAgent(Player):
             return True
         return False
 
-    def max_move(self, state: GameState, alpha, beta, distance: int, transposition_table, start_time):
+    def max_move(self, state: GameState, alpha, beta, distance: int, transposition_table, start_time, killer_moves):
         """
         Calculate Best Black Move.
         :param start_time: Time
         :param transposition_table:
+        :param killer_moves: dict mapping depth -> list of moves that caused beta cutoffs
         :param state: GameState
         :param alpha: White's Best Value (Int)
         :param beta: Black's Best Value (Int)
         :param distance: Iterative Deepening Distance (Int)
         :return: Tuple of Best Value and Best State for Black
         """
-        # if Terminal Test state return Utility
         if self.terminal_test(state) or distance <= 0 or self.running_out_of_time(start_time):
             return self.evaluation(state), state
 
-        # Check if Position is in Transposition Table
         v, v_state = self.board_value_in_transposition_table(state.get_board(), transposition_table)
         if (v, v_state) != (None, None):
             return v, state
 
-        # Assign Lowest Value
         best_value = -math.inf
         best_state = None
-
-        # Decrement Distance if the move is your color
         new_distance = distance - 1
 
-        possible_moves = state.get_next_possible_moves()
+        killer_keys = {self._move_key(k) for k in killer_moves.get(distance, [])}
+        for move, child_state in self._get_ordered_children(state, killer_keys, maximize=True):
+            v, v_state = self.min_move(child_state, alpha, beta, new_distance, transposition_table, start_time, killer_moves)
 
-        # Check each possible state from current game state
-        while True:
-            try:
-                child_state = state.generate_new_game_state(next(possible_moves))
+            if v > best_value:
+                best_value = v
+                best_state = child_state
 
-                # Get White's Best State
-                v, v_state = self.min_move(child_state, alpha, beta, new_distance, transposition_table, start_time)
-
-                # Re-assign Best Value if White's Best State is better than the current Best State
-                if v > best_value:
-                    best_value = v
-                    best_state = child_state
-
-                # Prune Branch if White's Best State is better than current best White State
-                if best_value >= beta or self.running_out_of_time(start_time):
-                    break
-
-                alpha = max(alpha, best_value)
-            except StopIteration:
+            if best_value >= beta or self.running_out_of_time(start_time):
+                self._store_killer(killer_moves, distance, move)
                 break
 
-        # Add Best State to Transposition Table
+            alpha = max(alpha, best_value)
+
         self.add_board_hash_to_transposition_table(best_state, best_value, transposition_table)
         return best_value, best_state
 
-    def min_move(self, state: GameState, alpha, beta, distance: int, transposition_table, start_time):
+    def min_move(self, state: GameState, alpha, beta, distance: int, transposition_table, start_time, killer_moves):
         """
-        Calculate Best White Move
+        Calculate Best White Move.
         :param start_time: Time
         :param transposition_table:
+        :param killer_moves: dict mapping depth -> list of moves that caused alpha cutoffs
         :param state: GameState
         :param alpha: White's Best Value (Int)
         :param beta: Black's Best Value (Int)
         :param distance: Iterative Deepening Distance (Int)
         :return: Tuple of Best Value and Best State for White
         """
-        # if Terminal Test state return Utility
         if self.terminal_test(state) or distance <= 0 or self.running_out_of_time(start_time):
             return self.evaluation(state), state
 
-        # Check if Position is in Transposition Table
         v, v_state = self.board_value_in_transposition_table(state.get_board(), transposition_table)
         if (v, v_state) != (None, None):
             return v, state
 
-        # Assign Highest Value
         best_value = math.inf
         best_state = None
-
-        # Decrement Distance if the move is your color
         new_distance = distance - 1
 
-        possible_moves = state.get_next_possible_moves()
+        killer_keys = {self._move_key(k) for k in killer_moves.get(distance, [])}
+        for move, child_state in self._get_ordered_children(state, killer_keys, maximize=False):
+            v, v_state = self.max_move(child_state, alpha, beta, new_distance, transposition_table, start_time, killer_moves)
 
-        # Check each possible state from current game state
-        while True:
-            try:
-                move = next(possible_moves)
-                child_state = state.generate_new_game_state(move)
+            if v < best_value:
+                best_value = v
+                best_state = child_state
 
-                # Get Best Black State
-                v, v_state = self.max_move(child_state, alpha, beta, new_distance, transposition_table, start_time)
-
-                # Re-assign Best Value if Black's Best State is better than the current Best State
-                if v < best_value:
-                    best_value = v
-                    best_state = child_state
-
-                # Prune Branch if Black's Best State is better than current best Black State
-                if best_value <= alpha or self.running_out_of_time(start_time):
-                    break
-                beta = min(beta, best_value)
-            except StopIteration:
+            if best_value <= alpha or self.running_out_of_time(start_time):
+                self._store_killer(killer_moves, distance, move)
                 break
 
-        # Add Best State to Transposition Table
+            beta = min(beta, best_value)
+
         self.add_board_hash_to_transposition_table(best_state, best_value, transposition_table)
         return best_value, best_state
+
+    def _get_ordered_children(self, state: GameState, killer_keys: set, maximize: bool):
+        """
+        Generate all child states, score each with the evaluation heuristic, and return
+        (move, child_state) pairs ordered so the most-promising moves come first.
+        Killer moves (those that caused cutoffs in sibling nodes) are always tried first.
+        """
+        killers = []
+        others = []
+        for move in state.generate_possible_moves():
+            child = state.generate_new_game_state(move)
+            score = self.evaluation(child)
+            if self._move_key(move) in killer_keys:
+                killers.append((score, move, child))
+            else:
+                others.append((score, move, child))
+
+        others.sort(key=lambda x: x[0], reverse=maximize)
+        return [(m, c) for _, m, c in killers + others]
+
+    @staticmethod
+    def _move_key(move):
+        return (move.get_pos_i(), move.get_direction(), move.get_marble())
+
+    @staticmethod
+    def _store_killer(killer_moves, depth, move):
+        killers = killer_moves.setdefault(depth, [])
+        key = AbaloneAgent._move_key(move)
+        if key not in [AbaloneAgent._move_key(k) for k in killers]:
+            killers.insert(0, move)
+            if len(killers) > 2:
+                killers.pop()
 
     @staticmethod
     def add_board_hash_to_transposition_table(state, value, transposition_table):

@@ -4,8 +4,8 @@ with contextlib.redirect_stdout(None):
     import pygame
 from app.api.enums import Marble
 from app.ui.pi_handler import PlayerInputHandler
-
 from app.ui.ui_components import Drawable, EventHandler
+from app.resource_path import resource_path
 
 
 class Board(Drawable, EventHandler):
@@ -121,7 +121,7 @@ class Board(Drawable, EventHandler):
             clicks = []
 
         background_image = pygame.image.load(
-            "./app/images/Numbered_Board.png", "rb")
+            resource_path("app/images/Numbered_Board.png"))
         background_image = pygame.transform.scale(
             background_image, (1000, 1000))
         background_image = pygame.transform.scale(
@@ -133,17 +133,17 @@ class Board(Drawable, EventHandler):
                 if game_manager[row][col] == Marble.BLACK:
                     if (row, col) in clicks:
                         ball_image = pygame.image.load(
-                            "./app/images/dark_black_ball.png")
+                            resource_path("app/images/dark_black_ball.png"))
                     else:
                         ball_image = pygame.image.load(
-                            "./app/images/black_ball.png")
+                            resource_path("app/images/black_ball.png"))
                 elif game_manager[row][col] == Marble.WHITE:
                     if (row, col) in clicks:
                         ball_image = pygame.image.load(
-                            "./app/images/dark_white_ball.png")
+                            resource_path("app/images/dark_white_ball.png"))
                     else:
                         ball_image = pygame.image.load(
-                            "./app/images/white_ball.png")
+                            resource_path("app/images/white_ball.png"))
                 else:
                     continue
 

@@ -4,7 +4,7 @@ from app.api.records import RecordHistory
 from app.api.exceptions import InvalidMarbleValue
 import csv
 from app.gameplay.game_state import GameState
-from pathlib import Path
+from app.resource_path import resource_path
 
 
 class Game:
@@ -43,18 +43,15 @@ class Game:
         csv_reader = None
 
         if formation == Formation.DEFAULT:
-            file_path = Path('./app/formations/default.csv').resolve()
-            file = open(file_path, 'r')
+            file = open(resource_path('app/formations/default.csv'), 'r')
             csv_reader = csv.reader(file, delimiter=',')
 
         elif formation == Formation.BELGIAN_DAISY:
-            file_path = Path('./app/formations/belgian_daisy.csv').resolve()
-            file = open(file_path, 'r')
+            file = open(resource_path('app/formations/belgian_daisy.csv'), 'r')
             csv_reader = csv.reader(file, delimiter=',')
 
         elif formation == Formation.GERMAN_DAISY:
-            file_path = Path('./app/formations/german_daisy.csv').resolve()
-            file = open(file_path, 'r')
+            file = open(resource_path('app/formations/german_daisy.csv'), 'r')
             csv_reader = csv.reader(file, delimiter=',')
 
         for row in csv_reader:
